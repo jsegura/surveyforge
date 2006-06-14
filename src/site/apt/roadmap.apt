@@ -1,0 +1,20 @@
+                -----
+                SurveyForge - Road Map
+                -----
+                $Author$
+                -----
+                $Date$
+
+Current status
+
+    <<SurveyForge>> is in planning phase, and we hope to release some files real soon.
+    
+Where are we going?
+
+    Here is a rough planning of future versions:
+    
+    * <<0.1>> - Core library supporting classifications, survey metadata and data.
+    
+    * <<0.2>> - Basic survey runner providing minimal functionality for running surveys.
+    
+    * <<0.3>> - TBD

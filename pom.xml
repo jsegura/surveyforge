@@ -1,0 +1,148 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.surveyforge</groupId>
+  <artifactId>surveyforge</artifactId>
+  <packaging>pom</packaging>
+  <name>SurveyForge</name>
+  <version>0.1-SNAPSHOT</version>
+  <url>http://www.surveyforge.org/</url>
+  <issueManagement>
+    <system>SourceForge issue management system</system>
+    <url>http://sourceforge.net/tracker/?group_id=169885</url>
+  </issueManagement>
+  <ciManagement>
+    <system>No countinous integration management yet</system>
+    <url>http://www.surveyforge.org/</url>
+    <notifiers>
+      <notifier>
+        <type>Unknown</type>
+        <address>DEPRECATED</address>
+      </notifier>
+    </notifiers>
+  </ciManagement>
+  <inceptionYear>2006</inceptionYear>
+  <mailingLists>
+    <mailingList>
+      <name>SurveyForge users list</name>
+      <subscribe>surveyforge-user-subscribe@lists.sourceforge.net</subscribe>
+      <unsubscribe>surveyforge-user-unsubscribe@lists.sourceforge.net</unsubscribe>
+      <post>surveyforge-user@lists.sourceforge.net</post>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum=surveyforge-user</archive>
+    </mailingList>
+    <mailingList>
+      <name>SurveyForge developers list</name>
+      <subscribe>surveyforge-devel-subscribe@lists.sourceforge.net</subscribe>
+      <unsubscribe>surveyforge-devel-unsubscribe@lists.sourceforge.net</unsubscribe>
+      <post>surveyforge-devel@lists.sourceforge.net</post>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum=surveyforge-devel</archive>
+    </mailingList>
+    <mailingList>
+      <name>SurveyForge svn commit list</name>
+      <subscribe>surveyforge-svn-subscribe@lists.sourceforge.net</subscribe>
+      <unsubscribe>surveyforge-svn-unsubscribe@lists.sourceforge.net</unsubscribe>
+      <post>surveyforge-svn@lists.sourceforge.net</post>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum=surveyforge-svn</archive>
+    </mailingList>
+  </mailingLists>
+  <developers>
+    <developer>
+      <id>jgongo</id>
+      <name>José González Gómez</name>
+      <email>jgongo@users.sourceforge.net</email>
+      <url>http://sourceforge.net/users/jgongo/</url>
+      <organization>OPEN input</organization>
+      <organizationUrl>http://www.openinput.com/</organizationUrl>
+      <roles>
+        <role>Creator</role>
+      </roles>
+      <timezone>1</timezone>
+    </developer>
+    <developer>
+      <id>javism</id>
+      <name>Javier Segura Martínez</name>
+      <email>javism@users.sourceforge.net</email>
+      <url>http://sourceforge.net/users/javism/</url>
+      <roles>
+        <role>Creator</role>
+      </roles>
+      <timezone>1</timezone>
+    </developer>
+  </developers>
+  <licenses>
+    <license>
+      <name>GNU General Public License (GPL)</name>
+      <url>LICENSE.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <connection>scm:svn:https://svn.sourceforge.net/svnroot/surveyforge</connection>
+    <developerConnection>scm:svn:https://svn.sourceforge.net/svnroot/surveyforge</developerConnection>
+    <url>http://svn.sourceforge.net/viewcvs.cgi/surveyforge/</url>
+  </scm>
+  <organization>
+    <name>OPEN input</name>
+    <url>http://www.openinput.com/</url>
+  </organization>
+  <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh-external</artifactId>
+        <version>1.0-alpha-6</version>
+      </extension>
+    </extensions>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <tagBase>https://svn.sourceforge.net/svnroot/surveyforge/tags</tagBase>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <modules>
+    <!-- <module>surveyforge-core</module> -->
+  </modules>
+  <reporting>
+    <plugins>
+      <plugin>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>dependencies</report>
+              <report>mailing-list</report>
+              <report>scm</report>
+              <report>issue-tracking</report>
+              <report>license</report>
+              <report>project-team</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
+  <distributionManagement>
+    <repository>
+      <uniqueVersion>false</uniqueVersion>
+      <id>surveyforge.org</id>
+      <name>SurveyForge Maven2 repository</name>
+      <url>scp://surveyforge.org/home/surveyforge/surveyforge.org/html/maven2</url>
+    </repository>
+    <site>
+      <id>surveyforge.org</id>
+      <name>SurveyForge development web</name>
+      <url>scp://surveyforge.org/home/surveyforge/surveyforge.org/html</url>
+    </site>
+    <downloadUrl>http://sourceforge.net/project/showfiles.php?group_id=169885</downloadUrl>
+  </distributionManagement>
+</project>
