@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.surveyforge</groupId>
@@ -47,7 +48,7 @@
   <developers>
     <developer>
       <id>jgongo</id>
-      <name>JosÈ Gonz·lez GÛmez</name>
+      <name>Jos√© Gonz√°lez G√≥mez</name>
       <email>jgongo@users.sourceforge.net</email>
       <url>http://sourceforge.net/users/jgongo/</url>
       <organization>OPEN input</organization>
@@ -59,7 +60,7 @@
     </developer>
     <developer>
       <id>javism</id>
-      <name>Javier Segura MartÌnez</name>
+      <name>Javier Segura Mart√≠nez</name>
       <email>javism@users.sourceforge.net</email>
       <url>http://sourceforge.net/users/javism/</url>
       <roles>
@@ -110,7 +111,8 @@
     </plugins>
   </build>
   <modules>
-    <!-- <module>surveyforge-core</module> -->
+    <module>surveyforge-classification</module>
+    <module>surveyforge-core</module>
   </modules>
   <reporting>
     <plugins>
@@ -131,6 +133,30 @@
       </plugin>
     </plugins>
   </reporting>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.surveyforge</groupId>
+        <artifactId>surveyforge-classification</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.surveyforge</groupId>
+        <artifactId>surveyforge-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+        <version>1.0.4</version>
+      </dependency>
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.13</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <distributionManagement>
     <repository>
       <uniqueVersion>false</uniqueVersion>
