@@ -114,6 +114,14 @@
     <module>surveyforge-classification</module>
     <module>surveyforge-core</module>
   </modules>
+  <repositories>
+    <repository>
+      <id>java.net</id>
+      <name>Java.net Maven Repository</name>
+      <url>https://maven-repository.dev.java.net/nonav/repository/</url>
+      <layout>legacy</layout>
+    </repository>
+  </repositories>
   <reporting>
     <plugins>
       <plugin>
@@ -154,6 +162,11 @@
         <groupId>log4j</groupId>
         <artifactId>log4j</artifactId>
         <version>1.2.13</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.persistence</groupId>
+        <artifactId>persistence-api</artifactId>
+        <version>1.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
