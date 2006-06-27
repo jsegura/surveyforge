@@ -79,7 +79,7 @@
   <scm>
     <connection>scm:svn:https://svn.sourceforge.net/svnroot/surveyforge/trunk/</connection>
     <developerConnection>scm:svn:https://svn.sourceforge.net/svnroot/surveyforge/trunk/</developerConnection>
-    <url>http://svn.sourceforge.net/viewcvs.cgi/surveyforge/</url>
+    <url>http://svn.sourceforge.net/viewcvs.cgi/surveyforge/trunk/</url>
   </scm>
   <organization>
     <name>OPEN input</name>
