@@ -1,0 +1,21 @@
+                -----
+                SurveyForge Classification - Introduction
+                -----
+                $Author$
+                -----
+                $Date$
+
+What is SurveyForge Classification?
+
+    SurveyForge Classification is the core API within the SurveyForge project providing support for 
+    classifications. A classification is a concept commonly used in statistical applications used
+    to categorize possible values for a variable. Think of a typical survey with a question asking
+    for the sex of the respondent. You may answer here male of female. Each of both answers is a
+    category in the sex classification (Keep in mind this is a very simplistic example of a 
+    classification, and the API is much richer than this).
+    
+    All the concepts, objects types and attributes are taken from the excellent work done by the
+    Neuchâtel Group in their paper, version 2. Our intention is to provide a complete implementation
+    of the paper, but right now we just implement the core concepts needed to support classifications
+    (Family, Classfication, Version, Level and Item).
+    

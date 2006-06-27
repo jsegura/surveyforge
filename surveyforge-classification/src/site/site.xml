@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="SurveyForge Classification API">
+  <body>
+    <menu ref="parent" />
+    <menu name="SurveyForge Classification API">
+      <item name="Introduction" href="index.html"/>
+    </menu>
+    <menu ref="reports" />
+  </body>
+</project>
