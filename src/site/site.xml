@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="SurveyForge">
+  <skin>
+    <groupId>org.surveyforge</groupId>
+    <artifactId>surveyforge-style</artifactId>
+    <version>0.1-SNAPSHOT</version>
+  </skin>
   <bannerLeft>
     <name>SurveyForge</name>
     <src>images/surveyforge-logo.png</src>

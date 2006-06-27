@@ -9,30 +9,31 @@ What is SurveyForge?
 
     SurveyForge is a survey definition and execution tool providing the following:
     
-    [[1]] <<surveyforge core>> - A set of core classes that may be used programatically 
-    to be embedded in any application, letting you to work with classifications, define
-    surveys using metadata and working with survey data.
+    [[1]] <<surveyforge classification>> - A set of classes providing support for classifications.
     
-    [[2]] <<surveyforge designer>> - A GUI application that will let you define surveys.
+    [[2]] <<surveyforge core>> - A set of core classes that may be used programatically 
+    to be embedded in any application, letting you define surveys using metadata and working with survey data.
     
-    [[3]] <<surveyforge runner>> - A tool to run surveys.
+    [[3]] <<surveyforge designer>> - A GUI application that will let you define surveys.
+    
+    [[4]] <<surveyforge runner>> - A tool to run surveys.
     
 Why another survey tool?
 
     SurveyForge tries to provide some features that we found lacking at some of the most popular survey tools:
 
     [[1]] The intended audience of <<SurveyForge>> will be statisticians wanting to run a survey and possibly 
-    performing themselves the data entry process. Most of the tools currently available are oriented to running 
+    performing themselves the data entry process. Most of the currently available tools are oriented to running 
     a survey on the web with respondents directly filling in the questionnaire
 
-    [[2]] <<SurveyForge>> will make special emphasis on data entry. Most (all?) of the tools available just show 
+    [[2]] <<SurveyForge>> will make special emphasis on data entry. Most (all?) of the available tools just show 
     a standard HTML interface. This may be suitable for a single respondent filling in a single questionnaire, 
     but unsuitable for massive data entry.
 
-    [[3]] <<SurveyForge>> will make use of existing standards. Very few (none?) of the tools available make use 
+    [[3]] <<SurveyForge>> will make use of existing standards. Very few (none?) of the available tools make use 
     of standards for survey interchange ({{{http://www.triple-s.org/}Triple-S}}, {{{http://www.icpsr.umich.edu/DDI/}DDI}})
 
     [[4]] <<SurveyForge>> will provide tools for reuse of standard (or not) classifications. Very few (none?) of 
-    the tools available provide functionality for loading and reusing standard classifications used in statistics 
+    the available tools provide functionality for loading and reusing standard classifications used in statistics 
     (for example, {{{http://www.who.int/classifications/icd/}International Disease Classification (IDC)}} for 
     medical surveys), or even for defining classifications to be reused across surveys in a organization
