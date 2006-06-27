@@ -1,0 +1,13 @@
+                -----
+                SurveyForge Core - Introduction
+                -----
+                $Author$
+                -----
+                $Date$
+
+What is SurveyForge Core?
+
+    SurveyForge Core is the core API within the SurveyForge project providing support for 
+    survey metadata and data. The main goal of this package is to provide a core API to manage 
+    description of surveys (survey metadata) and reponses to questionnaires (survey data).
+    
