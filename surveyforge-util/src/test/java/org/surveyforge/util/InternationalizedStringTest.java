@@ -75,4 +75,6 @@ public class InternationalizedStringTest
 
     Assert.assertEquals( this.i15dString.getString( Locale.FRENCH ), InternationalizedStringTest.ESPAÑOL );
     }
+
+  // TODO: Add tests for setString with null parameters, removeString and getLocales
   }

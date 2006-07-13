@@ -21,9 +21,12 @@
  */
 package org.surveyforge.util;
 
+import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,8 +43,10 @@ import org.hibernate.annotations.MapKey;
  * @author jgonzalez
  */
 @Entity
-public class InternationalizedString
+public class InternationalizedString implements Serializable
   {
+  private static final long   serialVersionUID = 4441883710391359007L;
+
   @Id
   @Column(length = 50)
   @GeneratedValue(generator = "system-uuid")
@@ -53,9 +58,9 @@ public class InternationalizedString
   @CollectionOfElements
   @MapKey(columns = {@Column(name = "locale", length = 25)})
   @Column(name = "string", length = 2500)
-  private Map<Locale, String> strings       = new HashMap<Locale, String>( );
+  private Map<Locale, String> strings          = new HashMap<Locale, String>( );
   @Column(length = 25)
-  private Locale              defaultLocale = Locale.getDefault( );
+  private Locale              defaultLocale    = Locale.getDefault( );
 
   public InternationalizedString( )
     {}
@@ -102,8 +107,31 @@ public class InternationalizedString
       return this.getString( );
     }
 
+  public void setString( String string )
+    {
+    this.strings.put( this.getDefaultLocale( ), string );
+    }
+
   public void setString( Locale locale, String string )
     {
-    this.strings.put( locale, string );
+    if( locale != null )
+      {
+      if( string != null )
+        this.strings.put( locale, string );
+      else
+        this.removeString( locale );
+      }
+    else
+      throw new NullPointerException( );
+    }
+
+  public void removeString( Locale locale )
+    {
+    this.strings.remove( locale );
+    }
+
+  public Set<Locale> getLocales( )
+    {
+    return Collections.unmodifiableSet( this.strings.keySet( ) );
     }
   }
