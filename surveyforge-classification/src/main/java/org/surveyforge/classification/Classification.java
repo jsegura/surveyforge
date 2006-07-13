@@ -36,7 +36,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Transient;
 
 import org.hibernate.annotations.CollectionOfElements;
 import org.hibernate.annotations.GenericGenerator;
@@ -113,7 +112,7 @@ public class Classification implements Serializable
    * If there are several versions of a classification, one version is assigned as the currently valid version. Ex.: ISIC Rev. 3; NACE
    * Rev. 1.
    */
-  @Transient
+  @ManyToOne
   private Version           currentVersion;
 
   /**
