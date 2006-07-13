@@ -27,6 +27,17 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.IndexColumn;
+
 /**
  * A classification structure (classification version or classification variant) is composed of one or several levels. In a
  * hierarchical classification the items of each level but the highest (most aggregated) level are aggregated to the nearest higher
@@ -34,18 +45,31 @@ import java.util.List;
  * 
  * @author jgonzalez
  */
+@Entity
+// @Table(schema = "classification")
 public class Level implements Serializable
   {
   private static final long serialVersionUID = -8542980068158519003L;
 
+  @Id
+  @Column(length = 50)
+  @GeneratedValue(generator = "system-uuid")
+  @GenericGenerator(name = "system-uuid", strategy = "uuid")
+  private String            id;
+  /** Version for optimistic locking. */
+  @javax.persistence.Version
+  private int               lockingVersion;
   /** The version this level belongs to. */
+  @ManyToOne(optional = false)
   private Version           version;
   /** The name given to the level. Ex.: Sections, Sub-sections, Divisions, Groups and Classes in NACE Rev.1. */
+  @Column(length = 50)
   private String            name;
   /**
    * Text describing the content and particular purpose of the level. Ex.: NACE sub-sections were introduced to provide more detail at
    * an aggregate level.
    */
+  @Column(length = 250)
   private String            description;
   // TODO: Should we make any distinctions here?
   // /** Indicates whether the item code at the level is alphabetical, numerical or alphanumerical. */
@@ -54,19 +78,24 @@ public class Level implements Serializable
    * Indicates how the code is constructed of numbers, letters and separators. Ex. In NACE Rev.1 the code structure at the Class level
    * is 99.99
    */
+  @Column(length = 50)
   private String            codeStructure;
   /**
    * Rule for the construction of dummy codes from the codes of the next higher level when an incomplete level is made complete. Ex.:
    * The NACE Rev.1 subsection dummy codes may be created by doubling the section code letter, i.e. Section code: B, subsection dummy
    * code: BB
    */
+  @Column(length = 50)
   private String            dummyCode;
   /**
    * A foreign level is a level that has been inherited from another classification version and is owned and maintained by the owners
    * and maintenance unit of that classification version.
    */
+  @ManyToOne
   private Level             foreignLevel;
   /** An ordered list of the categories (classification items) that constitute the level. */
+  @OneToMany(mappedBy = "level", fetch = FetchType.LAZY)
+  @IndexColumn(name = "itemIndex")
   private List<Item>        items            = new ArrayList<Item>( );
 
   /**

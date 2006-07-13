@@ -93,6 +93,25 @@
         <version>1.0-alpha-6</version>
       </extension>
     </extensions>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>hibernate3-maven-plugin</artifactId>
+          <version>1.0-SNAPSHOT</version>
+          <configuration>
+            <hibernate>
+              <configurationFile>/src/main/resources/hibernate.cfg.xml</configurationFile>
+            </hibernate>
+            <outputDirectory>
+              <hbm2ddl>target/hibernate3/sql</hbm2ddl>
+            </outputDirectory>
+            <!-- <outputFile>target/hibernate3/sql/classification.sql</outputFile> -->
+            <drop>true</drop>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -120,8 +139,10 @@
     </plugins>
   </build>
   <modules>
+    <module>surveyforge-util</module>
     <module>surveyforge-classification</module>
     <module>surveyforge-core</module>
+    <module>surveyforge-db</module>
   </modules>
   <repositories>
     <repository>
@@ -207,6 +228,11 @@
     <dependencies>
       <dependency>
         <groupId>org.surveyforge</groupId>
+        <artifactId>surveyforge-util</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.surveyforge</groupId>
         <artifactId>surveyforge-classification</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -238,6 +264,29 @@
         <artifactId>persistence-api</artifactId>
         <version>1.0</version>
         <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-annotations</artifactId>
+        <version>3.2.0.cr1</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.persistence</groupId>
+            <artifactId>ejb</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>hibernate</groupId>
+        <artifactId>hibernate-entitymanager</artifactId>
+        <version>3.1beta1</version>
+        <scope>test</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.persistence</groupId>
+            <artifactId>ejb</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>

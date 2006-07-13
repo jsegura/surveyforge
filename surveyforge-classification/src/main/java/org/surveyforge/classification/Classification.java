@@ -29,6 +29,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.CollectionOfElements;
+import org.hibernate.annotations.GenericGenerator;
+
 /**
  * A classification describes the ensemble of one or several consecutive classification {@link org.surveyforge.classification.Version}s.
  * In the context of the classification database, there is no structured list of categories directly associated with the
@@ -36,49 +48,72 @@ import java.util.Set;
  * 
  * @author jgonzalez
  */
+@Entity
+// @Table(schema = "classification")
 public class Classification implements Serializable
   {
   private static final long serialVersionUID = 4169537105933133532L;
 
+  @Id
+  @Column(length = 50)
+  @GeneratedValue(generator = "system-uuid")
+  @GenericGenerator(name = "system-uuid", strategy = "uuid")
+  private String            id;
+  /** Version for optimistic locking. */
+  @javax.persistence.Version
+  private int               lockingVersion;
   /** A classification is identified by a unique identifier, which may typically be an abbreviation of its title. */
+  @Column(unique = true, length = 50)
   private String            identifier;
   /** A classification has a title as provided by the owner. */
+  @Column(unique = true, length = 250)
   private String            title;
   /** Short general description of the classification, including its purpose, its main subject areas etc. */
+  @Column(length = 500)
   private String            description;
   /**
    * A classification can be designed in a specific context. Ex.: ISIC: international classification; NACE: EU classification;
    * NACE-BEL: Belgian classification.
    */
+  @Column(length = 250)
   private String            context;
   /**
    * A classification is designed to classify a specific type of object/unit according to a specific attribute. Ex.: Enterprises by
    * economic activity, products by origin, persons by age.
    */
+  @Column(length = 250)
   private String            objectsClassified;
   /** Areas of statistics in which the classification is implemented. Ex.: ISCO is used in employment and labour force statistics. */
+  @Column(length = 250)
   private String            subjectAreas;
   /**
    * The statistical office or other authority, which created and maintains the version(s) of the classification. A classification may
    * have several owners. Ex.: ISIC is owned by UNSD; ISCO-COM is owned by ILO and Eurostat.
    */
+  @CollectionOfElements
+  @Column(name = "owner", length = 100)
   private Set<String>       owners           = new HashSet<String>( );
   /** A classification can be associated with one or a number of keywords. Ex.: For NACE: ”Economic Activity”; ”Industry”; ”Production”. */
+  @CollectionOfElements
+  @Column(name = "keyword", length = 100)
   private Set<String>       keywords         = new HashSet<String>( );
   /**
    * Classifications may be grouped into classification {@link Family families}. Shows to which family the classification belongs.
    * Ex.: ISIC and NACE belong to the family ”Classifications of economic activity”.
    */
+  @ManyToOne(optional = false)
   private Family            family;
   /**
    * A classification has at least one {@link Version} (classification version). Ex.: ISIC: ISIC Rev.1, ISIC Rev.2, ISIC Rev.3; NACE:
    * NACE 70, NACE Rev.1.
    */
+  @OneToMany(mappedBy = "classification", fetch = FetchType.LAZY)
   private Set<Version>      versions         = new HashSet<Version>( );
   /**
    * If there are several versions of a classification, one version is assigned as the currently valid version. Ex.: ISIC Rev. 3; NACE
    * Rev. 1.
    */
+  @Transient
   private Version           currentVersion;
 
   /**

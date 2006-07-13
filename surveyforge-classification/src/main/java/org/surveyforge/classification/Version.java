@@ -30,6 +30,22 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.CollectionOfElements;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.IndexColumn;
+
 /**
  * A classification version is a list of mutually exclusive categories representing the version-specific values of the classification
  * variable. If the version is hierarchical, each level in the hierarchy is a set of mutually exclusive categories. A classification
@@ -41,36 +57,57 @@ import java.util.Set;
  * 
  * @author jgonzalez
  */
+@Entity
+// @Table(schema = "classification")
 public class Version implements Serializable
   {
   private static final long serialVersionUID   = -6949734640328443272L;
 
+  @Id
+  @Column(length = 50)
+  @GeneratedValue(generator = "system-uuid")
+  @GenericGenerator(name = "system-uuid", strategy = "uuid")
+  private String            id;
+  /** Version for optimistic locking. */
+  @javax.persistence.Version
+  private int               lockingVersion;
   /**
    * A classification version is identified by a unique identifier, which may typically be an abbreviation of its title. It is often
    * distinguished from other versions of the same classification by reference to a revision number or to the year of the version's
    * coming into force. Ex.: NACE Rev.1, CPA 96.
    */
+  @Basic(optional = false)
+  @Column(nullable = false, unique = true, length = 50)
   private String            identifier;
   /**
    * A classification version has a title as provided by the owner or maintenance unit. Ex.: Classification of Products by Activity,
    * 1996.
    */
+  @Column(unique = true, length = 250)
   private String            title;
   /** Short general description of the classification version. */
+  @Column(length = 500)
   private String            description;
   /** Date on which the classification version was released. */
+  @Basic(optional = false)
+  @Temporal(TemporalType.DATE)
+  @Column(nullable = false)
   private Date              releaseDate;
   /**
    * The introduction provides a detailed description of the classification version, the background for its creation, the
    * classification variable and objects/units classified, classification rules etc.
    */
+  @Column(length = 500)
   private String            introduction;
   /**
    * The unit or group of persons within the organisation who are responsible for the classification version, i.e. for maintaining,
    * updating and changing it.
    */
+  @Column(length = 250)
   private String            maintenanceUnit;
   /** Person(s) who may be contacted for additional information about the classification version. */
+  @CollectionOfElements
+  @Column(name = "contactPerson", length = 100)
   private Set<String>       contactPersons     = new HashSet<String>( );
   /**
    * Indicates that the classification version is covered by a legal act or by some other formal agreement. Ex.: The legal base for
@@ -78,15 +115,24 @@ public class Version implements Serializable
    * European Communities No. L 293, 24.10.1990) 2. Commission of the European Communities Regulation (EEC) No. 761/93 of 24 March 1993
    * (Official Journal of the European Communities No. L 83, 3.4.1993)
    */
+  @Column(length = 500)
   private String            legalBase;
   /** A list of the publications in which the classification version has been published. */
+  @CollectionOfElements
+  @IndexColumn(name = "publicationIndex")
+  @Column(name = "publication", length = 100)
   private List<String>      publications       = new ArrayList<String>( );
   /**
    * A list of the defined types of alternative item titles available for the version. Each title type refers to a list of alternative
    * item titles. Ex.: Short titles; Medium titles.
    */
+  @CollectionOfElements
+  @IndexColumn(name = "titleTypeIndex")
+  @Column(name = "titleType", length = 100)
   private List<String>      titleTypes;
   /** A classification version can exist in one or several languages. */
+  @CollectionOfElements
+  @AttributeOverride(name = "element", column = @Column(name = "language"))
   private Set<Locale>       availableLanguages = new HashSet<Locale>( );
   /**
    * Indicates whether or not updates are allowed within the classification version, i.e. without leading to a new version. Such
@@ -95,17 +141,21 @@ public class Version implements Serializable
    */
   private boolean           updatesPossible;
   /** Verbal summary description of changes which have occurred from the previous classification version to the actual version. */
+  @Column(length = 2500)
   private String            changes;
   /** Verbal summary description of changes which have occurred within the classification version. */
+  @Column(length = 2500)
   private String            updates;
   /**
    * Classification versions may have restricted copyrights. Such versions might be excluded from downloading and should be displayed
    * in official publications (e.g. WEB) indicating the copyright owner.
    */
+  @Column(length = 500)
   private String            copyright;
   /** Indicates whether or not the classification version may be published or disseminated (e.g. on the Web). */
   private boolean           disseminationAllowed;
   /** A classification version is a version of one specific classification. Ex.: CPA 96 is a version of CPA. */
+  @ManyToOne(optional = false)
   private Classification    classification;
   /**
    * A classification version can be derived from one of the classification versions of another classification. The derived version can
@@ -114,8 +164,11 @@ public class Version implements Serializable
    * the classification version from which the actual version is derived. Ex.: NACE Rev.1 is derived from ISIC Rev.3; CPA 93 is derived
    * from the Provisional CPC (1991).
    */
+  @ManyToOne
   private Version           derivedFrom;
   /** The structure of a classification version is defined by its levels. */
+  @OneToMany(mappedBy = "version", fetch = FetchType.LAZY)
+  @IndexColumn(name = "levelIndex")
   private List<Level>       levels             = new ArrayList<Level>( );
 
   // /** A list of all case laws associated with the classification version. */

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+  version="1.0">
+  <persistence-unit name="surveyforge">
+    <class>org.surveyforge.util.InternationalizedString</class>
+    <class>org.surveyforge.classification.Family</class>
+    <class>org.surveyforge.classification.Classification</class>
+    <class>org.surveyforge.classification.Version</class>
+    <class>org.surveyforge.classification.Level</class>
+    <class>org.surveyforge.classification.Item</class>
+    <properties>
+      <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
+      <property name="hibernate.connection.driver_class" value="org.postgresql.Driver" />
+      <property name="hibernate.connection.url" value="jdbc:postgresql://server/DATABASE" />
+      <property name="hibernate.connection.username" value="user" />
+      <property name="hibernate.connection.password" value="password" />
+      <!-- alternatively to <class> and <property> declarations, you can use a regular hibernate.cfg.xml file -->
+      <!-- property name="hibernate.ejb.cfgfile" value="/org/hibernate/ejb/test/hibernate.cfg.xml"/ -->
+    </properties>
+  </persistence-unit>
+</persistence>

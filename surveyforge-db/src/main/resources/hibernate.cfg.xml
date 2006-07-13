@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+    "-//Hibernate/Hibernate Configuration DTD//EN"
+    "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+  <!-- a SessionFactory instance listed as /jndi/name -->
+  <session-factory name="java:hibernate/SessionFactory">
+    <!-- properties -->
+    <!-- <property name="connection.datasource">java:/comp/env/jdbc/MyDB</property> -->
+    <!-- 
+      <property name="connection.driver_class">org.postgresql.Driver</property>
+      <property name="connection.url">jdbc:postgresql://server/DATABASE</property>
+      <property name="connection.username">user</property>
+      <property name="connection.password">password</property>
+      <property name="show_sql">false</property>
+      <property name="transaction.factory_class">org.hibernate.transaction.JTATransactionFactory</property>
+      <property name="jta.UserTransaction">java:comp/UserTransaction</property>
+      <property name="ejb.naming_strategy">org.hibernate.cfg.DefaultComponentSafeNamingStrategy</property>
+    -->
+    <property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+
+    <!-- mapping files -->
+    <mapping class="org.surveyforge.util.InternationalizedString" />
+    <mapping class="org.surveyforge.classification.Family" />
+    <mapping class="org.surveyforge.classification.Classification" />
+    <mapping class="org.surveyforge.classification.Version" />
+    <mapping class="org.surveyforge.classification.Level" />
+    <mapping class="org.surveyforge.classification.Item" />
+
+    <!-- cache settings -->
+    <!-- 
+      <class-cache class="org.hibernate.auction.Item" usage="read-write" />
+      <class-cache class="org.hibernate.auction.Bid" usage="read-only" />
+      <collection-cache collection="org.hibernate.auction.Item.bids" usage="read-write" />
+    -->
+  </session-factory>
+</hibernate-configuration>

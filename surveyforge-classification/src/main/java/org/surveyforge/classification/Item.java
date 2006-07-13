@@ -24,9 +24,18 @@ package org.surveyforge.classification;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.IndexColumn;
 
 /**
  * A classification item represents a category at a certain level within a classification version or variant. It defines the content
@@ -35,48 +44,69 @@ import java.util.Map;
  * 
  * @author jgonzalez
  */
+@Entity
+// @Table(schema = "classification")
 public class Item implements Serializable
   {
-  private static final long   serialVersionUID  = -3965211400312532582L;
+  private static final long serialVersionUID = -3965211400312532582L;
 
+  @Id
+  @Column(length = 50)
+  @GeneratedValue(generator = "system-uuid")
+  @GenericGenerator(name = "system-uuid", strategy = "uuid")
+  private String            id;
+  /** Version for optimistic locking. */
+  @javax.persistence.Version
+  private int               lockingVersion;
   /** The level this item belongs to. */
-  private Level               level;
+  @ManyToOne(optional = false)
+  private Level             level;
   // TODO: Should we make any distinction among alphabetical, numericcal and alphanumerical codes?
   /**
    * A classification item is identified by an alphabetical, numerical or alphanumerical code, which is in line with the code structure
    * of the classification level. The code is unique within the classification version or variant to which the item belongs.
    */
-  private String              code;
+  @Column(length = 50)
+  private String            code;
   /** A classification item has a title as provided by the owner or maintenance unit. The title describes the content of the category. */
-  private String              oficialTitle;
+  @Column(length = 250)
+  private String            oficialTitle;
   /**
    * An item can be expressed in terms of one or several alternative titles. Each alternative title is associated with a title type.
    * Ex.: Short titles; Medium titles; Self-explanatory titles in CN; Titles in plural form (e.g. Men, Women) for dissemination
    * purposes; gender related titles.
    */
-  private Map<String, String> alternativeTitles = new HashMap<String, String>( );
+  // @CollectionOfElements
+  // @MapKey(columns = {@Column(name = "titleType", length = 100)})
+  // @Column(name = "alternativeTitle", length = 250)
+  // private Map<String, String> alternativeTitles = new HashMap<String, String>( );
   // TODO: Explanatory notes
   /**
    * Indicates whether or not the item has been generated to make the level to which it belongs complete. Ex.: In NACE Rev.1 one may
    * generate items AA, BB, FF etc. to make the subsection level complete.
    */
-  private boolean             generated;
+  private boolean           generated;
   // TODO: currently valid and validity periods
   /** Describes the changes, which the item has been subject to from the previous to the actual classification version or variant. */
-  private String              changes;
+  @Column(length = 2500)
+  private String            changes;
   /** Describes the changes, which the item has been subject to during the life time of the actual classification version or variant. */
-  private String              updates;
+  @Column(length = 2500)
+  private String            updates;
   /**
    * The item at the next higher level of the classification version or variant of which the actual item is a sub item. Ex.: In NACE
    * Rev.1 item 10 is the parent of item 10.1.
    */
-  private Item                parentItem;
+  @ManyToOne
+  private Item              parentItem;
   /**
    * Each item, which is not at the lowest level of the classification version or variant, might contain one or a number of sub items,
    * i.e. items at the next lower level of the classification version or variant. Ex.: In NACE Rev.1, the Group level items 10.1, 10.2
    * and 10.3 are sub items of the Division level item 10.
    */
-  private List<Item>          subItems          = new ArrayList<Item>( );
+  @OneToMany(mappedBy = "parentItem", fetch = FetchType.LAZY)
+  @IndexColumn(name = "subItemIndex")
+  private List<Item>        subItems         = new ArrayList<Item>( );
 
   // TODO: Linked items
   // TODO: Case laws
@@ -186,16 +216,15 @@ public class Item implements Serializable
    * @throws IllegalArgumentException if the requested title type is not among the title types of the classification version this item
    *           belongs to.
    */
-  public String getAlternativeTitle( String titleType )
-    {
-    if( this.getVersion( ).getTitleTypes( ).contains( titleType ) )
-      {
-      return this.alternativeTitles.get( titleType );
-      }
-    else
-      throw new IllegalArgumentException( );
-    }
-
+  // public String getAlternativeTitle( String titleType )
+  // {
+  // if( this.getVersion( ).getTitleTypes( ).contains( titleType ) )
+  // {
+  // return this.alternativeTitles.get( titleType );
+  // }
+  // else
+  // throw new IllegalArgumentException( );
+  // }
   /**
    * Sets the alternative description of this category of the requested type. The title type must be among the title types defined for
    * the classification version this item belongs to ({@see Version#getTitleTypes()}), otherwise this method throws a
@@ -206,16 +235,15 @@ public class Item implements Serializable
    * @throws IllegalArgumentException if the requested title type is not among the title types of the classification version this item
    *           belongs to.
    */
-  public void setAlternativeTitle( String titleType, String alternativeTitle )
-    {
-    if( this.getVersion( ).getTitleTypes( ).contains( titleType ) )
-      {
-      this.alternativeTitles.put( titleType, alternativeTitle );
-      }
-    else
-      throw new IllegalArgumentException( );
-    }
-
+  // public void setAlternativeTitle( String titleType, String alternativeTitle )
+  // {
+  // if( this.getVersion( ).getTitleTypes( ).contains( titleType ) )
+  // {
+  // this.alternativeTitles.put( titleType, alternativeTitle );
+  // }
+  // else
+  // throw new IllegalArgumentException( );
+  // }
   /**
    * Returns the number of the level to which the item belongs.
    * 

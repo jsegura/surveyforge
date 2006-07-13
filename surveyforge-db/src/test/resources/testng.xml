@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="SurveyForge db test suite">
+  <test name="database">
+    <packages>
+      <package name="org.surveyforge.util" />
+      <package name="org.surveyforge.classification" />
+      <package name="org.surveyforge.core" />
+    </packages>
+  </test>
+</suite>

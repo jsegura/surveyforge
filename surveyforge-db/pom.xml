@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <parent>
+    <groupId>org.surveyforge</groupId>
+    <artifactId>surveyforge</artifactId>
+    <version>0.1-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>surveyforge-db</artifactId>
+  <name>SurveyForge database generation and tests</name>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>hibernate3-maven-plugin</artifactId>
+        <configuration>
+          <outputFile>surveyforge.sql</outputFile>
+        </configuration>
+      </plugin>
+    </plugins>
+    <!-- 
+      <extensions>
+      <extension>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>8.1-407.jdbc3</version>
+      </extension>
+      </extensions>
+    -->
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>org.surveyforge</groupId>
+      <artifactId>surveyforge-util</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.surveyforge</groupId>
+      <artifactId>surveyforge-classification</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.surveyforge</groupId>
+      <artifactId>surveyforge-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <classifier>jdk15</classifier>
+    </dependency>
+    <dependency>
+      <groupId>hibernate</groupId>
+      <artifactId>hibernate-entitymanager</artifactId>
+    </dependency>
+  </dependencies>
+</project>

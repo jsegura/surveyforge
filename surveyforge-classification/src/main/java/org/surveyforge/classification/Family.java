@@ -26,6 +26,18 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.surveyforge.util.InternationalizedString;
+
 /**
  * A classification family comprises a number of {@link org.surveyforge.classification.Classification}s, which are related from a
  * certain point of view. The family may be based, for instance, on a common classification variable (e.g. economic activity) or on a
@@ -34,16 +46,30 @@ import java.util.Set;
  * 
  * @author jgonzalez
  */
+@Entity
+// @Table(schema = "classification")
 public class Family implements Serializable
   {
-  private static final long   serialVersionUID = -2041101270919820504L;
+  private static final long       serialVersionUID = -2041101270919820504L;
 
+  @Id
+  @Column(length = 50)
+  @GeneratedValue(generator = "system-uuid")
+  @GenericGenerator(name = "system-uuid", strategy = "uuid")
+  private String                  id;
+  /** Version for optimistic locking. */
+  @javax.persistence.Version
+  private int                     lockingVersion;
   /** A classification family is identified by a unique identifier. */
-  private String              identifier;
+  @Basic(optional = false)
+  @Column(length = 50, nullable = false, unique = true)
+  private String                  identifier;
   /** A classification family has a title. */
-  private String              title;
+  @ManyToOne
+  private InternationalizedString title;
   /** A classification family refers to a number of classifications. */
-  private Set<Classification> classifications  = new HashSet<Classification>( );
+  @OneToMany(mappedBy = "family", fetch = FetchType.LAZY)
+  private Set<Classification>     classifications  = new HashSet<Classification>( );
 
   /**
    * Creates a new family with the given identifier.
@@ -85,7 +111,7 @@ public class Family implements Serializable
    * 
    * @return the title of this family.
    */
-  public String getTitle( )
+  public InternationalizedString getTitle( )
     {
     return title;
     }
@@ -95,7 +121,7 @@ public class Family implements Serializable
    * 
    * @param title the new title of this family.
    */
-  public void setTitle( String title )
+  public void setTitle( InternationalizedString title )
     {
     this.title = title;
     }

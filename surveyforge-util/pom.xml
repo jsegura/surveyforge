@@ -6,21 +6,13 @@
     <version>0.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>surveyforge-classification</artifactId>
-  <name>SurveyForge classification API</name>
+  <artifactId>surveyforge-util</artifactId>
+  <name>SurveyForge support classes</name>
   <dependencies>
-    <dependency>
-      <groupId>org.surveyforge</groupId>
-      <artifactId>surveyforge-util</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
       <classifier>jdk15</classifier>
-    </dependency>
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.persistence</groupId>
