@@ -66,7 +66,7 @@ public class Family implements Serializable
   @Column(length = 50, nullable = false, unique = true)
   private String                  identifier;
   /** A classification family has a title. */
-  @ManyToOne
+  @ManyToOne(cascade = {CascadeType.ALL})
   private InternationalizedString title;
   /** A classification family refers to a number of classifications. */
   @OneToMany(mappedBy = "family", fetch = FetchType.LAZY, cascade = {CascadeType.ALL})

@@ -116,6 +116,10 @@ public class Classification implements Serializable
   @ManyToOne
   private Version           currentVersion;
 
+  /** Constructor provided for persistence engine. */
+  private Classification( )
+    {}
+
   /**
    * Creates a new classification belonging to a family, with the given identifier. Both parameters must be non null, otherwise this
    * constructor will throw a {@link NullPointerException}.

@@ -99,6 +99,10 @@ public class Level implements Serializable
   @IndexColumn(name = "itemIndex")
   private List<Item>        items            = new ArrayList<Item>( );
 
+  /** Constructor provided for persistence engine. */
+  private Level( )
+    {}
+
   /**
    * Creates a new level belonging to a version, with the given identifier. Both parameters must be non null, otherwise this
    * constructor will throw a {@link NullPointerException}.

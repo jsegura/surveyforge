@@ -24,18 +24,25 @@ package org.surveyforge.classification;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.IndexColumn;
+import org.hibernate.annotations.MapKey;
+import org.surveyforge.util.InternationalizedString;
 
 /**
  * A classification item represents a category at a certain level within a classification version or variant. It defines the content
@@ -48,57 +55,57 @@ import org.hibernate.annotations.IndexColumn;
 // @Table(schema = "classification")
 public class Item implements Serializable
   {
-  private static final long serialVersionUID = -3965211400312532582L;
+  private static final long                    serialVersionUID  = -3965211400312532582L;
 
   @Id
   @Column(length = 50)
   @GeneratedValue(generator = "system-uuid")
   @GenericGenerator(name = "system-uuid", strategy = "uuid")
-  private String            id;
+  private String                               id;
   /** Version for optimistic locking. */
   @javax.persistence.Version
-  private int               lockingVersion;
+  private int                                  lockingVersion;
   /** The level this item belongs to. */
   @ManyToOne(optional = false)
-  private Level             level;
+  private Level                                level;
   // TODO: Should we make any distinction among alphabetical, numericcal and alphanumerical codes?
   /**
    * A classification item is identified by an alphabetical, numerical or alphanumerical code, which is in line with the code structure
    * of the classification level. The code is unique within the classification version or variant to which the item belongs.
    */
   @Column(length = 50)
-  private String            code;
+  private String                               code;
   /** A classification item has a title as provided by the owner or maintenance unit. The title describes the content of the category. */
-  @Column(length = 250)
-  private String            oficialTitle;
+  @ManyToOne(cascade = {CascadeType.ALL})
+  private InternationalizedString              oficialTitle;
   /**
    * An item can be expressed in terms of one or several alternative titles. Each alternative title is associated with a title type.
    * Ex.: Short titles; Medium titles; Self-explanatory titles in CN; Titles in plural form (e.g. Men, Women) for dissemination
    * purposes; gender related titles.
    */
-  // @CollectionOfElements
-  // @MapKey(columns = {@Column(name = "titleType", length = 100)})
-  // @Column(name = "alternativeTitle", length = 250)
-  // private Map<String, String> alternativeTitles = new HashMap<String, String>( );
+  @OneToMany(cascade = {CascadeType.ALL})
+  @JoinTable(name = "item_alternativeTitles")
+  @MapKey(columns = {@Column(name = "titleType", length = 100)})
+  private Map<String, InternationalizedString> alternativeTitles = new HashMap<String, InternationalizedString>( );
   // TODO: Explanatory notes
   /**
    * Indicates whether or not the item has been generated to make the level to which it belongs complete. Ex.: In NACE Rev.1 one may
    * generate items AA, BB, FF etc. to make the subsection level complete.
    */
-  private boolean           generated;
+  private boolean                              generated;
   // TODO: currently valid and validity periods
   /** Describes the changes, which the item has been subject to from the previous to the actual classification version or variant. */
   @Column(length = 2500)
-  private String            changes;
+  private String                               changes;
   /** Describes the changes, which the item has been subject to during the life time of the actual classification version or variant. */
   @Column(length = 2500)
-  private String            updates;
+  private String                               updates;
   /**
    * The item at the next higher level of the classification version or variant of which the actual item is a sub item. Ex.: In NACE
    * Rev.1 item 10 is the parent of item 10.1.
    */
   @ManyToOne
-  private Item              parentItem;
+  private Item                                 parentItem;
   /**
    * Each item, which is not at the lowest level of the classification version or variant, might contain one or a number of sub items,
    * i.e. items at the next lower level of the classification version or variant. Ex.: In NACE Rev.1, the Group level items 10.1, 10.2
@@ -106,12 +113,17 @@ public class Item implements Serializable
    */
   @OneToMany(mappedBy = "parentItem", fetch = FetchType.LAZY)
   @IndexColumn(name = "subItemIndex")
-  private List<Item>        subItems         = new ArrayList<Item>( );
+  private List<Item>                           subItems          = new ArrayList<Item>( );
 
   // TODO: Linked items
   // TODO: Case laws
   // TODO: Index entries
-  // TODO: What about classification translations?
+  // TODO: Classification translations - Solved for the moment, we should change the way to access the strings to provide proper
+  // control of languages
+
+  /** Constructor provided for persistence engine. */
+  private Item( )
+    {}
 
   /**
    * Creates a new item. The item must be included in a level and have a parent item if the level is not the topmost one. Providing a
@@ -134,6 +146,7 @@ public class Item implements Serializable
       this.level = level;
       this.parentItem = parentItem;
       this.setCode( code );
+      this.oficialTitle = new InternationalizedString( this.getVersion( ).getDefaultLanguage( ) );
       this.setOficialTitle( oficialTitle );
 
       // Reverse relations
@@ -180,13 +193,26 @@ public class Item implements Serializable
     }
 
   /**
-   * Returns the description of the category represented by this item.
+   * Returns the description of the category represented by this item for the default language.
    * 
-   * @return the description of the category represented by this item.
+   * @return the description of the category represented by this item for the default language.
+   * @see InternationalizedString#getString()
    */
   public String getOficialTitle( )
     {
-    return this.oficialTitle;
+    return this.oficialTitle.getString( );
+    }
+
+  /**
+   * Returns the description of the category represented by this item for the given language.
+   * 
+   * @param locale the language of the oficial title to be returned.
+   * @return the description of the category represented by this item for the given language.
+   * @see InternationalizedString#getString(Locale)
+   */
+  public String getOficialTitle( Locale locale )
+    {
+    return this.oficialTitle.getString( locale );
     }
 
   /**
@@ -199,51 +225,141 @@ public class Item implements Serializable
   public void setOficialTitle( String oficialTitle )
     {
     if( oficialTitle != null )
-      this.oficialTitle = oficialTitle;
+      this.oficialTitle.setString( oficialTitle );
     else
       throw new NullPointerException( );
     }
 
   /**
-   * Returns the alternative description of this category of the requested type. The requested title type must be among the title types
-   * defined for the classification version this item belongs to ({@see Version#getTitleTypes()}), otherwise this method throws a
-   * {@link IllegalArgumentException}. If no alternative title has been defined for the requested title type this method returns
-   * <code>null</code>.
+   * Sets the description of the category represented by this item for the given language. The language and title must be non
+   * <code>null</code>, otherwise a {@link NullPointerException} is thrown.
+   * 
+   * @param locale the language of the oficial title to be set.
+   * @param oficialTitle the description of the category represented by this item.
+   * @throws NullPointerException if the language or title are <code>null</code>.
+   */
+  public void setOficialTitle( Locale locale, String oficialTitle )
+    {
+    if( oficialTitle != null )
+      this.oficialTitle.setString( locale, oficialTitle );
+    else
+      throw new NullPointerException( );
+    }
+
+  /**
+   * Returns the alternative description of this category of the requested type for the default language. The requested title type must
+   * be among the title types defined for the classification version this item belongs to ({@see Version#getTitleTypes()}), otherwise
+   * this method throws a {@link IllegalArgumentException}. If no alternative title has been defined for the requested title type this
+   * method returns <code>null</code>.
    * 
    * @param titleType the type of the requested alternative title.
    * @return the alternative description of this category of the requested type, <code>null</code> if no alternative title has been
    *         defined for the requested title type.
    * @throws IllegalArgumentException if the requested title type is not among the title types of the classification version this item
    *           belongs to.
+   * @see InternationalizedString#getString()
    */
-  // public String getAlternativeTitle( String titleType )
-  // {
-  // if( this.getVersion( ).getTitleTypes( ).contains( titleType ) )
-  // {
-  // return this.alternativeTitles.get( titleType );
-  // }
-  // else
-  // throw new IllegalArgumentException( );
-  // }
+  public String getAlternativeTitle( String titleType )
+    {
+    if( this.getVersion( ).getTitleTypes( ).contains( titleType ) )
+      {
+      return this.alternativeTitles.get( titleType ).getString( );
+      }
+    else
+      throw new IllegalArgumentException( );
+    }
+
   /**
-   * Sets the alternative description of this category of the requested type. The title type must be among the title types defined for
-   * the classification version this item belongs to ({@see Version#getTitleTypes()}), otherwise this method throws a
-   * {@link IllegalArgumentException}.
+   * Sets the alternative description of this category of the requested type for the default language. The title type must be among the
+   * title types defined for the classification version this item belongs to ({@see Version#getTitleTypes()}), otherwise this method
+   * throws a {@link IllegalArgumentException}.
    * 
    * @param titleType the type of the alternative title to be set.
    * @param alternativeTitle the alternative description of this category of the requested type.
    * @throws IllegalArgumentException if the requested title type is not among the title types of the classification version this item
    *           belongs to.
    */
-  // public void setAlternativeTitle( String titleType, String alternativeTitle )
-  // {
-  // if( this.getVersion( ).getTitleTypes( ).contains( titleType ) )
-  // {
-  // this.alternativeTitles.put( titleType, alternativeTitle );
-  // }
-  // else
-  // throw new IllegalArgumentException( );
-  // }
+  public void setAlternativeTitle( String titleType, String alternativeTitle )
+    {
+    if( this.getVersion( ).getTitleTypes( ).contains( titleType ) )
+      {
+      InternationalizedString alternativeI15dString;
+      if( this.alternativeTitles.containsKey( titleType ) )
+        alternativeI15dString = this.alternativeTitles.get( titleType );
+      else
+        {
+        alternativeI15dString = new InternationalizedString( this.getVersion( ).getDefaultLanguage( ) );
+        this.alternativeTitles.put( alternativeTitle, alternativeI15dString );
+        }
+      alternativeI15dString.setString( alternativeTitle );
+      }
+    else
+      throw new IllegalArgumentException( );
+    }
+
+  /**
+   * Returns the alternative description of this category of the requested type for the given language. The requested title type must
+   * be among the title types defined for the classification version this item belongs to ({@see Version#getTitleTypes()}), otherwise
+   * this method throws a {@link IllegalArgumentException}. If no alternative title has been defined for the requested title type this
+   * method returns <code>null</code>.
+   * 
+   * @param titleType the type of the requested alternative title.
+   * @param locale the language of the requested alternative title.
+   * @return the alternative description of this category of the requested type, <code>null</code> if no alternative title has been
+   *         defined for the requested title type.
+   * @throws IllegalArgumentException if the requested title type is not among the title types of the classification version this item
+   *           belongs to.
+   * @see InternationalizedString#getString(Locale)
+   */
+  public String getAlternativeTitle( String titleType, Locale locale )
+    {
+    if( this.getVersion( ).getTitleTypes( ).contains( titleType ) )
+      {
+      return this.alternativeTitles.get( titleType ).getString( locale );
+      }
+    else
+      throw new IllegalArgumentException( );
+    }
+
+  /**
+   * Sets the alternative description of this category of the requested type for the given language. The title type must be among the
+   * title types defined for the classification version this item belongs to ({@see Version#getTitleTypes()}), otherwise this method
+   * throws a {@link IllegalArgumentException}.
+   * 
+   * @param titleType the type of the alternative title to be set.
+   * @param locale the language of the alternative title to be set.
+   * @param alternativeTitle the alternative description of this category of the requested type.
+   * @throws IllegalArgumentException if the requested title type is not among the title types of the classification version this item
+   *           belongs to.
+   */
+  public void setAlternativeTitle( String titleType, Locale locale, String alternativeTitle )
+    {
+    if( this.getVersion( ).getTitleTypes( ).contains( titleType ) )
+      {
+      InternationalizedString alternativeI15dString;
+      if( this.alternativeTitles.containsKey( titleType ) )
+        alternativeI15dString = this.alternativeTitles.get( titleType );
+      else
+        {
+        alternativeI15dString = new InternationalizedString( this.getVersion( ).getDefaultLanguage( ) );
+        this.alternativeTitles.put( alternativeTitle, alternativeI15dString );
+        }
+      alternativeI15dString.setString( locale, alternativeTitle );
+      }
+    else
+      throw new IllegalArgumentException( );
+    }
+
+  /**
+   * Removes an alternative title.
+   * 
+   * @param titleType the title type of the alternative title to be removed.
+   */
+  public void removeAlternativeTitle( String titleType )
+    {
+    this.alternativeTitles.remove( titleType );
+    }
+
   /**
    * Returns the number of the level to which the item belongs.
    * 

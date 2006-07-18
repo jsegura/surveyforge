@@ -131,10 +131,11 @@ public class Version implements Serializable
   @IndexColumn(name = "titleTypeIndex")
   @Column(name = "titleType", length = 100)
   private List<String>      titleTypes;
+  /** Default language to be used when no language is specified. */
+  private Locale            defaultLanguage    = Locale.getDefault( );
   /** A classification version can exist in one or several languages. */
   @CollectionOfElements
-  @AttributeOverride(name = "element", column = @Column(name = "language"))
-  private Set<Locale>       availableLanguages = new HashSet<Locale>( );
+  private Set<Locale>       availableLanguages = Collections.singleton( this.defaultLanguage );
   /**
    * Indicates whether or not updates are allowed within the classification version, i.e. without leading to a new version. Such
    * updates will usually be changes, which add items to the structure and/or revalidates/invalidates classification items but which do
@@ -175,6 +176,10 @@ public class Version implements Serializable
   // /** A list of all case laws associated with the classification version. */
   // private List<CaseLaw> caseLaws;
 
+  /** Constructor provided for persistence engine. */
+  private Version( )
+    {}
+
   /**
    * Creates a new version belonging to a classification, with the given identifier and release date. All the parameters must be non
    * null, otherwise this constructor will throw a {@link NullPointerException}.
@@ -189,6 +194,23 @@ public class Version implements Serializable
     this.setIdentifier( identifier );
     this.setClassification( classification );
     this.setReleaseDate( releaseDate );
+    }
+
+  /**
+   * Creates a new version belonging to a classification, with the given identifier, release date and default language. All the
+   * parameters must be non null, otherwise this constructor will throw a {@link NullPointerException}.
+   * 
+   * @param classification the classification this version will belong to.
+   * @param identifier the identifier of this version.
+   * @param releaseDate the date on which this version was released.
+   * @throws NullPointerException if any parameter is <code>null</code>.
+   */
+  public Version( Classification classification, String identifier, Date releaseDate, Locale defaultLanguage )
+    {
+    this.setIdentifier( identifier );
+    this.setClassification( classification );
+    this.setReleaseDate( releaseDate );
+    this.setAvailableLanguages( defaultLanguage, Collections.singleton( defaultLanguage ) );
     }
 
   /**
@@ -437,25 +459,45 @@ public class Version implements Serializable
     }
 
   /**
+   * Returns the default language to be used when no language is specified.
+   * 
+   * @return the default language to be used when no language is specified.
+   */
+  public Locale getDefaultLanguage( )
+    {
+    return this.defaultLanguage;
+    }
+
+  /**
    * Returns the set of languages this version is available in.
    * 
    * @return the set of languages this version is available in.
    */
   public Set<Locale> getAvailableLanguages( )
     {
-    return this.availableLanguages;
+    return Collections.unmodifiableSet( this.availableLanguages );
     }
 
   /**
-   * Sets the set of languages this version is available in. This method throws {@link NullPointerException} if the set of languages is
-   * <code>null</code>.
+   * Sets the default language of this version and the set of languages this version is available in. This method throws
+   * {@link NullPointerException} if the set of languages is <code>null</code>.
    * 
    * @param availableLanguages the set of languages this version is available in.
+   * @throws NullPointerException if the default language or available languages are null.
+   * @throws IllegalArgumentException if the available languages set doesn't include the default language.
    */
-  public void setAvailableLanguages( Set<Locale> availableLanguages )
+  public void setAvailableLanguages( Locale defaultLanguage, Set<Locale> availableLanguages )
     {
-    if( availableLanguages != null )
-      this.availableLanguages = availableLanguages;
+    if( availableLanguages != null && defaultLanguage != null )
+      {
+      if( availableLanguages.contains( defaultLanguage ) )
+        {
+        this.defaultLanguage = defaultLanguage;
+        this.availableLanguages = availableLanguages;
+        }
+      else
+        throw new IllegalArgumentException( );
+      }
     else
       throw new NullPointerException( );
     }
