@@ -32,6 +32,7 @@ import java.util.Set;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -167,7 +168,7 @@ public class Version implements Serializable
   @ManyToOne
   private Version           derivedFrom;
   /** The structure of a classification version is defined by its levels. */
-  @OneToMany(mappedBy = "version", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "version", fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "levelIndex")
   private List<Level>       levels             = new ArrayList<Level>( );
 

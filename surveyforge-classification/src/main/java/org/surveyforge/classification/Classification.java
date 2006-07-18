@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -106,7 +107,7 @@ public class Classification implements Serializable
    * A classification has at least one {@link Version} (classification version). Ex.: ISIC: ISIC Rev.1, ISIC Rev.2, ISIC Rev.3; NACE:
    * NACE 70, NACE Rev.1.
    */
-  @OneToMany(mappedBy = "classification", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "classification", fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   private Set<Version>      versions         = new HashSet<Version>( );
   /**
    * If there are several versions of a classification, one version is assigned as the currently valid version. Ex.: ISIC Rev. 3; NACE

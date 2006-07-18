@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -94,7 +95,7 @@ public class Level implements Serializable
   @ManyToOne
   private Level             foreignLevel;
   /** An ordered list of the categories (classification items) that constitute the level. */
-  @OneToMany(mappedBy = "level", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "level", fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "itemIndex")
   private List<Item>        items            = new ArrayList<Item>( );
 

@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -68,8 +69,12 @@ public class Family implements Serializable
   @ManyToOne
   private InternationalizedString title;
   /** A classification family refers to a number of classifications. */
-  @OneToMany(mappedBy = "family", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "family", fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   private Set<Classification>     classifications  = new HashSet<Classification>( );
+
+  /** Constructor provided for persistence engine. */
+  private Family( )
+    {}
 
   /**
    * Creates a new family with the given identifier.
