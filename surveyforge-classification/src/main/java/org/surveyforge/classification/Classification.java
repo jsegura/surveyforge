@@ -421,6 +421,19 @@ public class Classification implements Serializable
       throw new IllegalArgumentException( );
     }
 
+  @Override
+  public boolean equals( Object object )
+    {
+    Classification otherClassification = (Classification) object;
+    return this.getIdentifier( ).equals( otherClassification.getIdentifier( ) );
+    }
+
+  @Override
+  public int hashCode( )
+    {
+    return this.getIdentifier( ).hashCode( );
+    }
+
   /**
    * Compares two verions ordering them by release date.
    * 
@@ -432,6 +445,5 @@ public class Classification implements Serializable
       {
       return version1.getReleaseDate( ).compareTo( version2.getReleaseDate( ) );
       }
-
     }
   }

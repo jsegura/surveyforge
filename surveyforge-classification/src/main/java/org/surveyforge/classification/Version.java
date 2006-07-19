@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.persistence.AttributeOverride;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -38,6 +37,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
@@ -169,8 +169,9 @@ public class Version implements Serializable
   @ManyToOne
   private Version           derivedFrom;
   /** The structure of a classification version is defined by its levels. */
-  @OneToMany(mappedBy = "version", fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "levelIndex")
+  @JoinColumn(name = "version_id", nullable = false)
   private List<Level>       levels             = new ArrayList<Level>( );
 
   // /** A list of all case laws associated with the classification version. */
@@ -752,4 +753,17 @@ public class Version implements Serializable
   // {
   // this.caseLaws = caseLaws;
   // }
+
+  @Override
+  public boolean equals( Object object )
+    {
+    Version otherVersion = (Version) object;
+    return this.getIdentifier( ).equals( otherVersion.getIdentifier( ) );
+    }
+
+  @Override
+  public int hashCode( )
+    {
+    return this.getIdentifier( ).hashCode( );
+    }
   }

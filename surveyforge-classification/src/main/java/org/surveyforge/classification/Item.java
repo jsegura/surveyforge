@@ -35,6 +35,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -66,7 +67,8 @@ public class Item implements Serializable
   @javax.persistence.Version
   private int                                  lockingVersion;
   /** The level this item belongs to. */
-  @ManyToOne(optional = false)
+  @ManyToOne
+  @JoinColumn(name = "level_id", insertable = false, updatable = false)
   private Level                                level;
   // TODO: Should we make any distinction among alphabetical, numericcal and alphanumerical codes?
   /**
@@ -105,14 +107,16 @@ public class Item implements Serializable
    * Rev.1 item 10 is the parent of item 10.1.
    */
   @ManyToOne
+  @JoinColumn(name = "parentItem_id", insertable = false, updatable = false)
   private Item                                 parentItem;
   /**
    * Each item, which is not at the lowest level of the classification version or variant, might contain one or a number of sub items,
    * i.e. items at the next lower level of the classification version or variant. Ex.: In NACE Rev.1, the Group level items 10.1, 10.2
    * and 10.3 are sub items of the Division level item 10.
    */
-  @OneToMany(mappedBy = "parentItem", fetch = FetchType.LAZY)
+  @OneToMany(fetch = FetchType.LAZY)
   @IndexColumn(name = "subItemIndex")
+  @JoinColumn(name = "parentItem_id")
   private List<Item>                           subItems          = new ArrayList<Item>( );
 
   // TODO: Linked items
@@ -461,5 +465,18 @@ public class Item implements Serializable
   public List<Item> getSubItems( )
     {
     return Collections.unmodifiableList( this.subItems );
+    }
+
+  @Override
+  public boolean equals( Object object )
+    {
+    Item otherItem = (Item) object;
+    return this.getVersion( ).equals( otherItem.getVersion( ) ) && this.getCode( ).equals( otherItem.getCode( ) );
+    }
+
+  @Override
+  public int hashCode( )
+    {
+    return this.getVersion( ).hashCode( ) ^ this.getCode( ).hashCode( );
     }
   }

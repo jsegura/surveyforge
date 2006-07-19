@@ -174,4 +174,17 @@ public class Family implements Serializable
     else
       throw new IllegalArgumentException( );
     }
+
+  @Override
+  public boolean equals( Object object )
+    {
+    Family otherFamily = (Family) object;
+    return this.getIdentifier( ).equals( otherFamily.getIdentifier( ) );
+    }
+
+  @Override
+  public int hashCode( )
+    {
+    return this.getIdentifier( ).hashCode( );
+    }
   }

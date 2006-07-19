@@ -33,6 +33,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -61,7 +62,8 @@ public class Level implements Serializable
   @javax.persistence.Version
   private int               lockingVersion;
   /** The version this level belongs to. */
-  @ManyToOne(optional = false)
+  @ManyToOne
+  @JoinColumn(name = "version_id", insertable = false, updatable = false)
   private Version           version;
   /** The name given to the level. Ex.: Sections, Sub-sections, Divisions, Groups and Classes in NACE Rev.1. */
   @Column(length = 50)
@@ -95,8 +97,9 @@ public class Level implements Serializable
   @ManyToOne
   private Level             foreignLevel;
   /** An ordered list of the categories (classification items) that constitute the level. */
-  @OneToMany(mappedBy = "level", fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "itemIndex")
+  @JoinColumn(name = "level_id", nullable = false)
   private List<Item>        items            = new ArrayList<Item>( );
 
   /** Constructor provided for persistence engine. */
@@ -323,5 +326,18 @@ public class Level implements Serializable
       }
     else
       throw new IllegalArgumentException( );
+    }
+
+  @Override
+  public boolean equals( Object object )
+    {
+    Level otherLevel = (Level) object;
+    return this.getVersion( ).equals( otherLevel.getVersion( ) ) && this.getName( ) == otherLevel.getName( );
+    }
+
+  @Override
+  public int hashCode( )
+    {
+    return this.getVersion( ).hashCode( ) ^ this.getNumber( );
     }
   }
