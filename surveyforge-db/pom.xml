@@ -9,25 +9,81 @@
   <artifactId>surveyforge-db</artifactId>
   <name>SurveyForge database generation and tests</name>
   <build>
+    <!-- Unfortunately it seems this can't be externalized -->
+    <extensions>
+      <extension>
+        <groupId>postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>8.1-407.jdbc3</version>
+      </extension>
+    </extensions>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+    <filters>
+      <filter>src/test/filters/database.properties</filter>
+    </filters>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>hibernate3-maven-plugin</artifactId>
-        <configuration>
-          <outputFile>surveyforge.sql</outputFile>
-        </configuration>
       </plugin>
     </plugins>
-    <!-- 
-      <extensions>
-      <extension>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>8.1-407.jdbc3</version>
-      </extension>
-      </extensions>
-    -->
   </build>
+  <profiles>
+    <profile>
+      <id>script</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <filters>
+          <filter>src/main/filters/script.properties</filter>
+        </filters>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>hibernate3-maven-plugin</artifactId>
+              <extensions>false</extensions>
+              <configuration>
+                <outputFile>surveyforge.sql</outputFile>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>database</id>
+      <build>
+        <filters>
+          <filter>src/main/filters/database.properties</filter>
+        </filters>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>hibernate3-maven-plugin</artifactId>
+              <configuration>
+                <drop>true</drop>
+              </configuration>
+              <extensions>true</extensions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
   <dependencies>
     <dependency>
       <groupId>org.surveyforge</groupId>

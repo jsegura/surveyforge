@@ -101,13 +101,11 @@
           <version>1.0-SNAPSHOT</version>
           <configuration>
             <hibernate>
-              <configurationFile>/src/main/resources/hibernate.cfg.xml</configurationFile>
+              <configurationFile>/target/classes/hibernate.cfg.xml</configurationFile>
             </hibernate>
             <outputDirectory>
               <hbm2ddl>target/hibernate3/sql</hbm2ddl>
             </outputDirectory>
-            <!-- <outputFile>target/hibernate3/sql/classification.sql</outputFile> -->
-            <drop>true</drop>
           </configuration>
         </plugin>
       </plugins>

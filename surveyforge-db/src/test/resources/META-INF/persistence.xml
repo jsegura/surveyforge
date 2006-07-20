@@ -10,13 +10,11 @@
     <class>org.surveyforge.classification.Level</class>
     <class>org.surveyforge.classification.Item</class>
     <properties>
-      <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
-      <property name="hibernate.connection.driver_class" value="org.postgresql.Driver" />
-      <property name="hibernate.connection.url" value="jdbc:postgresql://server/DATABASE" />
-      <property name="hibernate.connection.username" value="user" />
-      <property name="hibernate.connection.password" value="password" />
-      <!-- alternatively to <class> and <property> declarations, you can use a regular hibernate.cfg.xml file -->
-      <!-- property name="hibernate.ejb.cfgfile" value="/org/hibernate/ejb/test/hibernate.cfg.xml"/ -->
+      <property name="hibernate.dialect" value="${test.database.dialect}" />
+      <property name="hibernate.connection.driver_class" value="${test.database.driver}" />
+      <property name="hibernate.connection.url" value="${test.database.url}" />
+      <property name="hibernate.connection.username" value="${test.database.username}" />
+      <property name="hibernate.connection.password" value="${test.database.password}" />
     </properties>
   </persistence-unit>
 </persistence>
