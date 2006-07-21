@@ -13,11 +13,43 @@
     <property name="show_sql">false</property>
 
     <!-- mapping files -->
+    <!--
     <mapping class="org.surveyforge.util.InternationalizedString" />
     <mapping class="org.surveyforge.classification.Family" />
     <mapping class="org.surveyforge.classification.Classification" />
     <mapping class="org.surveyforge.classification.Version" />
     <mapping class="org.surveyforge.classification.Level" />
     <mapping class="org.surveyforge.classification.Item" />
+    -->
+
+	<!-- package org.surveyforge.core.survey -->
+    <mapping class="org.surveyforge.core.survey.QuestionnaireElement" />
+    <mapping class="org.surveyforge.core.survey.Study" />
+    <mapping class="org.surveyforge.core.survey.Questionnaire" />
+    <mapping class="org.surveyforge.core.survey.Question" />
+
+	<!-- package org.surveyforge.core.metadata -->
+	<mapping class="org.surveyforge.core.metadata.ValidationRule" />
+	<mapping class="org.surveyforge.core.metadata.Register" />
+	<mapping class="org.surveyforge.core.metadata.RegisterDataElement" />
+	<mapping class="org.surveyforge.core.metadata.ConceptualDataElement" />
+	<mapping class="org.surveyforge.core.metadata.DataElement" />
+	<mapping class="org.surveyforge.core.metadata.ValueDomain" />
+	<mapping class="org.surveyforge.core.metadata.ObjectVariable" />
+	<mapping class="org.surveyforge.core.metadata.GlobalVariable" />
+	<mapping class="org.surveyforge.core.metadata.VariableFamily" />
+	<mapping class="org.surveyforge.core.metadata.StatisticalObjectType" />
+
+    <!-- package org.surveyforge.core.data -->
+    <mapping class="org.surveyforge.core.data.RegisterData" />
+    <mapping class="org.surveyforge.core.data.Row" />
+    <mapping class="org.surveyforge.core.data.RowData" />
+
+    <!-- cache settings -->
+    <!-- 
+      <class-cache class="org.hibernate.auction.Item" usage="read-write" />
+      <class-cache class="org.hibernate.auction.Bid" usage="read-only" />
+      <collection-cache collection="org.hibernate.auction.Item.bids" usage="read-write" />
+    -->
   </session-factory>
 </hibernate-configuration>
