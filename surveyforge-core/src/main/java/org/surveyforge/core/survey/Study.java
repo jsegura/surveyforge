@@ -26,6 +26,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.IndexColumn;
+
 /**
  * Studies are used to document the concepts and production rules for statistical data. A statistical activity might describe
  * activities organized in a traditional 'stove pipe system' as well as describing statistical surveys (input) and statistical products
@@ -33,26 +45,45 @@ import java.util.List;
  * 
  * @author jsegura
  */
+@Entity
 public class Study implements Serializable
   {
   private static final long   serialVersionUID = -4089931270976596457L;
+
+  @Id
+  @Column(length = 50)
+  @GeneratedValue(generator = "system-uuid")
+  @GenericGenerator(name = "system-uuid", strategy = "uuid")
+  private String              id;
+  /** Version for optimistic locking. */
+  @javax.persistence.Version
+  private int                 lockingVersion;
 
   /**
    * A statistical activity is identified by a unique identifier, which may typically be an abbreviation of its title or a systematic
    * number.
    */
+  @Column(unique = true, nullable = false, length = 50)
   private String              identifier;
   /** A statistical activity has a title as provided by the owner or maintenance unit. */
+  @Column(length = 250)
   private String              title            = "";
   /**
    * Detailed description of the statistical activity. The activity description describes the actions performed in the frame of the
    * activity.
    */
+  @Column(length = 500)
   private String              description      = "";
+
   /** When the statistical activity includes a survey one or more questionnaires can be defined in the context of the activity. */
+  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+  @IndexColumn(name = "questionnairesIndex")
+  @JoinColumn(name = "study_id", nullable = false)
   private List<Questionnaire> questionnaires   = new ArrayList<Questionnaire>( );
 
   /* TODO : elaborate on keywords? */
+  private Study( )
+    {}
 
   /**
    * Creates a new Study identified by the identifier.
@@ -167,11 +198,24 @@ public class Study implements Serializable
    * @param questionnaire The questionnaire to remove.
    * @throws NullPointerException If the questionnaire is <code>null</code>.
    */
-  public void delQuestionnaire( Questionnaire questionnaire )
+  public void removeQuestionnaire( Questionnaire questionnaire )
     {
     if( questionnaire != null )
       this.questionnaires.remove( questionnaire );
     else
       throw new NullPointerException( );
+    }
+
+  @Override
+  public boolean equals( Object object )
+    {
+    Study other = (Study) object;
+    return this.getIdentifier( ).equals( other.getIdentifier( ) );
+    }
+
+  @Override
+  public int hashCode( )
+    {
+    return this.getIdentifier( ).hashCode( );
     }
   }

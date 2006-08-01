@@ -122,18 +122,4 @@ public class QuestionTest
     Assert.assertEquals( slave1.getUpperQuestion( ), master2 );
     }
 
-  @Test
-  @ExpectedExceptions( {NullPointerException.class})
-  public void questionAddNullSubQuestion( )
-    {
-    new Question( "id" ).addSubQuestion( null );
-    }
-
-  @Test
-  @ExpectedExceptions( {NullPointerException.class})
-  public void removeAddNullSubQuestion( )
-    {
-    new Question( "id" ).removeSubQuestion( null );
-    }
-
   }

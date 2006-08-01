@@ -23,13 +23,38 @@ package org.surveyforge.core.metadata;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+import org.hibernate.annotations.GenericGenerator;
+
 // TODO: Elaborate on comments
 /**
  * @author jsegura
  */
-public abstract class ValueDomain implements Serializable
+@Entity
+public class ValueDomain implements Serializable
   {
-  private static final long serialVersionUID = 7936854840394336906L;
+  private static final long serialVersionUID = -83487445078388347L;
 
-  public abstract boolean isValid( Object object );
+  @Id
+  @Column(length = 50)
+  @GeneratedValue(generator = "system-uuid")
+  @GenericGenerator(name = "system-uuid", strategy = "uuid")
+  private String            id;
+  /** Version for optimistic locking. */
+  @javax.persistence.Version
+  private int               lockingVersion;
+
+  public ValueDomain( )
+    {}
+
+  public boolean isValid( Serializable data )
+    {
+    // TODO Auto-generated method stub
+    return false;
+    }
+
   }

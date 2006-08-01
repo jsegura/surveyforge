@@ -23,15 +23,43 @@ package org.surveyforge.core.data;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
+import org.hibernate.annotations.GenericGenerator;
+
 // TODO: Elaborate on comments
 /**
  * @author jsegura
  */
-public class RowData
+@Entity
+public class RowData implements Serializable
   {
-  private Serializable data;
-  private boolean      answered;
-  private boolean      applicable;
+  private static final long serialVersionUID = 0L;
+
+
+  @Id
+  @Column(length = 50)
+  @GeneratedValue(generator = "system-uuid")
+  @GenericGenerator(name = "system-uuid", strategy = "uuid")
+  private String            id;
+  /** Version for optimistic locking. */
+  @javax.persistence.Version
+  private int               lockingVersion;
+
+  @ManyToOne
+  @JoinColumn(name = "row_id", insertable = false, updatable = false)
+  private Row               row;
+  // TODO get/set of the row
+
+  private Serializable      data;
+
+  private boolean           answered;
+  private boolean           applicable;
 
   /**
    * @return Returns the data.

@@ -29,6 +29,7 @@ import org.testng.annotations.ExpectedExceptions;
 import org.testng.annotations.Test;
 import org.surveyforge.core.metadata.ConceptualDataElement;
 import org.surveyforge.core.metadata.LogicalValueDomain;
+import org.surveyforge.core.metadata.Register;
 import org.surveyforge.core.metadata.RegisterDataElement;
 import org.surveyforge.core.metadata.ValueDomain;
 
@@ -41,8 +42,9 @@ public class QuestionnaireElementTest
   @DataProvider(name = "dp")
   public Object[][] createData( Method m )
     {
+    Register register = new Register( "register" );
     ConceptualDataElement conceptualDataElement = new ConceptualDataElement( new LogicalValueDomain( ), "conceptualDataElement" );
-    RegisterDataElement registerDataElement = new RegisterDataElement( conceptualDataElement, new LogicalValueDomain( ),
+    RegisterDataElement registerDataElement = new RegisterDataElement( conceptualDataElement, new ValueDomain( ),
         "registerDataElement" );
     return new Object[][] {new Object[] {registerDataElement}};
     }

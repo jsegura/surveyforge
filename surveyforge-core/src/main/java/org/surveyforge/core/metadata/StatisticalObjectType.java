@@ -26,6 +26,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.IndexColumn;
+import org.surveyforge.core.survey.Study;
+
 /**
  * Statistical objects or units may be real world objects (e.g. person, enterprise) or abstract objects like events or states (e.g.
  * accident, temperature). A statistical object or unit describes the type of object observed in a statistical survey or presented in a
@@ -33,25 +47,51 @@ import java.util.List;
  * 
  * @author jsegura
  */
+@Entity
 public class StatisticalObjectType implements Serializable
   {
   private static final long           serialVersionUID = 3051156955695891963L;
+
+
+  @Id
+  @Column(length = 50)
+  @GeneratedValue(generator = "system-uuid")
+  @GenericGenerator(name = "system-uuid", strategy = "uuid")
+  private String                      id;
+  /** Version for optimistic locking. */
+  @javax.persistence.Version
+  private int                         lockingVersion;
 
   /**
    * A statistical object is identified by a unique language independent identifier, which may typically be an abbreviation of its
    * name.
    */
+  @Column(unique = true, length = 50)
   private String                      identifier;
   /** Unique name statistical unit. */
+  @Column(length = 250)
   private String                      name             = "";
   /** Short general multilingual description of the statistical object/unit, including its purpose, its main subject areas etc. */
+  @Column(length = 500)
   private String                      description      = "";
   /** A super-type is a generalisation of an object type. */
+  @ManyToOne
+  @JoinColumn(name = "superType_id", insertable = false, updatable = false)
   private StatisticalObjectType       superType;
   /** A sub type describes a specialisation of the type. Sub types are described as "IS A" relationships. */
+  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+  @IndexColumn(name = "subTypesIndex")
+  @JoinColumn(name = "superType_id")
   private List<StatisticalObjectType> subTypes         = new ArrayList<StatisticalObjectType>( );
   /** Object variables defined for the statistical object/unit. */
+  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+  @IndexColumn(name = "objectVariablesIndex")
+  @JoinColumn(name = "statisticalObjectType_id", nullable = false)
   private List<ObjectVariable>        objectVariables  = new ArrayList<ObjectVariable>( );
+
+
+  private StatisticalObjectType( )
+    {}
 
   /**
    * Creates a new {@link StatisticalObjectType} identified by identifier.
@@ -231,6 +271,20 @@ public class StatisticalObjectType implements Serializable
       this.objectVariables.remove( objectVariable );
     else
       throw new NullPointerException( );
+    }
+
+  // TODO add subtypes to hashcode & equals
+  @Override
+  public boolean equals( Object object )
+    {
+    StatisticalObjectType other = (StatisticalObjectType) object;
+    return this.getIdentifier( ).equals( other.getIdentifier( ) );
+    }
+
+  @Override
+  public int hashCode( )
+    {
+    return this.getIdentifier( ).hashCode( );
     }
 
   }

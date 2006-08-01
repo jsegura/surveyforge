@@ -21,9 +21,23 @@
  */
 package org.surveyforge.core.survey;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.IndexColumn;
 
 /**
  * The question contain the text for the question, with the sub questions being used to provide further information about the question.
@@ -31,21 +45,45 @@ import java.util.List;
  * 
  * @author jsegura
  */
-public class Question
+@Entity
+public class Question implements Serializable
   {
+  private static final long serialVersionUID = 0L;
+
+  @Id
+  @Column(length = 50)
+  @GeneratedValue(generator = "system-uuid")
+  @GenericGenerator(name = "system-uuid", strategy = "uuid")
+  private String            id;
+  /** Version for optimistic locking. */
+  @javax.persistence.Version
+  private int               lockingVersion;
+
   /** A question has a language independent identifier that identifies the question among all other globally defined questions. */
-  private String         identifier;
+  @Column(unique = true, length = 50)
+  private String            identifier;
   /**
    * The question contains the exact text of the question that has been asked to collect the data. The question text is language
    * dependent.
    */
-  private String         text          = "";
+  @Column(length = 250)
+  private String            text             = "";
   /** The description contains explanatory notes to the question and/or an extended definition of the question's meaning. */
-  private String         description   = "";
+  @Column(length = 500)
+  private String            description      = "";
   /** This is the question that acts as a frame for a number of sub questions. */
-  private Question       upperQuestion = null;
+  @ManyToOne
+  @JoinColumn(name = "upperQuestion_id", insertable = false, updatable = false)
+  private Question          upperQuestion    = null;
   /** A question referring to a complex fact can be divided in a number of sub questions. */
-  private List<Question> subQuestions  = new ArrayList<Question>( );
+  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+  @IndexColumn(name = "subQuestionsIndex")
+  @JoinColumn(name = "upperQuestion_id", nullable = false)
+  private List<Question>    subQuestions     = new ArrayList<Question>( );
+
+
+  private Question( )
+    {}
 
   /**
    * Creates a new Question with an identifier.
@@ -168,7 +206,7 @@ public class Question
    * @param subQuestions The subQuestions to add.
    * @throws NullPointerException If the subquestion is <code>null</code>.
    */
-  protected void addSubQuestion( Question subQuestion )
+  private void addSubQuestion( Question subQuestion )
     {
     if( subQuestion != null )
       this.subQuestions.add( subQuestion );
@@ -182,11 +220,25 @@ public class Question
    * @param subQuestion the subQuestion to remove.
    * @throws NullPointerException If the subquestion is <code>null</code>.
    */
-  protected void removeSubQuestion( Question subQuestion )
+  private void removeSubQuestion( Question subQuestion )
     {
     if( subQuestion != null )
       this.subQuestions.remove( subQuestion );
     else
       throw new NullPointerException( );
     }
+
+  @Override
+  public boolean equals( Object object )
+    {
+    Question other = (Question) object;
+    return this.getIdentifier( ).equals( other.getIdentifier( ) );
+    }
+
+  @Override
+  public int hashCode( )
+    {
+    return this.getIdentifier( ).hashCode( );
+    }
+
   }

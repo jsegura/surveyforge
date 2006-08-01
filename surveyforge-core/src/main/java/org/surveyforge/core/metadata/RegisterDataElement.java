@@ -21,18 +21,39 @@
  */
 package org.surveyforge.core.metadata;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+
+import org.hibernate.annotations.IndexColumn;
+import org.surveyforge.core.survey.Question;
+
 /**
  * Register data elements define data elements for a register. In contrast to an abstract data element a register data element is
  * defined in the context of a register and carries process information besides conceptual one.
  * 
  * @author jsegura
  */
+@Entity
 public class RegisterDataElement extends DataElement
   {
   private static final long     serialVersionUID = -8986375207717119033L;
 
   /** The context data element describes the basic properties of the register data element. */
+  @ManyToOne
+  @JoinColumn(name = "conceptualDataElement")
   private ConceptualDataElement conceptualDataElement;
+  /** */
+  private boolean               optional;
+  /** */
+  @ManyToOne(optional = true)
+  private Question              question;
+
 
   /**
    * Creates a new instance of ConceptualDataElement linked with a {@link ConceptualDataElement}.
@@ -71,5 +92,36 @@ public class RegisterDataElement extends DataElement
       throw new NullPointerException( );
     }
 
+  /**
+   * @return the optional
+   */
+  public boolean isOptional( )
+    {
+    return this.optional;
+    }
+
+  /**
+   * @param optional the optional to set
+   */
+  public void setOptional( boolean optional )
+    {
+    this.optional = optional;
+    }
+
+  /**
+   * @return the question
+   */
+  public Question getQuestion( )
+    {
+    return this.question;
+    }
+
+  /**
+   * @param question the question to set
+   */
+  public void setQuestion( Question question )
+    {
+    this.question = question;
+    }
 
   }

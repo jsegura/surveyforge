@@ -21,6 +21,10 @@
  */
 package org.surveyforge.core.metadata;
 
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
 import org.surveyforge.core.survey.Question;
 
 // TODO: Measure unit?
@@ -32,12 +36,20 @@ import org.surveyforge.core.survey.Question;
  * 
  * @author jsegura
  */
+@Entity
 public class ConceptualDataElement extends DataElement
   {
   private static final long serialVersionUID = -6880246451318487216L;
 
   /** */
+  @ManyToOne(optional = true)
+  @JoinColumn(name = "question_id")
   private Question          question;
+  /**  */
+  @ManyToOne(optional = true)
+  @JoinColumn(name = "objectVariable_id", insertable = false, updatable = false)
+  private ObjectVariable    objectVariable;
+
 
   /**
    * Creates a new ConceptualDataElement based on the params of a DataElement
@@ -66,5 +78,34 @@ public class ConceptualDataElement extends DataElement
     this.question = question;
     }
 
+  /**
+   * @return Returns the objectVariable.
+   */
+  public ObjectVariable getObjectVariable( )
+    {
+    return this.objectVariable;
+    }
 
+  /**
+   * @param objectVariable The objectVariable to set.
+   */
+  public void setObjectVariable( ObjectVariable objectVariable )
+    {
+    if( this.objectVariable != null ) this.objectVariable.removeConceptualDataElement( this );
+    this.objectVariable = objectVariable;
+    if( this.objectVariable != null ) this.objectVariable.addConceptualDataElement( this );
+    }
+
+  @Override
+  public boolean equals( Object object )
+    {
+    ConceptualDataElement other = (ConceptualDataElement) object;
+    return this.getIdentifier( ).equals( other.getIdentifier( ) );
+    }
+
+  @Override
+  public int hashCode( )
+    {
+    return this.getIdentifier( ).hashCode( );
+    }
   }

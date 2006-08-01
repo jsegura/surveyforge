@@ -21,18 +21,48 @@
  */
 package org.surveyforge.core.data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.IndexColumn;
+
 /**
  * @author jsegura
  */
-public class Row
+@Entity
+public class Row implements Serializable
   {
 
+  @Id
+  @Column(length = 50)
+  @GeneratedValue(generator = "system-uuid")
+  @GenericGenerator(name = "system-uuid", strategy = "uuid")
+  private String        id;
+  /** Version for optimistic locking. */
+  @javax.persistence.Version
+  private int           lockingVersion;
+
+  @ManyToOne(optional = true)
+  @JoinColumn(name = "registerData_id", insertable = false, updatable = false)
   private RegisterData  registerData;
+
+  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+  @IndexColumn(name = "rowDatasIndex")
+  @JoinColumn(name = "row_id", nullable = false)
   private List<RowData> rowDatas = new ArrayList<RowData>( );
 
   public Row( RegisterData registerData )
@@ -54,7 +84,10 @@ public class Row
   public void setRegisterData( RegisterData registerData )
     {
     if( registerData != null )
+      {
       this.registerData = registerData;
+      this.registerData.addRow( this );
+      }
     else
       throw new NullPointerException( );
     }

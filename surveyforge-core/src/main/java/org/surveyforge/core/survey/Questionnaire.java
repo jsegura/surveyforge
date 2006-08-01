@@ -21,10 +21,23 @@
  */
 package org.surveyforge.core.survey;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.IndexColumn;
 import org.surveyforge.core.metadata.Register;
 
 /**
@@ -33,27 +46,54 @@ import org.surveyforge.core.metadata.Register;
  * 
  * @author jsegura
  */
-public class Questionnaire
+@Entity
+public class Questionnaire implements Serializable
   {
+  private static final long          serialVersionUID = 6844066269698434310L;
+
+  @Id
+  @Column(length = 50)
+  @GeneratedValue(generator = "system-uuid")
+  @GenericGenerator(name = "system-uuid", strategy = "uuid")
+  private String                     id;
+  /** Version for optimistic locking. */
+  @javax.persistence.Version
+  private int                        lockingVersion;
+
   /**
    * A questionnaire is identified by an identifier, which is unique in the context of a statistical activity. It may typically be an
    * abbreviation of its title or a systematic number.
    */
+  @Column(unique = true, nullable = false, length = 50)
   private String                     identifier;
   /** A questionnaire has a title as provided by the owner or maintenance unit. */
-  private String                     title       = "";
+  @Column(length = 250)
+  private String                     title            = "";
   /**
    * Detailed description of the questionnaire. The questionnaire description typically describes the underlying concept of the
    * questionnaire and basic principles.
    */
-  private String                     description = "";
+  @Column(length = 500)
+  private String                     description      = "";
   /** A questionnaire consists of a number of questionnaire elements. Each element refers to a question. */
-  private List<QuestionnaireElement> elements    = new ArrayList<QuestionnaireElement>( );
+
+  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+  @IndexColumn(name = "questionnairesIndex")
+  @JoinColumn(name = "questionnaire_id", nullable = false)
+  private List<QuestionnaireElement> elements         = new ArrayList<QuestionnaireElement>( );
+
   /** A questionnaire corresponds logically to a register, which describes the content of the data collection. */
+  @OneToOne(fetch = FetchType.LAZY)
   private Register                   register;
+
   /** A questionnaire is included in a Study. */
+  @ManyToOne
+  @JoinColumn(name = "study_id", insertable = false, updatable = false)
   private Study                      study;
 
+
+  private Questionnaire( )
+    {}
 
   /**
    * Creates a new Questionnaire included in a Study, corresponding to a Register and identified bu identifier.
@@ -225,10 +265,25 @@ public class Questionnaire
   public void setStudy( Study study )
     {
     if( study != null )
+      {
       this.study = study;
+      this.study.addQuestionnaire( this );
+      }
     else
       throw new NullPointerException( );
     }
 
+  @Override
+  public boolean equals( Object object )
+    {
+    Questionnaire otherQuestionnaire = (Questionnaire) object;
+    return this.getStudy( ).equals( otherQuestionnaire.getStudy( ) )
+        && this.getIdentifier( ).equals( otherQuestionnaire.getIdentifier( ) );
+    }
 
+  @Override
+  public int hashCode( )
+    {
+    return this.getStudy( ).hashCode( ) ^ this.getIdentifier( ).hashCode( );
+    }
   }

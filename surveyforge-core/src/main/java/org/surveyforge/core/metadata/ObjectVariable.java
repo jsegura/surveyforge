@@ -26,6 +26,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.IndexColumn;
+import org.surveyforge.core.survey.Study;
+
 /**
  * An object variable defines the concept of a variable in connection with a defined statistical object (e.g. the income of a person).
  * The general description of the meaning of the variable is part of the global variable definition, which is linked to the object
@@ -33,38 +48,67 @@ import java.util.List;
  * 
  * @author jsegura
  */
+@Entity
 public class ObjectVariable implements Serializable
   {
-  private static final long     serialVersionUID = 4288089682729653747L;
+  private static final long           serialVersionUID       = 4288089682729653747L;
+
+
+  @Id
+  @Column(length = 50)
+  @GeneratedValue(generator = "system-uuid")
+  @GenericGenerator(name = "system-uuid", strategy = "uuid")
+  private String                      id;
+  /** Version for optimistic locking. */
+  @javax.persistence.Version
+  private int                         lockingVersion;
 
   /**
    * Unique and language independent identifier for the object variable. The identifier is unique among all object variables. The
    * identifier should contain identifications for the statistical object and the global variable it is based on.
    */
-  private String                identifier;
+  @Column(unique = true, length = 50)
+  private String                      identifier;
   /** The name is the official, language dependent name of the global variable, provided by the owner of the variable. */
-  private String                name             = "";
+  @Column(length = 250)
+  private String                      name                   = "";
   /** Short general multilingual description of the object variable, including its purpose, its main subject areas etc. */
-  private String                description      = "";
+  @Column(length = 500)
+  private String                      description            = "";
   /**
    * Each object variable belongs to a statistical object or unit. The object variable exists only in the context of the object
    * variable.
    */
-  private StatisticalObjectType statisticalObjectType;
+  @ManyToOne
+  @JoinColumn(name = "statisticalObjectType_id", insertable = false, updatable = false)
+  private StatisticalObjectType       statisticalObjectType;
   /** An object variable should refer to a global variable definition that reflects the general concepts of the object variable. */
-  private GlobalVariable        globalVariable;
-  /** Based on an object variable a number of data elements may refer to this object variable. */
-  private List<DataElement>     dataElements     = new ArrayList<DataElement>( );
+  @ManyToOne
+  @JoinColumn(name = "globalVariable_id", insertable = false, updatable = false)
+  private GlobalVariable              globalVariable;
 
+  /** Based on an object variable a number of data elements may refer to this object variable. */
+  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+  @IndexColumn(name = "dataElementsIndex")
+  @JoinColumn(name = "objectVariable_id")
+  private List<ConceptualDataElement> conceptualDataElements = new ArrayList<ConceptualDataElement>( );
+
+
+  private ObjectVariable( )
+    {}
 
   /**
    * Creates a new instance of ObjectVariable identified by identifier.
    * 
+   * @param statisticalObjectType
+   * @param globalVariable
    * @param identifier The identifier to set.
    * @throws NullPointerException If the identifier is <code>null</code> or is empty.
    */
-  public ObjectVariable( String identifier )
+  public ObjectVariable( StatisticalObjectType statisticalObjectType, GlobalVariable globalVariable, String identifier )
     {
+    this.setStatisticalObjectType( statisticalObjectType );
+    this.setGlobalVariable( globalVariable );
     this.setIdentifier( identifier );
     }
 
@@ -159,7 +203,10 @@ public class ObjectVariable implements Serializable
   public void setStatisticalObjectType( StatisticalObjectType statisticalObjectType )
     {
     if( statisticalObjectType != null )
+      {
       this.statisticalObjectType = statisticalObjectType;
+      this.statisticalObjectType.addObjectVariable( this );
+      }
     else
       throw new NullPointerException( );
     }
@@ -189,33 +236,45 @@ public class ObjectVariable implements Serializable
     }
 
   /**
-   * Returns the list of {@link DataElement} linked to this ObjectVariable.
+   * Returns the list of {@link ConceptualDataElement} linked to this ObjectVariable.
    * 
-   * @return Returns the list of dataElements.
+   * @return Returns the list of ConceptualDataElements.
    */
-  public List<DataElement> getDataElements( )
+  public List<ConceptualDataElement> getConceptualDataElements( )
     {
-    return Collections.unmodifiableList( dataElements );
+    return Collections.unmodifiableList( conceptualDataElements );
     }
 
   /**
-   * Adds a new {@link DataElement} to the list.
+   * Adds a new {@link ConceptualDataElement} to the list.
    * 
-   * @param dataElements The dataElements to add.
+   * @param dataElements The conceptualDataElement to add.
    */
-  protected void addDataElement( DataElement dataElement )
+  protected void addConceptualDataElement( ConceptualDataElement conceptualDataElement )
     {
-    this.dataElements.add( dataElement );
+    this.conceptualDataElements.add( conceptualDataElement );
     }
 
   /**
-   * Removes a {@link DataElement} from the list.
+   * Removes a {@link ConceptualDataElement} from the list.
    * 
-   * @param dataElements The dataElements to remove.
+   * @param dataElements The conceptualDataElement to remove.
    */
-  protected void removeDataElement( DataElement dataElement )
+  protected void removeConceptualDataElement( ConceptualDataElement conceptualDataElement )
     {
-    this.dataElements.remove( dataElement );
+    this.conceptualDataElements.remove( conceptualDataElement );
     }
 
+  @Override
+  public boolean equals( Object object )
+    {
+    ObjectVariable other = (ObjectVariable) object;
+    return this.getIdentifier( ).equals( other.getIdentifier( ) );
+    }
+
+  @Override
+  public int hashCode( )
+    {
+    return this.getIdentifier( ).hashCode( );
+    }
   }

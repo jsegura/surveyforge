@@ -21,14 +21,44 @@
  */
 package org.surveyforge.core.metadata;
 
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
+import org.hibernate.annotations.GenericGenerator;
+
 /*
- * TODO : implementation of ValidationRule 
- * TODO: Elaborate on comments
+ * TODO : implementation of ValidationRule TODO: Elaborate on comments
  */
 /**
  * @author jsegura
  */
-public class ValidationRule
+@Entity
+public class ValidationRule implements Serializable
   {
+  private static final long serialVersionUID = 0L;
+
+  @Id
+  @Column(length = 50)
+  @GeneratedValue(generator = "system-uuid")
+  @GenericGenerator(name = "system-uuid", strategy = "uuid")
+  private String            id;
+  /** Version for optimistic locking. */
+  @javax.persistence.Version
+  private int               lockingVersion;
+
+  @ManyToOne
+  @JoinColumn(name = "register_id", insertable = false, updatable = false)
+  private Register          register;
+
+  public ValidationRule( )
+    {}
+
+  // TODO hashcode + equals
 
   }

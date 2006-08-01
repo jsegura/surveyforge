@@ -26,42 +26,56 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.IndexColumn;
 import org.surveyforge.core.metadata.Register;
 
 /**
  * @author jsegura
  */
+@Entity
 public class RegisterData implements Serializable
   {
   private static final long serialVersionUID = 4300393468288029803L;
 
-  private String            identifier;
+
+  @Id
+  @Column(length = 50)
+  @GeneratedValue(generator = "system-uuid")
+  @GenericGenerator(name = "system-uuid", strategy = "uuid")
+  private String            id;
+  /** Version for optimistic locking. */
+  @javax.persistence.Version
+  private int               lockingVersion;
+
+  @OneToOne(optional = true)
   private Register          register;
+
+  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+  @IndexColumn(name = "rowsIndex")
+  @JoinColumn(name = "registerData_id")
   private List<Row>         rows             = new ArrayList<Row>( );
 
-  public RegisterData( Register register, String identifier )
-    {
-    this.setRegister( register );
-    this.setIdentifier( identifier );
-    }
+  private RegisterData( )
+    {}
 
-  /**
-   * @return Returns the identifier.
-   */
-  public String getIdentifier( )
+  public RegisterData( Register register )
     {
-    return this.identifier;
-    }
-
-  /**
-   * @param identifier The identifier to set.
-   */
-  public void setIdentifier( String identifier )
-    {
-    if( identifier != null && !identifier.equals( "" ) )
-      this.identifier = identifier;
-    else
+    if( register == null )
       throw new NullPointerException( );
+    else if( register.getRegisterData( ) != null )
+      throw new IllegalArgumentException( );
+    else
+      this.register = register;
     }
 
   /**
@@ -72,16 +86,6 @@ public class RegisterData implements Serializable
     return this.register;
     }
 
-  /**
-   * @param register The register to set.
-   */
-  public void setRegister( Register register )
-    {
-    if( register == null )
-      throw new NullPointerException( );
-    else if( this.register != null && this.rows.size( ) != 0 ) throw new IllegalArgumentException( );
-    this.register = register;
-    }
 
   /**
    * @return Returns the rows.
@@ -94,7 +98,7 @@ public class RegisterData implements Serializable
   /**
    * @param rows The rows to .
    */
-  protected void addRows( Row row )
+  protected void addRow( Row row )
     {
     if( row != null )
       {

@@ -26,25 +26,55 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.IndexColumn;
+
 /**
  * A variable family groups a number of global variables that refer to a certain theme.
  * 
  * @author jsegura
  */
+@Entity
 public class VariableFamily implements Serializable
   {
   private static final long    serialVersionUID = 7344092827765295413L;
 
+  @Id
+  @Column(length = 50)
+  @GeneratedValue(generator = "system-uuid")
+  @GenericGenerator(name = "system-uuid", strategy = "uuid")
+  private String               id;
+  /** Version for optimistic locking. */
+  @javax.persistence.Version
+  private int                  lockingVersion;
+
   /** A VariableFamily is identified by a unique identifier. */
+  @Column(unique = true, length = 50)
   private String               identifier;
   /**
    * Detailed description of the VariableFamily. The description describes the theme of the {@link GlobalVariable}s included in the
    * family.
    */
+  @Column(length = 500)
   private String               description      = "";
   /** The family have the list of all {@link GlobalVariable}s included in the theme. */
+
+  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+  @IndexColumn(name = "globalVariablesIndex")
+  @JoinColumn(name = "variableFamily_id", nullable = false)
   private List<GlobalVariable> globalVariables  = new ArrayList<GlobalVariable>( );
 
+  private VariableFamily( )
+    {}
 
   /**
    * Creates a new Family identified by the identifier.
@@ -142,4 +172,18 @@ public class VariableFamily implements Serializable
     else
       throw new NullPointerException( );
     }
+
+  @Override
+  public boolean equals( Object object )
+    {
+    VariableFamily other = (VariableFamily) object;
+    return this.getIdentifier( ).equals( other.getIdentifier( ) );
+    }
+
+  @Override
+  public int hashCode( )
+    {
+    return this.getIdentifier( ).hashCode( );
+    }
+
   }

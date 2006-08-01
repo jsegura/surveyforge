@@ -21,6 +21,16 @@
  */
 package org.surveyforge.core.survey;
 
+import java.io.Serializable;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import org.hibernate.annotations.GenericGenerator;
 import org.surveyforge.core.metadata.RegisterDataElement;
 
 
@@ -30,18 +40,41 @@ import org.surveyforge.core.metadata.RegisterDataElement;
  * 
  * @author jsegura
  */
-public class QuestionnaireElement
+@Entity
+public class QuestionnaireElement implements Serializable
   {
+  private static final long   serialVersionUID     = 0L;
+
+  @Id
+  @Column(length = 50)
+  @GeneratedValue(generator = "system-uuid")
+  @GenericGenerator(name = "system-uuid", strategy = "uuid")
+  private String              id;
+  /** Version for optimistic locking. */
+  @javax.persistence.Version
+  private int                 lockingVersion;
+
   /** A questionnaire element is identified by a unique identifier. */
+  @Column(unique = true, length = 50)
   private String              identifier;
   /** Each questionnaire element has a {@link Question} that has the text and the structure of the question. */
+  @ManyToOne(optional = true, cascade = {CascadeType.ALL})
+  @JoinColumn(name = "question_id", insertable = false, updatable = false)
   private Question            question             = null;
   /** A questionnaire element have a {@link RegisterDataElement} to have the info of the data. */
+  @ManyToOne(optional = false)
+  @JoinColumn(name = "registerDataElement_id", insertable = false, updatable = false)
   private RegisterDataElement registerDataElement;
   /** Default answer if the question is not applicable. */
+  @Column(nullable = false, length = 50)
   private String              defaultNotApplicable = "";
   /** Default answer if the question is not answered. */
+  @Column(nullable = false, length = 50)
   private String              defaultNotAnswered   = "";
+
+
+  private QuestionnaireElement( )
+    {}
 
   /**
    * Creates a new instance of a QuestionnaireElement linked to the registerDataElement and identified by identifier.
@@ -171,4 +204,20 @@ public class QuestionnaireElement
     else
       throw new NullPointerException( );
     }
+
+  // TODO : Equals+hashcode
+  // @Override
+  // public boolean equals( Object object )
+  // {
+  // Questionnaire otherQuestionnaire = (Questionnaire) object;
+  // return this.getQuestion( )( ).equals( otherQuestionnaire.getStudy( ) )
+  // && this.getIdentifier( ).equals( otherQuestionnaire.getIdentifier( ) );
+  // }
+  //
+  // @Override
+  // public int hashCode( )
+  // {
+  // return this.getStudy( ).hashCode( ) ^ this.getIdentifier( ).hashCode( );
+  // }
+
   }

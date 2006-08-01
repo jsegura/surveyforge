@@ -23,6 +23,15 @@ package org.surveyforge.core.metadata;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
+import org.hibernate.annotations.GenericGenerator;
+
 
 /**
  * The global variable defines the general concept of a statistical variable (e.g. income). More special definitions can be provided
@@ -31,24 +40,56 @@ import java.io.Serializable;
  * 
  * @author jsegura
  */
+@Entity
 public class GlobalVariable implements Serializable
   {
   private static final long serialVersionUID = 1661678204467740737L;
 
+  @Id
+  @Column(length = 50)
+  @GeneratedValue(generator = "system-uuid")
+  @GenericGenerator(name = "system-uuid", strategy = "uuid")
+  private String            id;
+  /** Version for optimistic locking. */
+  @javax.persistence.Version
+  private int               lockingVersion;
+
   /** A global variable is identified by a unique language independent identifier, which may typically be an abbreviation of its name. */
+  @Column(unique = true, length = 50)
   private String            identifier;
   /** The official name of the global variable is provided by the owner of the variable. */
+  @Column(length = 250)
   private String            name             = "";
   /**
    * Short general multilingual description of the global variable, including its purpose, its main subject areas etc.
    */
+  @Column(length = 500)
   private String            description      = "";
 
   /** Family to which the global variable belongs. */
+  @ManyToOne
+  @JoinColumn(name = "variableFamily_id", insertable = false, updatable = false)
   private VariableFamily    variableFamily;
 
+
+  private GlobalVariable( )
+    {}
+
   /**
-   * Creates a new GlobalVariable identified by the identifier
+   * Creates a new GlobalVariable identified by the identifier and placed in the variableFamily.
+   * 
+   * @param identifier The identifier of the GlobalVariable.
+   * @param variableFamily The Variable Family where the GlobalVariable will be placed.
+   * @throws NullPointerException If the identifier is <code>null</code> or is empty.
+   */
+  public GlobalVariable( VariableFamily variableFamily, String identifier )
+    {
+    this.setIdentifier( identifier );
+    this.setVariableFamily( variableFamily );
+    }
+
+  /**
+   * Creates a new GlobalVariable identified by the identifier.
    * 
    * @param identifier The identifier of the GlobalVariable.
    * @throws NullPointerException If the identifier is <code>null</code> or is empty.
@@ -57,6 +98,7 @@ public class GlobalVariable implements Serializable
     {
     this.setIdentifier( identifier );
     }
+
 
   /**
    * Returns the identifier of the Global Variable.
@@ -144,7 +186,6 @@ public class GlobalVariable implements Serializable
    * Sets the new {@link VariableFamily} of the GlobalVariable.
    * 
    * @param variableFamily The variableFamily to set.
-   * @throws NullPointerException If the {@link VariableFamily} is <code>null</code>.
    */
   public void setVariableFamily( VariableFamily variableFamily )
     {
@@ -153,5 +194,17 @@ public class GlobalVariable implements Serializable
     if( this.variableFamily != null ) this.variableFamily.addGlobalVariable( this );
     }
 
+  @Override
+  public boolean equals( Object object )
+    {
+    GlobalVariable other = (GlobalVariable) object;
+    return this.getIdentifier( ).equals( other.getIdentifier( ) ) && this.getVariableFamily( ).equals( other.getVariableFamily( ) );
+    }
+
+  @Override
+  public int hashCode( )
+    {
+    return this.getIdentifier( ).hashCode( ) ^ (this.getVariableFamily( ) == null ? 0 : this.getVariableFamily( ).hashCode( ));
+    }
 
   }

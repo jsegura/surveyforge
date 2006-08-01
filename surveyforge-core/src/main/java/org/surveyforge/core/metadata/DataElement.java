@@ -21,33 +21,68 @@
  */
 package org.surveyforge.core.metadata;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.IndexColumn;
 
 // TODO Elaborate on comments
 /**
  * @author jsegura
  */
-public class DataElement
+@Entity
+public class DataElement implements Serializable
   {
+  private static final long serialVersionUID  = 0L;
+
+  @Id
+  @Column(length = 50)
+  @GeneratedValue(generator = "system-uuid")
+  @GenericGenerator(name = "system-uuid", strategy = "uuid")
+  private String            id;
+  /** Version for optimistic locking. */
+  @javax.persistence.Version
+  private int               lockingVersion;
+
   /**
    * This is a unique and language independent identifier for the data element. The identifier is unique among all other data elements
    * for an object variable (standard data element) or within the scope of a statistical activity.
    */
+  @Column(unique = true, length = 50)
   private String            identifier;
   /**  */
   private boolean           multiple          = false;
   /**  */
   private int               maxResponses      = 1;
   /**  */
+  @ManyToOne
+  @JoinColumn(name = "valueDomain_id")
   private ValueDomain       valueDomain;
   /**  */
-  private ObjectVariable    objectVariable;
-  /**  */
+  @ManyToOne(cascade = {CascadeType.ALL})
+  @JoinColumn(name = "variableStructure_id", insertable = false, updatable = false)
   private DataElement       variableStructure;
   /**  */
+  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+  @IndexColumn(name = "componentElementsIndex")
+  @JoinColumn(name = "variableStructure_id")
   private List<DataElement> componentElements = new ArrayList<DataElement>( );
+
+
+  private DataElement( )
+    {}
 
   /**
    * @param valueDomain
@@ -132,23 +167,6 @@ public class DataElement
       throw new NullPointerException( );
     }
 
-  /**
-   * @return Returns the objectVariable.
-   */
-  public ObjectVariable getObjectVariable( )
-    {
-    return this.objectVariable;
-    }
-
-  /**
-   * @param objectVariable The objectVariable to set.
-   */
-  public void setObjectVariable( ObjectVariable objectVariable )
-    {
-    if( this.objectVariable != null ) this.objectVariable.removeDataElement( this );
-    this.objectVariable = objectVariable;
-    if( this.objectVariable != null ) this.objectVariable.addDataElement( this );
-    }
 
   /**
    * @return Returns the variableStructure.
@@ -179,7 +197,7 @@ public class DataElement
   /**
    * @param componentElements The componentElements to set.
    */
-  protected void addComponentElement( DataElement componentElement )
+  private void addComponentElement( DataElement componentElement )
     {
     if( componentElement != null )
       this.componentElements.add( componentElement );
@@ -190,7 +208,7 @@ public class DataElement
   /**
    * @param componentElements The componentElements to set.
    */
-  protected void removeComponentElement( DataElement componentElement )
+  private void removeComponentElement( DataElement componentElement )
     {
     if( componentElement != null )
       this.componentElements.remove( componentElement );
@@ -198,5 +216,17 @@ public class DataElement
       throw new NullPointerException( );
     }
 
+  @Override
+  public boolean equals( Object object )
+    {
+    DataElement other = (DataElement) object;
+    return this.getIdentifier( ).equals( other.getIdentifier( ) );
+    }
+
+  @Override
+  public int hashCode( )
+    {
+    return this.getIdentifier( ).hashCode( );
+    }
 
   }
