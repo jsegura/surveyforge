@@ -44,8 +44,7 @@ public class QuestionnaireElementTest
     {
     Register register = new Register( "register" );
     ConceptualDataElement conceptualDataElement = new ConceptualDataElement( new LogicalValueDomain( ), "conceptualDataElement" );
-    RegisterDataElement registerDataElement = new RegisterDataElement( conceptualDataElement, new ValueDomain( ),
-        "registerDataElement" );
+    RegisterDataElement registerDataElement = new RegisterDataElement( conceptualDataElement, "registerDataElement" );
     return new Object[][] {new Object[] {registerDataElement}};
     }
 
