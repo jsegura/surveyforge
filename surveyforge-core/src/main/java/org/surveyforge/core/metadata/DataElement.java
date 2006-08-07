@@ -67,7 +67,7 @@ public class DataElement implements Serializable
   /**  */
   private int               maxResponses      = 1;
   /**  */
-  @ManyToOne
+  @ManyToOne(cascade = {CascadeType.ALL})
   @JoinColumn(name = "valueDomain_id")
   private ValueDomain       valueDomain;
   /**  */

@@ -34,6 +34,7 @@ import org.surveyforge.core.survey.Question;
  * @author jsegura
  */
 @Entity
+// TODO: Improve javadocs
 public class RegisterDataElement extends DataElement
   {
   private static final long     serialVersionUID = -8986375207717119033L;
@@ -56,10 +57,18 @@ public class RegisterDataElement extends DataElement
    * @throws NullPointerException If the ValueDomain or the identifier or the ConceptualDataElements are <code>null</code> or the
    *           identifier is empty.
    */
-  public RegisterDataElement( ConceptualDataElement conceptualDataElement, ValueDomain valueDomain, String identifier )
+  public RegisterDataElement( ConceptualDataElement conceptualDataElement, String identifier )
+    {
+    super( conceptualDataElement.getValueDomain( ).clone( ), identifier );
+    this.setConceptualDataElement( conceptualDataElement );
+    }
+
+  /**
+   * Creates a new instance of ConceptualDataElement linked with a {@link ConceptualDataElement}.
+   */
+  public RegisterDataElement( ValueDomain valueDomain, String identifier )
     {
     super( valueDomain, identifier );
-    this.setConceptualDataElement( conceptualDataElement );
     }
 
   /**
@@ -80,6 +89,10 @@ public class RegisterDataElement extends DataElement
    */
   public void setConceptualDataElement( ConceptualDataElement conceptualDataElement )
     {
+    if( conceptualDataElement == null )
+      {
+      this.setValueDomain( conceptualDataElement.getValueDomain( ).clone( ) );
+      }
     this.conceptualDataElement = conceptualDataElement;
     }
 
@@ -114,5 +127,4 @@ public class RegisterDataElement extends DataElement
     {
     this.question = question;
     }
-
   }
