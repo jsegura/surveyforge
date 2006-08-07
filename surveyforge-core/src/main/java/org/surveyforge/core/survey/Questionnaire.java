@@ -23,7 +23,9 @@ package org.surveyforge.core.survey;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -39,6 +41,7 @@ import javax.persistence.OneToOne;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.IndexColumn;
 import org.surveyforge.core.metadata.Register;
+import org.surveyforge.util.InternationalizedString;
 
 /**
  * A questionnaire is a list of {@link Question}s used to recollect the data into a register. The questionnaire is included in almost
@@ -76,11 +79,20 @@ public class Questionnaire implements Serializable
   @Column(length = 500)
   private String                     description      = "";
   /** A questionnaire consists of a number of questionnaire elements. Each element refers to a question. */
-
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "questionnairesIndex")
   @JoinColumn(name = "questionnaire_id", nullable = false)
   private List<QuestionnaireElement> elements         = new ArrayList<QuestionnaireElement>( );
+  /** A questionnaire may have its content organized in pages. */
+  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+  @IndexColumn(name = "pageIndex")
+  @JoinColumn(name = "questionnaire_id", nullable = false)
+  private List<Feed>                 pageFeeds        = new ArrayList<Feed>( );
+  /** A questionnaire may have its content organized in sections. */
+  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+  @IndexColumn(name = "sectionIndex")
+  @JoinColumn(name = "questionnaire_id", nullable = false)
+  private List<SectionFeed>          sectionFeeds     = new ArrayList<SectionFeed>( );
 
   /** A questionnaire corresponds logically to a register, which describes the content of the data collection. */
   @OneToOne(fetch = FetchType.LAZY)
@@ -203,7 +215,11 @@ public class Questionnaire implements Serializable
   public void addElement( QuestionnaireElement element )
     {
     if( element != null )
+      {
       this.elements.add( element );
+      if( this.pageFeeds.isEmpty( ) ) this.createPageFeed( element );
+      if( this.sectionFeeds.isEmpty( ) ) this.createSectionFeed( element );
+      }
     else
       throw new NullPointerException( );
     }
@@ -217,9 +233,154 @@ public class Questionnaire implements Serializable
   public void delElement( QuestionnaireElement element )
     {
     if( element != null )
-      this.elements.remove( element );
+      {
+      int indexToRemove = this.elements.indexOf( element );
+      if( indexToRemove != -1 )
+        {
+        Comparator<Feed> feedComparator = new Questionnaire.FeedComparator( );
+
+        Feed pageFeedToRemove = new Feed( element );
+        Feed[] pageFeeds = this.getPageFeeds( ).toArray( new Feed[] {} );
+        int pageFeedPosition = Arrays.binarySearch( pageFeeds, pageFeedToRemove, feedComparator );
+        if( pageFeedPosition >= 0 )
+          {
+          this.pageFeeds.remove( pageFeedPosition );
+          if( indexToRemove < this.elements.size( ) - 1 ) this.createPageFeed( this.elements.get( indexToRemove + 1 ) );
+          }
+
+        SectionFeed sectionFeedToRemove = new SectionFeed( element );
+        SectionFeed[] sectionFeeds = this.getSectionFeeds( ).toArray( new SectionFeed[] {} );
+        int sectionFeedPosition = Arrays.binarySearch( sectionFeeds, sectionFeedToRemove, feedComparator );
+        if( sectionFeedPosition >= 0 )
+          {
+          SectionFeed oldSectionFeed = this.sectionFeeds.remove( sectionFeedPosition );
+          if( indexToRemove < this.elements.size( ) - 1 )
+            this.createSectionFeed( this.elements.get( indexToRemove + 1 ), oldSectionFeed.getInternationalizedTitle( ) );
+          }
+
+        this.elements.remove( element );
+        }
+      }
     else
       throw new NullPointerException( );
+    }
+
+  public Feed createPageFeed( QuestionnaireElement firstElement )
+    {
+    if( firstElement != null )
+      {
+      Comparator<Feed> feedComparator = new Questionnaire.FeedComparator( );
+      Feed[] pageFeeds = this.getPageFeeds( ).toArray( new Feed[] {} );
+
+      Feed pageFeed = new Feed( firstElement );
+      int insertionPoint = Arrays.binarySearch( pageFeeds, pageFeed, feedComparator );
+      if( insertionPoint < 0 ) // there was no page feed at the specified element
+        {
+        this.pageFeeds.add( -insertionPoint - 1, pageFeed );
+        return pageFeed;
+        }
+      else
+        return this.pageFeeds.get( insertionPoint );
+      }
+    else
+      throw new NullPointerException( );
+    }
+
+  public void removePageFeed( Feed pageFeed )
+    {
+    this.pageFeeds.remove( pageFeed );
+    }
+
+  public List<Feed> getPageFeeds( )
+    {
+    return Collections.unmodifiableList( this.pageFeeds );
+    }
+
+  public SectionFeed createSectionFeed( QuestionnaireElement firstElement )
+    {
+    return this.createSectionFeed( firstElement, null );
+    }
+
+  public SectionFeed createSectionFeed( QuestionnaireElement firstElement, InternationalizedString title )
+    {
+    if( firstElement != null )
+      {
+      Comparator<Feed> feedComparator = new Questionnaire.FeedComparator( );
+      Feed[] sectionFeeds = this.getSectionFeeds( ).toArray( new SectionFeed[] {} );
+
+      SectionFeed sectionFeed = new SectionFeed( firstElement, title );
+      int insertionPoint = Arrays.binarySearch( sectionFeeds, sectionFeed, feedComparator );
+      if( insertionPoint < 0 ) // there was no section feed at the specified element
+        {
+        this.sectionFeeds.add( -insertionPoint - 1, sectionFeed );
+        return sectionFeed;
+        }
+      else
+        return this.sectionFeeds.get( insertionPoint );
+      }
+    else
+      throw new NullPointerException( );
+    }
+
+  public void removeSectionFeed( SectionFeed sectionFeed )
+    {
+    this.sectionFeeds.remove( sectionFeed );
+    }
+
+  public List<SectionFeed> getSectionFeeds( )
+    {
+    return Collections.unmodifiableList( this.sectionFeeds );
+    }
+
+  public List<SectionFeed> getSectionsInPage( Feed pageFeed )
+    {
+    int pageNumber = this.pageFeeds.indexOf( pageFeed );
+    if( pageNumber != -1 )
+      {
+      QuestionnaireElement firstElement = pageFeed.getFirstElement( );
+      QuestionnaireElement lastElement = null;
+      if( pageNumber != this.pageFeeds.size( ) - 1 ) // We aren't in the last page
+        {
+        lastElement = this.pageFeeds.get( pageNumber + 1 ).getFirstElement( );
+        }
+
+      SectionFeed[] sectionFeeds = this.getSectionFeeds( ).toArray( new SectionFeed[] {} );
+      Comparator<Feed> sectionFeedComparator = new Questionnaire.FeedComparator( );
+      int firstSectionIndex = Arrays.binarySearch( sectionFeeds, new SectionFeed( firstElement ), sectionFeedComparator );
+      if( firstSectionIndex < 0 ) firstSectionIndex = -firstSectionIndex - 2;
+      int lastSectionIndex = this.getSectionFeeds( ).size( );
+      if( lastElement != null )
+        {
+        lastSectionIndex = Arrays.binarySearch( sectionFeeds, new SectionFeed( lastElement ), sectionFeedComparator );
+        if( lastSectionIndex < 0 ) lastSectionIndex = -lastSectionIndex - 1;
+        }
+
+      return Collections.unmodifiableList( this.sectionFeeds.subList( firstSectionIndex, lastSectionIndex ) );
+      }
+    else
+      throw new IllegalArgumentException( );
+    }
+
+  public List<QuestionnaireElement> getElementsInPageAndSection( Feed pageFeed, SectionFeed sectionFeed )
+    {
+    if( this.getSectionsInPage( pageFeed ).contains( sectionFeed ) )
+      {
+      int pageNumber = this.pageFeeds.indexOf( pageFeed );
+      int sectionNumber = this.sectionFeeds.indexOf( sectionFeed );
+
+      int firstElementIndex = Math.max( this.elements.indexOf( pageFeed.getFirstElement( ) ), this.elements.indexOf( sectionFeed
+          .getFirstElement( ) ) );
+
+      int lastElementInPageIndex = (pageNumber != this.pageFeeds.size( ) - 1) ? this.elements.indexOf( this.pageFeeds.get(
+          pageNumber + 1 ).getFirstElement( ) ) : Integer.MAX_VALUE;
+      int lastElementInSectionIndex = (sectionNumber != this.sectionFeeds.size( ) - 1) ? this.elements.indexOf( this.sectionFeeds.get(
+          sectionNumber + 1 ).getFirstElement( ) ) : Integer.MAX_VALUE;
+      int lastElementIndex = Math.min( Math.min( lastElementInPageIndex, lastElementInSectionIndex ), this.elements.size( ) );
+
+      return Collections.unmodifiableList( this.elements.subList( firstElementIndex, lastElementIndex ) );
+      }
+    else
+      throw new IllegalArgumentException( );
     }
 
   /**
@@ -285,5 +446,17 @@ public class Questionnaire implements Serializable
   public int hashCode( )
     {
     return this.getStudy( ).hashCode( ) ^ this.getIdentifier( ).hashCode( );
+    }
+
+  private class FeedComparator implements Comparator<Feed>, Serializable
+    {
+    private static final long serialVersionUID = 4718037652095754746L;
+
+    public int compare( Feed feed1, Feed feed2 )
+      {
+      Integer firstPosition = Questionnaire.this.getElements( ).indexOf( feed1.getFirstElement( ) );
+      Integer secondPosition = Questionnaire.this.getElements( ).indexOf( feed2.getFirstElement( ) );
+      return firstPosition.compareTo( secondPosition );
+      }
     }
   }
