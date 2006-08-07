@@ -126,6 +126,7 @@ public class Item implements Serializable
   // TODO: Index entries
   // TODO: Classification translations - Solved for the moment, we should change the way to access the strings to provide proper
   // control of languages
+  // TODO: Check for duplicated codes in constructors
 
   /** Constructor provided for persistence engine. */
   private Item( )
@@ -480,5 +481,11 @@ public class Item implements Serializable
   public int hashCode( )
     {
     return this.getVersion( ).hashCode( ) ^ this.getCode( ).hashCode( );
+    }
+
+  @Override
+  public String toString( )
+    {
+    return this.getOficialTitle( );
     }
   }
