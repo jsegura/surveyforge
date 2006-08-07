@@ -70,6 +70,12 @@ public class InternationalizedString implements Serializable
     this.setDefaultLocale( defaultLocale );
     }
 
+  public InternationalizedString( InternationalizedString otherString )
+    {
+    this.strings = new HashMap<Locale, String>( otherString.strings );
+    this.defaultLocale = otherString.defaultLocale;
+    }
+
   public Locale getDefaultLocale( )
     {
     return this.defaultLocale;

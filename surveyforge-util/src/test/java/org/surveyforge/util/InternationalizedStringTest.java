@@ -55,7 +55,7 @@ public class InternationalizedStringTest
   public void useOfDefaultLocale( )
     {
     Assert.assertEquals( new InternationalizedString( ).getDefaultLocale( ), Locale.getDefault( ) );
-    Assert.assertEquals( new InternationalizedString( null ).getDefaultLocale( ), Locale.getDefault( ) );
+    Assert.assertEquals( new InternationalizedString( (Locale) null ).getDefaultLocale( ), Locale.getDefault( ) );
     }
 
   @Test
