@@ -24,8 +24,10 @@ package org.surveyforge.classification;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -36,6 +38,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.IndexColumn;
@@ -103,6 +106,10 @@ public class Level implements Serializable
   @IndexColumn(name = "itemIndex")
   @JoinColumn(name = "level_id", nullable = false)
   private List<Item>        items            = new ArrayList<Item>( );
+
+  /** A mapping of codes to items for the items included in this level. */
+  @Transient
+  private Map<String, Item> codesToItems;
 
   /** Constructor provided for persistence engine. */
   private Level( )
@@ -328,6 +335,45 @@ public class Level implements Serializable
       }
     else
       throw new IllegalArgumentException( );
+    }
+
+  /**
+   * Returns the code to item mapping, useful to get the item with the provided code.
+   * 
+   * @return the code to item mapping.
+   */
+  protected Map<String, Item> getCodeToItemMapping( )
+    {
+    if( this.codesToItems == null )
+      {
+      this.codesToItems = new HashMap<String, Item>( );
+      for( Item item : this.getItems( ) )
+        this.codesToItems.put( item.getCode( ), item );
+      }
+
+    return this.codesToItems;
+    }
+
+  /**
+   * Returns <code>true</code> if the provided code is included in this level or levels under this level. Levels under this level
+   * will only be searched if <code>searchSublevels</code> is true.
+   * 
+   * @param code the code to search.
+   * @param searchSublevels whether to search in levels under this level.
+   * @return <code>true</code> if the provided code is included in this level or levels under this level.
+   */
+  public boolean isIncludedInLevel( String code, boolean searchSublevels )
+    {
+    if( this.getCodeToItemMapping( ).containsKey( code ) )
+      return true;
+    else
+      {
+      List<Level> levelsInVersion = this.getVersion( ).getLevels( );
+      if( searchSublevels && this.getNumber( ) < levelsInVersion.size( ) )
+        return levelsInVersion.get( this.getNumber( ) ).isIncludedInLevel( code, searchSublevels );
+      else
+        return false;
+      }
     }
 
   @Override
