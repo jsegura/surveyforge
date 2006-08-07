@@ -46,8 +46,7 @@ public class ConceptualDataElement extends DataElement
   @JoinColumn(name = "question_id")
   private Question          question;
   /**  */
-  @ManyToOne(optional = true)
-  @JoinColumn(name = "objectVariable_id", insertable = false, updatable = false)
+  @ManyToOne
   private ObjectVariable    objectVariable;
 
 
@@ -91,9 +90,10 @@ public class ConceptualDataElement extends DataElement
    */
   public void setObjectVariable( ObjectVariable objectVariable )
     {
-    if( this.objectVariable != null ) this.objectVariable.removeConceptualDataElement( this );
-    this.objectVariable = objectVariable;
-    if( this.objectVariable != null ) this.objectVariable.addConceptualDataElement( this );
+    if( objectVariable != null )
+      this.objectVariable = objectVariable;
+    else
+      throw new NullPointerException( );
     }
 
   @Override

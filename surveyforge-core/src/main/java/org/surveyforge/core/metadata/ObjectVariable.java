@@ -51,48 +51,41 @@ import org.surveyforge.core.survey.Study;
 @Entity
 public class ObjectVariable implements Serializable
   {
-  private static final long           serialVersionUID       = 4288089682729653747L;
+  private static final long     serialVersionUID = 4288089682729653747L;
 
 
   @Id
   @Column(length = 50)
   @GeneratedValue(generator = "system-uuid")
   @GenericGenerator(name = "system-uuid", strategy = "uuid")
-  private String                      id;
+  private String                id;
   /** Version for optimistic locking. */
   @javax.persistence.Version
-  private int                         lockingVersion;
+  private int                   lockingVersion;
 
   /**
    * Unique and language independent identifier for the object variable. The identifier is unique among all object variables. The
    * identifier should contain identifications for the statistical object and the global variable it is based on.
    */
   @Column(unique = true, length = 50)
-  private String                      identifier;
+  private String                identifier;
   /** The name is the official, language dependent name of the global variable, provided by the owner of the variable. */
   @Column(length = 250)
-  private String                      name                   = "";
+  private String                name             = "";
   /** Short general multilingual description of the object variable, including its purpose, its main subject areas etc. */
   @Column(length = 500)
-  private String                      description            = "";
+  private String                description      = "";
   /**
    * Each object variable belongs to a statistical object or unit. The object variable exists only in the context of the object
    * variable.
    */
   @ManyToOne
   @JoinColumn(name = "statisticalObjectType_id", insertable = false, updatable = false)
-  private StatisticalObjectType       statisticalObjectType;
+  private StatisticalObjectType statisticalObjectType;
   /** An object variable should refer to a global variable definition that reflects the general concepts of the object variable. */
   @ManyToOne
   @JoinColumn(name = "globalVariable_id", insertable = false, updatable = false)
-  private GlobalVariable              globalVariable;
-
-  /** Based on an object variable a number of data elements may refer to this object variable. */
-  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
-  @IndexColumn(name = "dataElementsIndex")
-  @JoinColumn(name = "objectVariable_id")
-  private List<ConceptualDataElement> conceptualDataElements = new ArrayList<ConceptualDataElement>( );
-
+  private GlobalVariable        globalVariable;
 
   private ObjectVariable( )
     {}
@@ -233,36 +226,6 @@ public class ObjectVariable implements Serializable
       this.globalVariable = globalVariable;
     else
       throw new NullPointerException( );
-    }
-
-  /**
-   * Returns the list of {@link ConceptualDataElement} linked to this ObjectVariable.
-   * 
-   * @return Returns the list of ConceptualDataElements.
-   */
-  public List<ConceptualDataElement> getConceptualDataElements( )
-    {
-    return Collections.unmodifiableList( conceptualDataElements );
-    }
-
-  /**
-   * Adds a new {@link ConceptualDataElement} to the list.
-   * 
-   * @param dataElements The conceptualDataElement to add.
-   */
-  protected void addConceptualDataElement( ConceptualDataElement conceptualDataElement )
-    {
-    this.conceptualDataElements.add( conceptualDataElement );
-    }
-
-  /**
-   * Removes a {@link ConceptualDataElement} from the list.
-   * 
-   * @param dataElements The conceptualDataElement to remove.
-   */
-  protected void removeConceptualDataElement( ConceptualDataElement conceptualDataElement )
-    {
-    this.conceptualDataElements.remove( conceptualDataElement );
     }
 
   @Override
