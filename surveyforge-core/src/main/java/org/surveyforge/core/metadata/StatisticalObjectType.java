@@ -38,7 +38,6 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.IndexColumn;
-import org.surveyforge.core.survey.Study;
 
 /**
  * Statistical objects or units may be real world objects (e.g. person, enterprise) or abstract objects like events or states (e.g.
@@ -52,13 +51,14 @@ public class StatisticalObjectType implements Serializable
   {
   private static final long           serialVersionUID = 3051156955695891963L;
 
-
+  @SuppressWarnings("unused")
   @Id
   @Column(length = 50)
   @GeneratedValue(generator = "system-uuid")
   @GenericGenerator(name = "system-uuid", strategy = "uuid")
   private String                      id;
   /** Version for optimistic locking. */
+  @SuppressWarnings("unused")
   @javax.persistence.Version
   private int                         lockingVersion;
 

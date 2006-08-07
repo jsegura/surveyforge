@@ -22,24 +22,15 @@
 package org.surveyforge.core.metadata;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.IndexColumn;
-import org.surveyforge.core.survey.Study;
 
 /**
  * An object variable defines the concept of a variable in connection with a defined statistical object (e.g. the income of a person).
@@ -53,13 +44,14 @@ public class ObjectVariable implements Serializable
   {
   private static final long     serialVersionUID = 4288089682729653747L;
 
-
+  @SuppressWarnings("unused")
   @Id
   @Column(length = 50)
   @GeneratedValue(generator = "system-uuid")
   @GenericGenerator(name = "system-uuid", strategy = "uuid")
   private String                id;
   /** Version for optimistic locking. */
+  @SuppressWarnings("unused")
   @javax.persistence.Version
   private int                   lockingVersion;
 

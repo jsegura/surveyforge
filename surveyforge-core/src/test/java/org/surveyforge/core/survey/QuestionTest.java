@@ -21,7 +21,6 @@
  */
 package org.surveyforge.core.survey;
 
-import org.surveyforge.core.metadata.GlobalVariable;
 import org.testng.Assert;
 import org.testng.annotations.ExpectedExceptions;
 import org.testng.annotations.Test;

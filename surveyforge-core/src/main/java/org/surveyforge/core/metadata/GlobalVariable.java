@@ -45,12 +45,14 @@ public class GlobalVariable implements Serializable
   {
   private static final long serialVersionUID = 1661678204467740737L;
 
+  @SuppressWarnings("unused")
   @Id
   @Column(length = 50)
   @GeneratedValue(generator = "system-uuid")
   @GenericGenerator(name = "system-uuid", strategy = "uuid")
   private String            id;
   /** Version for optimistic locking. */
+  @SuppressWarnings("unused")
   @javax.persistence.Version
   private int               lockingVersion;
 

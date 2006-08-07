@@ -54,12 +54,14 @@ public class Classification implements Serializable
   {
   private static final long serialVersionUID = 4169537105933133532L;
 
+  @SuppressWarnings("unused")
   @Id
   @Column(length = 50)
   @GeneratedValue(generator = "system-uuid")
   @GenericGenerator(name = "system-uuid", strategy = "uuid")
   private String            id;
   /** Version for optimistic locking. */
+  @SuppressWarnings("unused")
   @javax.persistence.Version
   private int               lockingVersion;
   /** A classification is identified by a unique identifier, which may typically be an abbreviation of its title. */

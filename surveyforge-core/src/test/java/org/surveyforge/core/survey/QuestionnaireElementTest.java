@@ -23,26 +23,22 @@ package org.surveyforge.core.survey;
 
 import java.lang.reflect.Method;
 
+import org.surveyforge.core.metadata.ConceptualDataElement;
+import org.surveyforge.core.metadata.LogicalValueDomain;
+import org.surveyforge.core.metadata.RegisterDataElement;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.ExpectedExceptions;
 import org.testng.annotations.Test;
-import org.surveyforge.core.metadata.ConceptualDataElement;
-import org.surveyforge.core.metadata.LogicalValueDomain;
-import org.surveyforge.core.metadata.Register;
-import org.surveyforge.core.metadata.RegisterDataElement;
-import org.surveyforge.core.metadata.ValueDomain;
 
 /**
  * @author jsegura
  */
 public class QuestionnaireElementTest
   {
-
   @DataProvider(name = "dp")
   public Object[][] createData( Method m )
     {
-    Register register = new Register( "register" );
     ConceptualDataElement conceptualDataElement = new ConceptualDataElement( new LogicalValueDomain( ), "conceptualDataElement" );
     RegisterDataElement registerDataElement = new RegisterDataElement( conceptualDataElement, "registerDataElement" );
     return new Object[][] {new Object[] {registerDataElement}};

@@ -39,12 +39,14 @@ public abstract class ValueDomain implements Serializable, Cloneable
   {
   private static final long serialVersionUID = -83487445078388347L;
 
+  @SuppressWarnings("unused")
   @Id
   @Column(length = 50)
   @GeneratedValue(generator = "system-uuid")
   @GenericGenerator(name = "system-uuid", strategy = "uuid")
   private String            id;
   /** Version for optimistic locking. */
+  @SuppressWarnings("unused")
   @javax.persistence.Version
   private int               lockingVersion;
 

@@ -58,12 +58,14 @@ public class Item implements Serializable
   {
   private static final long                    serialVersionUID  = -3965211400312532582L;
 
+  @SuppressWarnings("unused")
   @Id
   @Column(length = 50)
   @GeneratedValue(generator = "system-uuid")
   @GenericGenerator(name = "system-uuid", strategy = "uuid")
   private String                               id;
   /** Version for optimistic locking. */
+  @SuppressWarnings("unused")
   @javax.persistence.Version
   private int                                  lockingVersion;
   /** The level this item belongs to. */

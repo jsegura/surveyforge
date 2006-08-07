@@ -46,13 +46,16 @@ import org.hibernate.annotations.IndexColumn;
 @Entity
 public class Row implements Serializable
   {
-
+  private static final long serialVersionUID = 6601926722422919229L;
+  
+  @SuppressWarnings("unused")
   @Id
   @Column(length = 50)
   @GeneratedValue(generator = "system-uuid")
   @GenericGenerator(name = "system-uuid", strategy = "uuid")
   private String        id;
   /** Version for optimistic locking. */
+  @SuppressWarnings("unused")
   @javax.persistence.Version
   private int           lockingVersion;
 
