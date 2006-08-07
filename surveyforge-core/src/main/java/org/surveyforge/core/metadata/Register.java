@@ -210,8 +210,8 @@ public class Register implements Serializable
     {
     if( registerDataElement == null )
       throw new NullPointerException( );
-    else if( registerData == null || registerData.getRows( ).size( ) > 0 )
-      throw new IllegalArgumentException( );
+    else if( this.registerData.getRows( ).size( ) > 0 )
+      throw new IllegalStateException( );
     else
       {
       this.registerDataElements.add( registerDataElement );
@@ -223,8 +223,8 @@ public class Register implements Serializable
     {
     if( registerDataElement == null )
       throw new NullPointerException( );
-    else if( registerData != null )
-      throw new IllegalArgumentException( );
+    else if( this.registerData.getRows( ).size( ) > 0 )
+      throw new IllegalStateException( );
     else
       {
       this.registerDataElements.remove( registerDataElement );
@@ -239,9 +239,9 @@ public class Register implements Serializable
     {
     if( registerDataElements == null )
       throw new NullPointerException( );
-    else if( registerData != null )
-      throw new IllegalArgumentException( );
-    else if( key != null && !registerDataElements.containsAll( key ) )
+    else if( this.registerData.getRows( ).size( ) > 0 )
+      throw new IllegalStateException( );
+    else if( this.key != null && !registerDataElements.containsAll( this.key ) )
       throw new IllegalArgumentException( );
     else
       {
