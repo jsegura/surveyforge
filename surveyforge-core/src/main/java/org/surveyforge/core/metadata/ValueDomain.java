@@ -35,7 +35,7 @@ import org.hibernate.annotations.GenericGenerator;
  * @author jsegura
  */
 @Entity
-public class ValueDomain implements Serializable
+public abstract class ValueDomain implements Serializable, Cloneable
   {
   private static final long serialVersionUID = -83487445078388347L;
 
@@ -51,10 +51,21 @@ public class ValueDomain implements Serializable
   public ValueDomain( )
     {}
 
-  public boolean isValid( Serializable data )
-    {
-    // TODO Auto-generated method stub
-    return false;
-    }
+  public abstract boolean isValid( Serializable data );
 
+  @Override
+  public ValueDomain clone( )
+    {
+    try
+      {
+      ValueDomain copy = (ValueDomain) super.clone( );
+      copy.id = null;
+      copy.lockingVersion = 0;
+      return copy;
+      }
+    catch( CloneNotSupportedException exc )
+      {
+      throw new InternalError( exc.getLocalizedMessage( ) );
+      }
+    }
   }

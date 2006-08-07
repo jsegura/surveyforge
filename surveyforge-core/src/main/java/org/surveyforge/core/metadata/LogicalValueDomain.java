@@ -21,12 +21,7 @@
  */
 package org.surveyforge.core.metadata;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
-import org.hibernate.annotations.GenericGenerator;
+import java.io.Serializable;
 
 /**
  * @author jsegura
@@ -36,18 +31,22 @@ public class LogicalValueDomain extends ValueDomain
   {
   private static final long serialVersionUID = 2066579378848047283L;
 
-//  @Id
-//  @Column(length = 50)
-//  @GeneratedValue(generator = "system-uuid")
-//  @GenericGenerator(name = "system-uuid", strategy = "uuid")
-//  private String            id;
-//  /** Version for optimistic locking. */
-//  @javax.persistence.Version
-//  private int               lockingVersion;
+  // @Id
+  // @Column(length = 50)
+  // @GeneratedValue(generator = "system-uuid")
+  // @GenericGenerator(name = "system-uuid", strategy = "uuid")
+  // private String id;
+  // /** Version for optimistic locking. */
+  // @javax.persistence.Version
+  // private int lockingVersion;
 
-  public boolean isValid( Object object )
+  public boolean isValid( Serializable object )
     {
     return (Boolean.class.isInstance( object ));
     }
-
+//
+//  public LogicalValueDomain clone( )
+//    {
+//    return (LogicalValueDomain) super.clone( );
+//    }
   }
