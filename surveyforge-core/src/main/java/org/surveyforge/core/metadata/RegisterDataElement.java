@@ -21,16 +21,10 @@
  */
 package org.surveyforge.core.metadata;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
-import org.hibernate.annotations.IndexColumn;
 import org.surveyforge.core.survey.Question;
 
 /**
@@ -86,10 +80,7 @@ public class RegisterDataElement extends DataElement
    */
   public void setConceptualDataElement( ConceptualDataElement conceptualDataElement )
     {
-    if( conceptualDataElement != null )
-      this.conceptualDataElement = conceptualDataElement;
-    else
-      throw new NullPointerException( );
+    this.conceptualDataElement = conceptualDataElement;
     }
 
   /**
