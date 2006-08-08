@@ -28,6 +28,8 @@
     <mapping class="org.surveyforge.core.survey.Study" />
     <mapping class="org.surveyforge.core.survey.Questionnaire" />
     <mapping class="org.surveyforge.core.survey.Question" />
+    <mapping class="org.surveyforge.core.survey.Feed" />
+    <mapping class="org.surveyforge.core.survey.SectionFeed" />
 
     <!-- package org.surveyforge.core.metadata -->
     <mapping class="org.surveyforge.core.metadata.ValidationRule" />
@@ -40,6 +42,10 @@
     <mapping class="org.surveyforge.core.metadata.GlobalVariable" />
     <mapping class="org.surveyforge.core.metadata.VariableFamily" />
     <mapping class="org.surveyforge.core.metadata.StatisticalObjectType" />
+    <mapping class="org.surveyforge.core.metadata.domain.ClassificationValueDomain" />
+    <mapping class="org.surveyforge.core.metadata.domain.LogicalValueDomain" />
+    <mapping class="org.surveyforge.core.metadata.domain.QuantityValueDomain" />
+    <mapping class="org.surveyforge.core.metadata.domain.StringValueDomain" />
 
     <!-- package org.surveyforge.core.data -->
     <mapping class="org.surveyforge.core.data.RegisterData" />
