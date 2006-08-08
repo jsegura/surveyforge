@@ -27,6 +27,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -35,6 +37,7 @@ import org.hibernate.annotations.GenericGenerator;
  * @author jsegura
  */
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class ValueDomain implements Serializable, Cloneable
   {
   private static final long serialVersionUID = -83487445078388347L;
