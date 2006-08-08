@@ -24,8 +24,8 @@ package org.surveyforge.core.survey;
 import java.lang.reflect.Method;
 
 import org.surveyforge.core.metadata.ConceptualDataElement;
-import org.surveyforge.core.metadata.LogicalValueDomain;
 import org.surveyforge.core.metadata.RegisterDataElement;
+import org.surveyforge.core.metadata.domain.LogicalValueDomain;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.ExpectedExceptions;
