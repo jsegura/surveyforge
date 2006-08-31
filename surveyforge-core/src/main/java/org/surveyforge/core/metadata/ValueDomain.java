@@ -53,7 +53,7 @@ public abstract class ValueDomain implements Serializable, Cloneable
   @javax.persistence.Version
   private int               lockingVersion;
 
-  public ValueDomain( )
+  protected ValueDomain( )
     {}
 
   public abstract boolean isValid( Serializable data );

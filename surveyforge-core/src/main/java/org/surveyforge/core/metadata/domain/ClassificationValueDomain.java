@@ -41,6 +41,9 @@ public class ClassificationValueDomain extends ValueDomain
   private Level             level;
   private boolean           sublevelsAllowed = true;
 
+  protected ClassificationValueDomain( )
+    {};
+
   public ClassificationValueDomain( Level level )
     {
     this( level, true );

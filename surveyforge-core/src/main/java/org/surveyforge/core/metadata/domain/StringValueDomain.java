@@ -38,6 +38,9 @@ public class StringValueDomain extends ValueDomain
   private int               minLength        = 0;
   private int               maxLength        = Integer.MAX_VALUE;
 
+  protected StringValueDomain( )
+    {};
+
   public StringValueDomain( int minLength, int maxLength )
     {
     this.setMinLength( minLength );

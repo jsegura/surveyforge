@@ -26,10 +26,15 @@ import java.io.Serializable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
 import org.hibernate.annotations.GenericGenerator;
 import org.surveyforge.core.metadata.RegisterDataElement;
 
@@ -41,6 +46,7 @@ import org.surveyforge.core.metadata.RegisterDataElement;
  * @author jsegura
  */
 @Entity
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"identifier", "questionnaire_id"})})
 public class QuestionnaireElement implements Serializable
   {
   private static final long   serialVersionUID     = 0L;
@@ -64,18 +70,17 @@ public class QuestionnaireElement implements Serializable
   @JoinColumn(name = "question_id", insertable = false, updatable = false)
   private Question            question             = null;
   /** A questionnaire element have a {@link RegisterDataElement} to have the info of the data. */
-  @ManyToOne(optional = false)
-  @JoinColumn(name = "registerDataElement_id", insertable = false, updatable = false)
+  @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   private RegisterDataElement registerDataElement;
   /** Default answer if the question is not applicable. */
-  @Column(nullable = false, length = 50)
+  @Column(length = 50)
   private String              defaultNotApplicable = "";
   /** Default answer if the question is not answered. */
-  @Column(nullable = false, length = 50)
+  @Column(length = 50)
   private String              defaultNotAnswered   = "";
 
 
-  private QuestionnaireElement( )
+  protected QuestionnaireElement( )
     {}
 
   /**

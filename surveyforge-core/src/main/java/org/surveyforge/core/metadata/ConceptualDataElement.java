@@ -50,6 +50,9 @@ public class ConceptualDataElement extends DataElement
   private ObjectVariable    objectVariable;
 
 
+  protected ConceptualDataElement( )
+    {}
+
   /**
    * Creates a new ConceptualDataElement based on the params of a DataElement
    * 

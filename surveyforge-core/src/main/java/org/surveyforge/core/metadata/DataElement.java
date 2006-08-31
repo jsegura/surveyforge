@@ -35,6 +35,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.IndexColumn;
 
@@ -43,6 +46,7 @@ import org.hibernate.annotations.IndexColumn;
  * @author jsegura
  */
 @Entity
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"identifier", "register_id"})})
 public class DataElement implements Serializable
   {
   private static final long serialVersionUID  = 0L;
@@ -62,7 +66,7 @@ public class DataElement implements Serializable
    * This is a unique and language independent identifier for the data element. The identifier is unique among all other data elements
    * for an object variable (standard data element) or within the scope of a statistical activity.
    */
-  @Column(unique = true, length = 50)
+  @Column(length = 50)
   private String            identifier;
   /**  */
   private boolean           multiple          = false;
@@ -83,7 +87,7 @@ public class DataElement implements Serializable
   private List<DataElement> componentElements = new ArrayList<DataElement>( );
 
 
-  private DataElement( )
+  protected DataElement( )
     {}
 
   /**

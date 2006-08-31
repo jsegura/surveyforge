@@ -58,7 +58,7 @@ public class ValidationRule implements Serializable
   @JoinColumn(name = "register_id", insertable = false, updatable = false)
   private Register          register;
 
-  public ValidationRule( )
+  protected ValidationRule( )
     {}
 
   // TODO hashcode + equals

@@ -38,6 +38,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.IndexColumn;
 import org.surveyforge.core.metadata.Register;
@@ -50,6 +53,7 @@ import org.surveyforge.util.InternationalizedString;
  * @author jsegura
  */
 @Entity
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"identifier", "study_id"})})
 public class Questionnaire implements Serializable
   {
   private static final long          serialVersionUID = 6844066269698434310L;
@@ -69,7 +73,7 @@ public class Questionnaire implements Serializable
    * A questionnaire is identified by an identifier, which is unique in the context of a statistical activity. It may typically be an
    * abbreviation of its title or a systematic number.
    */
-  @Column(unique = true, nullable = false, length = 50)
+  @Column(nullable = false, length = 50)
   private String                     identifier;
   /** A questionnaire has a title as provided by the owner or maintenance unit. */
   @Column(length = 250)
@@ -88,12 +92,13 @@ public class Questionnaire implements Serializable
   /** A questionnaire may have its content organized in pages. */
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "pageIndex")
-  @JoinColumn(name = "questionnaire_id", nullable = false)
+  //@JoinColumn(name = "questionnaire_page_id")
+  @JoinColumn(name = "questionnaire_page_id", nullable = false)
   private List<Feed>                 pageFeeds        = new ArrayList<Feed>( );
   /** A questionnaire may have its content organized in sections. */
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "sectionIndex")
-  @JoinColumn(name = "questionnaire_id", nullable = false)
+  @JoinColumn(name = "questionnaire_section_id", nullable = false)
   private List<SectionFeed>          sectionFeeds     = new ArrayList<SectionFeed>( );
 
   /** A questionnaire corresponds logically to a register, which describes the content of the data collection. */
@@ -106,7 +111,7 @@ public class Questionnaire implements Serializable
   private Study                      study;
 
 
-  private Questionnaire( )
+  protected Questionnaire( )
     {}
 
   /**

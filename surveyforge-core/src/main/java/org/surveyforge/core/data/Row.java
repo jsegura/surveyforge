@@ -47,26 +47,29 @@ import org.hibernate.annotations.IndexColumn;
 public class Row implements Serializable
   {
   private static final long serialVersionUID = 6601926722422919229L;
-  
+
   @SuppressWarnings("unused")
   @Id
   @Column(length = 50)
   @GeneratedValue(generator = "system-uuid")
   @GenericGenerator(name = "system-uuid", strategy = "uuid")
-  private String        id;
+  private String            id;
   /** Version for optimistic locking. */
   @SuppressWarnings("unused")
   @javax.persistence.Version
-  private int           lockingVersion;
+  private int               lockingVersion;
 
   @ManyToOne(optional = true)
   @JoinColumn(name = "registerData_id", insertable = false, updatable = false)
-  private RegisterData  registerData;
+  private RegisterData      registerData;
 
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "rowDatasIndex")
   @JoinColumn(name = "row_id", nullable = false)
-  private List<RowData> rowDatas = new ArrayList<RowData>( );
+  private List<RowData>     rowDatas         = new ArrayList<RowData>( );
+
+  protected Row( )
+    {};
 
   public Row( RegisterData registerData )
     {
@@ -103,14 +106,7 @@ public class Row implements Serializable
       this.rowDatas.set( fieldIndex, rowData );
       }
     else
-      {
-      // String errorMessage = MessageFormat.format( Record.messages.getString( "message.invalid.name" ), fieldName );
-      // if( Record.log.isInfoEnabled( ) )
-      // {
-      // Record.log.info( Record.messages.getString( "exception.invalid.name" ) + errorMessage );
-      // }
       throw new NoSuchElementException( );
-      }
     }
 
   public List<RowData> getRowDatas( )

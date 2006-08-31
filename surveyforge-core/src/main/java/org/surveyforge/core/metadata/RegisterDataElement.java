@@ -22,8 +22,9 @@
 package org.surveyforge.core.metadata;
 
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 import org.surveyforge.core.survey.Question;
 
@@ -37,18 +38,19 @@ import org.surveyforge.core.survey.Question;
 // TODO: Improve javadocs
 public class RegisterDataElement extends DataElement
   {
-  private static final long     serialVersionUID = -8986375207717119033L;
+  private static final long     serialVersionUID      = -8986375207717119033L;
 
   /** The context data element describes the basic properties of the register data element. */
-  @ManyToOne
-  @JoinColumn(name = "conceptualDataElement")
-  private ConceptualDataElement conceptualDataElement;
+  @OneToOne(fetch = FetchType.LAZY)
+  private ConceptualDataElement conceptualDataElement = null;
   /** */
-  private boolean               optional;
+  private boolean               optional              = true;
   /** */
   @ManyToOne(optional = true)
   private Question              question;
 
+  protected RegisterDataElement( )
+    {};
 
   /**
    * Creates a new instance of ConceptualDataElement linked with a {@link ConceptualDataElement}.

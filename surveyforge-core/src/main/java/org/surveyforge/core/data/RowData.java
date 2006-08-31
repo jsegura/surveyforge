@@ -62,6 +62,9 @@ public class RowData implements Serializable
   private boolean           answered;
   private boolean           applicable;
 
+  protected RowData( )
+    {}
+
   /**
    * @return Returns the data.
    */

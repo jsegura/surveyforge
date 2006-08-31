@@ -90,7 +90,7 @@ public class StatisticalObjectType implements Serializable
   private List<ObjectVariable>        objectVariables  = new ArrayList<ObjectVariable>( );
 
 
-  private StatisticalObjectType( )
+  protected StatisticalObjectType( )
     {}
 
   /**

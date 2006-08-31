@@ -74,7 +74,7 @@ public class GlobalVariable implements Serializable
   private VariableFamily    variableFamily;
 
 
-  private GlobalVariable( )
+  protected GlobalVariable( )
     {}
 
   /**

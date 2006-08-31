@@ -66,7 +66,7 @@ public class RegisterData implements Serializable
   @JoinColumn(name = "registerData_id")
   private List<Row>         rows             = new ArrayList<Row>( );
 
-  private RegisterData( )
+  protected RegisterData( )
     {}
 
   public RegisterData( Register register )
@@ -105,7 +105,7 @@ public class RegisterData implements Serializable
       {
       if( this.register.getKey( ).size( ) == 0 ) throw new IllegalArgumentException( );
       ArrayList<Integer> illegalList = new ArrayList<Integer>( );
-      // TODO: Check valiadation rules
+      // TODO: Check validation rules and throw Exceptions if needed
 
       if( this.register.getRegisterDataElements( ).size( ) != row.getRowDatas( ).size( ) ) throw new IllegalArgumentException( );
       int index = 0;
@@ -116,7 +116,6 @@ public class RegisterData implements Serializable
         index++;
         }
       if( illegalList.size( ) == 0 ) this.rows.add( row );
-      // TODO: else throw Exception
       }
 
     else

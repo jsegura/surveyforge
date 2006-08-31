@@ -79,7 +79,7 @@ public class ObjectVariable implements Serializable
   @JoinColumn(name = "globalVariable_id", insertable = false, updatable = false)
   private GlobalVariable        globalVariable;
 
-  private ObjectVariable( )
+  protected ObjectVariable( )
     {}
 
   /**

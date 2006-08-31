@@ -97,7 +97,8 @@ public class Register implements Serializable
   /** */
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "registerDataElementsIndex")
-  @JoinColumn(name = "register_id", nullable = false)
+  // @JoinColumn(name = "register_id", nullable = false)
+  @JoinColumn(name = "register_id")
   private List<RegisterDataElement> registerDataElements = new ArrayList<RegisterDataElement>( );
 
   /** */
@@ -122,7 +123,7 @@ public class Register implements Serializable
   private Questionnaire             questionnaire;
 
 
-  private Register( )
+  protected Register( )
     {}
 
   /**

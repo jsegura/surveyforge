@@ -58,10 +58,8 @@ public class Feed implements Serializable
   @ManyToOne
   private QuestionnaireElement firstElement;
 
-  private Feed( )
-    {
-    // TODO Auto-generated constructor stub
-    }
+  protected Feed( )
+    {}
 
   public Feed( QuestionnaireElement firstElement )
     {

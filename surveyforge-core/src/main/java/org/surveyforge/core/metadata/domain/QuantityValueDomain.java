@@ -42,6 +42,10 @@ public class QuantityValueDomain extends ValueDomain
   private BigDecimal        minimum          = BigDecimal.valueOf( Integer.MIN_VALUE );
   private BigDecimal        maximum          = BigDecimal.valueOf( Integer.MAX_VALUE ); ;
 
+
+  protected QuantityValueDomain( )
+    {}
+
   /**
    * 
    */

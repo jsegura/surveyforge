@@ -75,7 +75,7 @@ public class VariableFamily implements Serializable
   @JoinColumn(name = "variableFamily_id", nullable = false)
   private List<GlobalVariable> globalVariables  = new ArrayList<GlobalVariable>( );
 
-  private VariableFamily( )
+  protected VariableFamily( )
     {}
 
   /**

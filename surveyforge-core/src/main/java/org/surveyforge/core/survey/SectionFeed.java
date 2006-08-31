@@ -40,6 +40,9 @@ public class SectionFeed extends Feed
   @ManyToOne(cascade = {CascadeType.ALL})
   private InternationalizedString title            = new InternationalizedString( );
 
+  protected SectionFeed( )
+    {};
+
   public SectionFeed( QuestionnaireElement firstElement )
     {
     this( firstElement, null );

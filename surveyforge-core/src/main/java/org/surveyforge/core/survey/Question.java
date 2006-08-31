@@ -80,11 +80,11 @@ public class Question implements Serializable
   /** A question referring to a complex fact can be divided in a number of sub questions. */
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "subQuestionsIndex")
-  @JoinColumn(name = "upperQuestion_id", nullable = false)
+  @JoinColumn(name = "upperQuestion_id")
   private List<Question>    subQuestions     = new ArrayList<Question>( );
 
 
-  private Question( )
+  protected Question( )
     {}
 
   /**
@@ -97,6 +97,20 @@ public class Question implements Serializable
     {
     this.setIdentifier( identifier );
     }
+
+  /**
+   * Creates a new Question with an identifier and a text.
+   * 
+   * @param identifier The identifier of this Question.
+   * @param text The text of this question
+   * @throws NullPointerException if the identifier or the question are <code>null</code>.
+   */
+  public Question( String identifier, String text )
+    {
+    this( identifier );
+    this.setText( text );
+    }
+
 
   /**
    * Returns the identifier of the classification.

@@ -83,8 +83,7 @@ public class Study implements Serializable
   @JoinColumn(name = "study_id", nullable = false)
   private List<Questionnaire> questionnaires   = new ArrayList<Questionnaire>( );
 
-  /* TODO : elaborate on keywords? */
-  private Study( )
+  protected Study( )
     {}
 
   /**
