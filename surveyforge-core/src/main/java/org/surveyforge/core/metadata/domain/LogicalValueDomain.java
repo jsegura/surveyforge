@@ -35,7 +35,7 @@ public class LogicalValueDomain extends ValueDomain
   {
   private static final long serialVersionUID = 2066579378848047283L;
 
-  protected LogicalValueDomain( )
+  public LogicalValueDomain( )
     {}
 
   public boolean isValid( Serializable object )
