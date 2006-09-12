@@ -22,15 +22,22 @@
 package org.surveyforge.core.data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.IndexColumn;
 
 // TODO: Elaborate on comments
 /**
@@ -52,15 +59,19 @@ public class RowData implements Serializable
   @javax.persistence.Version
   private int               lockingVersion;
 
-  @ManyToOne
-  @JoinColumn(name = "row_id", insertable = false, updatable = false)
-  private Row               row;
-  // TODO get/set of the row
-
   private Serializable      data;
 
   private boolean           answered;
   private boolean           applicable;
+
+  @ManyToOne(cascade = {CascadeType.ALL})
+  @JoinColumn(name = "upperRowData_id", insertable = false, updatable = false)
+  private RowData           upperRowData;
+
+  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+  @IndexColumn(name = "subRowDatasIndex")
+  @JoinColumn(name = "upperRowData_id")
+  private List<RowData>     subRowDatas      = new ArrayList<RowData>( );
 
   protected RowData( )
     {}
@@ -111,6 +122,49 @@ public class RowData implements Serializable
   public void setApplicable( boolean applicable )
     {
     this.applicable = applicable;
+    }
+
+  /**
+   * @return the upperRowData
+   */
+  public RowData getUpperRowData( )
+    {
+    return upperRowData;
+    }
+
+  /**
+   * @param upperRowData the upperRowData to set
+   */
+  public void setUpperRowData( RowData upperRowData )
+    {
+    if( this.upperRowData != null ) this.upperRowData.removeSubRowData( this );
+    this.upperRowData = upperRowData;
+    if( this.upperRowData != null ) this.upperRowData.addSubRowData( this );
+    }
+
+  private void removeSubRowData( RowData rowData )
+    {
+    if( rowData != null )
+      this.subRowDatas.remove( rowData );
+    else
+      throw new NullPointerException( );
+    }
+
+  private void addSubRowData( RowData rowData )
+    {
+    if( rowData != null )
+      this.subRowDatas.add( rowData );
+    else
+      throw new NullPointerException( );
+    }
+
+
+  /**
+   * @return the subRowDatas
+   */
+  public List<RowData> getSubRowDatas( )
+    {
+    return Collections.unmodifiableList( this.subRowDatas );
     }
 
 
