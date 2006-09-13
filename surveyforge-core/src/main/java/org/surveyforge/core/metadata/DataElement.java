@@ -47,7 +47,7 @@ import org.hibernate.annotations.IndexColumn;
  */
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"identifier", "register_id"})})
-public class DataElement implements Serializable
+public abstract class DataElement implements Serializable
   {
   private static final long serialVersionUID  = 0L;
 
@@ -89,6 +89,11 @@ public class DataElement implements Serializable
 
   protected DataElement( )
     {}
+
+  protected DataElement( String identifier )
+    {
+    this.setIdentifier( identifier );
+    }
 
   /**
    * @param valueDomain
