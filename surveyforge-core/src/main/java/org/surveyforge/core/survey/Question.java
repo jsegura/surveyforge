@@ -22,22 +22,13 @@
 package org.surveyforge.core.survey;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.IndexColumn;
 
 /**
  * The question contain the text for the question, with the sub questions being used to provide further information about the question.
@@ -73,15 +64,7 @@ public class Question implements Serializable
   /** The description contains explanatory notes to the question and/or an extended definition of the question's meaning. */
   @Column(length = 500)
   private String            description      = "";
-  /** This is the question that acts as a frame for a number of sub questions. */
-  @ManyToOne
-  @JoinColumn(name = "upperQuestion_id", insertable = false, updatable = false)
-  private Question          upperQuestion    = null;
-  /** A question referring to a complex fact can be divided in a number of sub questions. */
-  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
-  @IndexColumn(name = "subQuestionsIndex")
-  @JoinColumn(name = "upperQuestion_id")
-  private List<Question>    subQuestions     = new ArrayList<Question>( );
+
 
 
   protected Question( )
@@ -184,65 +167,6 @@ public class Question implements Serializable
       throw new NullPointerException( );
     }
 
-  /**
-   * Returns the Question that acts as a frame of the Question.
-   * 
-   * @return Returns the upperQuestion.
-   */
-  public Question getUpperQuestion( )
-    {
-    return this.upperQuestion;
-    }
-
-  /**
-   * Sets a new Question to act as a frame of the Question removing this one from the list of subQuestions of the old upperQuestion.
-   * 
-   * @param upperQuestion The upperQuestion to set.
-   */
-  public void setUpperQuestion( Question upperQuestion )
-    {
-    if( this.upperQuestion != null ) this.upperQuestion.removeSubQuestion( this );
-    this.upperQuestion = upperQuestion;
-    if( this.upperQuestion != null ) this.upperQuestion.addSubQuestion( this );
-    }
-
-  /**
-   * Returns the list of subQuestions of the Question.
-   * 
-   * @return Returns the subQuestions.
-   */
-  public List<Question> getSubQuestions( )
-    {
-    return Collections.unmodifiableList( this.subQuestions );
-    }
-
-  /**
-   * Add a new Question to the list of subQuestions.
-   * 
-   * @param subQuestions The subQuestions to add.
-   * @throws NullPointerException If the subquestion is <code>null</code>.
-   */
-  private void addSubQuestion( Question subQuestion )
-    {
-    if( subQuestion != null )
-      this.subQuestions.add( subQuestion );
-    else
-      throw new NullPointerException( );
-    }
-
-  /**
-   * Remove a Question from the list of subQuestions.
-   * 
-   * @param subQuestion the subQuestion to remove.
-   * @throws NullPointerException If the subquestion is <code>null</code>.
-   */
-  private void removeSubQuestion( Question subQuestion )
-    {
-    if( subQuestion != null )
-      this.subQuestions.remove( subQuestion );
-    else
-      throw new NullPointerException( );
-    }
 
   @Override
   public boolean equals( Object object )

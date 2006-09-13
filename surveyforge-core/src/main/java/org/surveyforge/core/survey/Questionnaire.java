@@ -87,18 +87,18 @@ public class Questionnaire implements Serializable
   /** A questionnaire consists of a number of questionnaire elements. Each element refers to a question. */
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "questionnairesIndex")
-  @JoinColumn(name = "questionnaire_id", nullable = false)
+  @JoinColumn(name = "questionnaire_id")
   private List<QuestionnaireElement> elements         = new ArrayList<QuestionnaireElement>( );
   /** A questionnaire may have its content organized in pages. */
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "pageIndex")
-  //@JoinColumn(name = "questionnaire_page_id")
-  @JoinColumn(name = "questionnaire_page_id", nullable = false)
+  // @JoinColumn(name = "questionnaire_page_id")
+  @JoinColumn(name = "questionnaire_page_id")
   private List<Feed>                 pageFeeds        = new ArrayList<Feed>( );
   /** A questionnaire may have its content organized in sections. */
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "sectionIndex")
-  @JoinColumn(name = "questionnaire_section_id", nullable = false)
+  @JoinColumn(name = "questionnaire_section_id")
   private List<SectionFeed>          sectionFeeds     = new ArrayList<SectionFeed>( );
 
   /** A questionnaire corresponds logically to a register, which describes the content of the data collection. */
