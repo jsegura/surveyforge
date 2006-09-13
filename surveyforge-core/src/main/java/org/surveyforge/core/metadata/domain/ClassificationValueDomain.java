@@ -27,13 +27,12 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 import org.surveyforge.classification.Level;
-import org.surveyforge.core.metadata.ValueDomain;
 
 /**
  * @author jgonzalez
  */
 @Entity
-public class ClassificationValueDomain extends ValueDomain
+public class ClassificationValueDomain extends AbstractValueDomain
   {
   private static final long serialVersionUID = 2295375925240989153L;
 
@@ -78,7 +77,7 @@ public class ClassificationValueDomain extends ValueDomain
     this.sublevelsAllowed = sublevelsAllowed;
     }
 
-  @Override
+
   public boolean isValid( Serializable object )
     {
     if( object instanceof String )

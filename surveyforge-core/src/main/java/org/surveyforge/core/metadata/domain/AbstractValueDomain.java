@@ -19,7 +19,7 @@
  *   
  * $Id$
  */
-package org.surveyforge.core.metadata;
+package org.surveyforge.core.metadata.domain;
 
 import java.io.Serializable;
 
@@ -31,6 +31,7 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.surveyforge.core.metadata.ValueDomain;
 
 // TODO: Elaborate on comments
 /**
@@ -38,7 +39,7 @@ import org.hibernate.annotations.GenericGenerator;
  */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class ValueDomain implements Serializable, Cloneable
+public abstract class AbstractValueDomain implements Serializable, Cloneable, ValueDomain
   {
   private static final long serialVersionUID = -83487445078388347L;
 
@@ -47,23 +48,24 @@ public abstract class ValueDomain implements Serializable, Cloneable
   @Column(length = 50)
   @GeneratedValue(generator = "system-uuid")
   @GenericGenerator(name = "system-uuid", strategy = "uuid")
-  private String            id;
+  protected String          id;
   /** Version for optimistic locking. */
   @SuppressWarnings("unused")
   @javax.persistence.Version
-  private int               lockingVersion;
+  protected int             lockingVersion;
 
-  protected ValueDomain( )
+
+  protected AbstractValueDomain( )
     {}
 
-  public abstract boolean isValid( Serializable data );
+
 
   @Override
-  public ValueDomain clone( )
+  public AbstractValueDomain clone( )
     {
     try
       {
-      ValueDomain copy = (ValueDomain) super.clone( );
+      AbstractValueDomain copy = (AbstractValueDomain) super.clone( );
       copy.id = null;
       copy.lockingVersion = 0;
       return copy;

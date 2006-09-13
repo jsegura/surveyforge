@@ -25,13 +25,11 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 
-import org.surveyforge.core.metadata.ValueDomain;
-
 /**
  * @author jsegura
  */
 @Entity
-public class LogicalValueDomain extends ValueDomain
+public class LogicalValueDomain extends AbstractValueDomain
   {
   private static final long serialVersionUID = 2066579378848047283L;
 
@@ -43,7 +41,7 @@ public class LogicalValueDomain extends ValueDomain
     return (Boolean.class.isInstance( object ));
     }
 
-  @Override
+
   public LogicalValueDomain clone( )
     {
     return (LogicalValueDomain) super.clone( );

@@ -25,13 +25,11 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 
-import org.surveyforge.core.metadata.ValueDomain;
-
 /**
  * @author jgonzalez
  */
 @Entity
-public class StringValueDomain extends ValueDomain
+public class StringValueDomain extends AbstractValueDomain
   {
   private static final long serialVersionUID = -5056062679246063821L;
 
@@ -73,7 +71,6 @@ public class StringValueDomain extends ValueDomain
       throw new IllegalArgumentException( );
     }
 
-  @Override
   public boolean isValid( Serializable object )
     {
     if( object instanceof String )
@@ -85,6 +82,8 @@ public class StringValueDomain extends ValueDomain
       return false;
     }
 
+
+  
   @Override
   public StringValueDomain clone( )
     {

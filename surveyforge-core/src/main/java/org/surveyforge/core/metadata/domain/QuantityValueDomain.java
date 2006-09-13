@@ -26,13 +26,11 @@ import java.math.BigDecimal;
 
 import javax.persistence.Entity;
 
-import org.surveyforge.core.metadata.ValueDomain;
-
 /**
  * @author jgonzalez
  */
 @Entity
-public class QuantityValueDomain extends ValueDomain
+public class QuantityValueDomain extends AbstractValueDomain
   {
   private static final long serialVersionUID = 475119088217988415L;
 
@@ -131,7 +129,7 @@ public class QuantityValueDomain extends ValueDomain
       throw new IllegalArgumentException( );
     }
 
-  @Override
+
   public boolean isValid( Serializable object )
     {
     if( object instanceof BigDecimal )
