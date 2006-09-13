@@ -23,12 +23,11 @@ package org.surveyforge.core.metadata;
 
 import java.io.Serializable;
 
+
 /**
  * @author jsegura
  */
 public interface ValueDomain
   {
   public boolean isValid( Serializable object );
-
-  public ValueDomain clone( );
   }

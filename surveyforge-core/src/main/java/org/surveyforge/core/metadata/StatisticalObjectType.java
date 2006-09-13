@@ -273,7 +273,6 @@ public class StatisticalObjectType implements Serializable
       throw new NullPointerException( );
     }
 
-  // TODO add subtypes to hashcode & equals
   @Override
   public boolean equals( Object object )
     {

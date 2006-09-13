@@ -26,7 +26,9 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
+import org.surveyforge.core.metadata.domain.AbstractValueDomain;
 import org.surveyforge.core.survey.Question;
+import org.surveyforge.core.survey.QuestionnaireElement;
 
 /**
  * Register data elements define data elements for a register. In contrast to an abstract data element a register data element is
@@ -49,6 +51,9 @@ public class RegisterDataElement extends DataElement
   @ManyToOne(optional = true)
   private Question              question;
 
+  @OneToOne
+  private QuestionnaireElement  questionnaireElement;
+
   protected RegisterDataElement( )
     {};
 
@@ -61,14 +66,14 @@ public class RegisterDataElement extends DataElement
    */
   public RegisterDataElement( ConceptualDataElement conceptualDataElement, String identifier )
     {
-    super( conceptualDataElement.getValueDomain( ).clone( ), identifier );
+    super( identifier );
     this.setConceptualDataElement( conceptualDataElement );
     }
 
   /**
    * Creates a new instance of ConceptualDataElement linked with a {@link ConceptualDataElement}.
    */
-  public RegisterDataElement( ValueDomain valueDomain, String identifier )
+  public RegisterDataElement( AbstractValueDomain valueDomain, String identifier )
     {
     super( valueDomain, identifier );
     }
@@ -89,12 +94,8 @@ public class RegisterDataElement extends DataElement
    * @param conceptualDataElement The conceptualDataElements to set.
    * @throws NullPointerException If the conceptualDataElement is <code>null</code>.
    */
-  public void setConceptualDataElement( ConceptualDataElement conceptualDataElement )
+  private void setConceptualDataElement( ConceptualDataElement conceptualDataElement )
     {
-    if( conceptualDataElement == null )
-      {
-      this.setValueDomain( conceptualDataElement.getValueDomain( ).clone( ) );
-      }
     this.conceptualDataElement = conceptualDataElement;
     }
 
@@ -128,5 +129,26 @@ public class RegisterDataElement extends DataElement
   public void setQuestion( Question question )
     {
     this.question = question;
+    }
+
+  /**
+   * @return the questionnaireElement
+   */
+  public QuestionnaireElement getQuestionnaireElement( )
+    {
+    return questionnaireElement;
+    }
+
+  /**
+   * @param questionnaireElement the questionnaireElement to set
+   */
+  public void setQuestionnaireElement( QuestionnaireElement questionnaireElement )
+    {
+    this.questionnaireElement = questionnaireElement;
+    }
+
+  public AbstractValueDomain getValueDomain( )
+    {
+    return (super.getValueDomain( ) != null ? super.getValueDomain( ) : this.getConceptualDataElement( ).getValueDomain( ));
     }
   }

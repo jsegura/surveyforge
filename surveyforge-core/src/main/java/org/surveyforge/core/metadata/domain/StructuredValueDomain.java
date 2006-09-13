@@ -23,7 +23,7 @@ public class StructuredValueDomain extends AbstractValueDomain
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "subDomainsIndex")
   @JoinColumn(name = "upperDomain_id")
-  private List<ValueDomain> subDomains       = new ArrayList<ValueDomain>( );
+  private List<AbstractValueDomain> subDomains       = new ArrayList<AbstractValueDomain>( );
 
 
   public StructuredValueDomain( )
@@ -66,12 +66,12 @@ public class StructuredValueDomain extends AbstractValueDomain
   /**
    * @return the subDomains
    */
-  public List<ValueDomain> getSubDomains( )
+  public List<AbstractValueDomain> getSubDomains( )
     {
     return Collections.unmodifiableList( this.subDomains );
     }
 
-  public void addSubDomain( ValueDomain domain )
+  public void addSubDomain( AbstractValueDomain domain )
     {
     if( domain != null )
       {
@@ -81,7 +81,7 @@ public class StructuredValueDomain extends AbstractValueDomain
       throw new NullPointerException( );
     }
 
-  public void removeSubDomain( ValueDomain domain )
+  public void removeSubDomain( AbstractValueDomain domain )
     {
     if( domain != null )
       {

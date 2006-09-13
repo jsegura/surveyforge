@@ -40,6 +40,7 @@ import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.IndexColumn;
+import org.surveyforge.core.metadata.domain.AbstractValueDomain;
 
 // TODO Elaborate on comments
 /**
@@ -75,7 +76,7 @@ public abstract class DataElement implements Serializable
   /**  */
   @ManyToOne(cascade = {CascadeType.ALL})
   @JoinColumn(name = "valueDomain_id")
-  private ValueDomain       valueDomain;
+  private AbstractValueDomain       valueDomain;
   /**  */
   @ManyToOne(cascade = {CascadeType.ALL})
   @JoinColumn(name = "variableStructure_id", insertable = false, updatable = false)
@@ -99,7 +100,7 @@ public abstract class DataElement implements Serializable
    * @param valueDomain
    * @param identifier
    */
-  public DataElement( ValueDomain valueDomain, String identifier )
+  public DataElement( AbstractValueDomain valueDomain, String identifier )
     {
     this.setValueDomain( valueDomain );
     this.setIdentifier( identifier );
@@ -162,7 +163,7 @@ public abstract class DataElement implements Serializable
   /**
    * @return Returns the valueDomain.
    */
-  public ValueDomain getValueDomain( )
+  public AbstractValueDomain getValueDomain( )
     {
     return this.valueDomain;
     }
@@ -170,7 +171,7 @@ public abstract class DataElement implements Serializable
   /**
    * @param valueDomain The valueDomain to set.
    */
-  public void setValueDomain( ValueDomain valueDomain )
+  public void setValueDomain( AbstractValueDomain valueDomain )
     {
     if( valueDomain != null )
       this.valueDomain = valueDomain;

@@ -22,67 +22,57 @@
 package org.surveyforge.core.metadata;
 
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import org.surveyforge.core.metadata.domain.AbstractValueDomain;
+import org.surveyforge.core.survey.Question;
 
-// TODO: Elaborate on comments
 /**
- * Conceptual data elements define conceptual standards for data elements. Conceptual data elements have a context independent
- * definition and are associated with a value set and a measure unit describing how the values are measured. A standard question used
- * for collecting data for those variables can be added.
- * 
  * @author jsegura
  */
 @Entity
-public class ConceptualDataElement extends QuestionDataElement
+public class QuestionDataElement extends DataElement
   {
-  private static final long serialVersionUID = -6880246451318487216L;
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 5831283455803703349L;
 
-  /**  */
-  @ManyToOne
-  private ObjectVariable    objectVariable;
+
+  @ManyToOne(optional = true)
+  @JoinColumn(name = "question_id")
+  private Question          question;
 
 
-  protected ConceptualDataElement( )
+  protected QuestionDataElement( )
     {}
 
-  /**
-   * Creates a new ConceptualDataElement based on the params of a DataElement
-   * 
-   * @param valueDomain
-   * @param identifier
-   */
-  public ConceptualDataElement( AbstractValueDomain valueDomain, ObjectVariable objectVariable, String identifier )
+  public QuestionDataElement( AbstractValueDomain valueDomain, String identifier )
     {
     super( valueDomain, identifier );
-    this.setObjectVariable( objectVariable );
-    }
-
-
-  /**
-   * @return Returns the objectVariable.
-   */
-  public ObjectVariable getObjectVariable( )
-    {
-    return this.objectVariable;
     }
 
   /**
-   * @param objectVariable The objectVariable to set.
+   * @return Returns the question.
    */
-  public void setObjectVariable( ObjectVariable objectVariable )
+  public Question getQuestion( )
     {
-    if( objectVariable != null )
-      this.objectVariable = objectVariable;
-    else
-      throw new NullPointerException( );
+    return this.question;
+    }
+
+  /**
+   * @param question The question to set.
+   */
+  public void setQuestion( Question question )
+    {
+    this.question = question;
     }
 
   @Override
   public boolean equals( Object object )
     {
-    ConceptualDataElement other = (ConceptualDataElement) object;
+    QuestionDataElement other = (QuestionDataElement) object;
     return this.getIdentifier( ).equals( other.getIdentifier( ) );
     }
 
