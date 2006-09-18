@@ -12,13 +12,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.IndexColumn;
-import org.surveyforge.core.data.RowData;
+import org.surveyforge.core.data.ObjectData;
 import org.surveyforge.core.metadata.ValueDomain;
 
 @Entity
 public class StructuredValueDomain extends AbstractValueDomain
   {
-  private static final long serialVersionUID = -3340195650321504136L;
+  private static final long         serialVersionUID = -3340195650321504136L;
 
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "subDomainsIndex")
@@ -42,18 +42,18 @@ public class StructuredValueDomain extends AbstractValueDomain
     if( object != null )
       {
 
-      if( !(object instanceof RowData) ) throw new IllegalArgumentException( );
-      if( this.getSubDomains( ).size( ) != ((RowData) object).getSubRowDatas( ).size( ) ) { return false; }
+      if( !(object instanceof ObjectData) ) throw new IllegalArgumentException( );
+      if( this.getSubDomains( ).size( ) != ((ObjectData) object).getComponentData( ).size( ) ) { return false; }
 
       for( int i = 0; i < this.getSubDomains( ).size( ); i++ )
         {
         if( this.getSubDomains( ).get( i ) instanceof StructuredValueDomain )
           {
-          if( !this.getSubDomains( ).get( i ).isValid( ((RowData) object).getSubRowDatas( ).get( i ) ) ) return false;
+          if( !this.getSubDomains( ).get( i ).isValid( ((ObjectData) object).getComponentData( ).get( i ) ) ) return false;
           }
         else
           {
-          if( !this.getSubDomains( ).get( i ).isValid( ((RowData) object).getSubRowDatas( ).get( i ).getData( ) ) ) return false;
+          if( !this.getSubDomains( ).get( i ).isValid( ((ObjectData) object).getComponentData( ).get( i ).getData( ) ) ) return false;
           }
         }
 

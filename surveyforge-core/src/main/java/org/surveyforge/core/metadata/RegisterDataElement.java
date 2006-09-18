@@ -21,6 +21,9 @@
  */
 package org.surveyforge.core.metadata;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
@@ -64,7 +67,7 @@ public class RegisterDataElement extends DataElement
    * @throws NullPointerException If the ValueDomain or the identifier or the ConceptualDataElements are <code>null</code> or the
    *           identifier is empty.
    */
-  public RegisterDataElement( ConceptualDataElement conceptualDataElement, String identifier )
+  public RegisterDataElement( String identifier, ConceptualDataElement conceptualDataElement )
     {
     super( identifier );
     this.setConceptualDataElement( conceptualDataElement );
@@ -73,9 +76,9 @@ public class RegisterDataElement extends DataElement
   /**
    * Creates a new instance of ConceptualDataElement linked with a {@link ConceptualDataElement}.
    */
-  public RegisterDataElement( AbstractValueDomain valueDomain, String identifier )
+  public RegisterDataElement( String identifier, AbstractValueDomain valueDomain )
     {
-    super( valueDomain, identifier );
+    super( identifier, valueDomain );
     }
 
   /**
@@ -97,6 +100,50 @@ public class RegisterDataElement extends DataElement
   private void setConceptualDataElement( ConceptualDataElement conceptualDataElement )
     {
     this.conceptualDataElement = conceptualDataElement;
+    }
+
+  @Override
+  public List<? extends RegisterDataElement> getComponentElements( )
+    {
+    List<RegisterDataElement> componentElements = new ArrayList<RegisterDataElement>( );
+    for( DataElement dataElement : super.getComponentElements( ) )
+      componentElements.add( (RegisterDataElement) dataElement );
+    return componentElements;
+    }
+
+  @Override
+  public void addComponentElement( DataElement componentElement )
+    {
+    if( !(componentElement instanceof RegisterDataElement) )
+      throw new IllegalArgumentException( );
+    else
+      {
+      DataElement root = this.getRootDataElement( );
+      if( root instanceof Register && ((Register) root).getRegisterData( ).getObjectData( ).size( ) > 0 )
+        throw new IllegalStateException( );
+      else
+        super.addComponentElement( componentElement );
+      }
+    }
+
+  @Override
+  public void removeComponentElement( DataElement componentElement )
+    {
+    if( ((Register) this.getRootDataElement( )).getRegisterData( ).getObjectData( ).size( ) > 0 )
+      throw new IllegalStateException( );
+    else
+      super.removeComponentElement( componentElement );
+    }
+
+  @Override
+  public void setComponentElements( List<? extends DataElement> componentElements )
+    {
+    if( componentElements == null )
+      throw new NullPointerException( );
+    else if( ((Register) this.getRootDataElement( )).getRegisterData( ).getObjectData( ).size( ) > 0 )
+      throw new IllegalStateException( );
+    else
+      super.setComponentElements( componentElements );
     }
 
   /**

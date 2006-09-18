@@ -21,30 +21,20 @@
  */
 package org.surveyforge.core.data;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.IndexColumn;
 
 /**
  * @author jsegura
  */
 @Entity
-public class Row implements Serializable
+public class ObjectData extends Data
   {
   private static final long serialVersionUID = 6601926722422919229L;
 
@@ -63,15 +53,10 @@ public class Row implements Serializable
   @JoinColumn(name = "registerData_id", insertable = false, updatable = false)
   private RegisterData      registerData;
 
-  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
-  @IndexColumn(name = "rowDatasIndex")
-  @JoinColumn(name = "row_id", nullable = false)
-  private List<RowData>     rowDatas         = new ArrayList<RowData>( );
-
-  protected Row( )
+  protected ObjectData( )
     {};
 
-  public Row( RegisterData registerData )
+  public ObjectData( RegisterData registerData )
     {
     this.setRegisterData( registerData );
     }
@@ -92,26 +77,9 @@ public class Row implements Serializable
     if( registerData != null )
       {
       this.registerData = registerData;
-      this.registerData.addRow( this );
+      this.registerData.addObjectData( this );
       }
     else
       throw new NullPointerException( );
     }
-
-  public void setField( String elementIdentifier, RowData rowData )
-    {
-    int fieldIndex = this.registerData.getRegister( ).getElementIndex( elementIdentifier );
-    if( fieldIndex != -1 )
-      {
-      this.rowDatas.set( fieldIndex, rowData );
-      }
-    else
-      throw new NoSuchElementException( );
-    }
-
-  public List<RowData> getRowDatas( )
-    {
-    return Collections.unmodifiableList( this.rowDatas );
-    }
-
   }

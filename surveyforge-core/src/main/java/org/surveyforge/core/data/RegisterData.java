@@ -39,6 +39,7 @@ import javax.persistence.OneToOne;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.IndexColumn;
 import org.surveyforge.core.metadata.Register;
+import org.surveyforge.core.metadata.RegisterDataElement;
 
 /**
  * @author jsegura
@@ -63,9 +64,9 @@ public class RegisterData implements Serializable
   private Register          register;
 
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
-  @IndexColumn(name = "rowsIndex")
+  @IndexColumn(name = "objectDataIndex")
   @JoinColumn(name = "registerData_id")
-  private List<Row>         rows             = new ArrayList<Row>( );
+  private List<ObjectData>  objectData       = new ArrayList<ObjectData>( );
 
   protected RegisterData( )
     {}
@@ -88,35 +89,35 @@ public class RegisterData implements Serializable
     return this.register;
     }
 
-
   /**
-   * @return Returns the rows.
+   * @return Returns the objectData.
    */
-  public List<Row> getRows( )
+  public List<ObjectData> getObjectData( )
     {
-    return Collections.unmodifiableList( this.rows );
+    return Collections.unmodifiableList( this.objectData );
     }
 
   /**
-   * @param rows The rows to .
+   * @param objectData The objectData to .
    */
-  protected void addRow( Row row )
+  protected void addObjectData( ObjectData objectData )
     {
-    if( row != null )
+    if( objectData != null )
       {
       if( this.register.getKey( ).size( ) == 0 ) throw new IllegalArgumentException( );
       ArrayList<Integer> illegalList = new ArrayList<Integer>( );
       // TODO: Check validation rules and throw Exceptions if needed
 
-      if( this.register.getRegisterDataElements( ).size( ) != row.getRowDatas( ).size( ) ) throw new IllegalArgumentException( );
+      if( this.register.getComponentElements( ).size( ) != objectData.getComponentData( ).size( ) )
+        throw new IllegalArgumentException( );
       int index = 0;
-      for( RowData rowData : row.getRowDatas( ) )
+      for( Data data : objectData.getComponentData( ) )
         {
-        if( !this.register.getRegisterDataElements( ).get( index ).getValueDomain( ).isValid( rowData.getData( ) ) )
+        if( !this.register.getComponentElements( ).get( index ).getValueDomain( ).isValid( data.getData( ) ) )
           illegalList.add( index ); // TODO: Elaborate on this Exception
         index++;
         }
-      if( illegalList.size( ) == 0 ) this.rows.add( row );
+      if( illegalList.size( ) == 0 ) this.objectData.add( objectData );
       }
 
     else
@@ -124,13 +125,31 @@ public class RegisterData implements Serializable
     }
 
   /**
-   * @param rows The rows to .
+   * @param objectData The objectData to .
    */
-  protected void removeRows( Row row )
+  protected void removeObjectData( ObjectData objectData )
     {
-    if( row != null )
-      this.rows.remove( row );
+    if( objectData != null )
+      this.objectData.remove( objectData );
     else
       throw new NullPointerException( );
+    }
+
+  // TODO: Maybe this could be joined in only a method?
+  public ObjectData createEmptyObjectData( )
+    {
+    ObjectData objectData = new ObjectData( );
+    objectData.setIdentifier( this.getRegister( ).getIdentifier( ) );
+    for( RegisterDataElement componentDataElement : this.getRegister( ).getComponentElements( ) )
+      objectData.addComponentData( RegisterData.createEmptyData( componentDataElement ) );
+    return objectData;
+    }
+
+  protected static Data createEmptyData( RegisterDataElement registerDataElement )
+    {
+    Data data = new Data( registerDataElement.getIdentifier( ) );
+    for( RegisterDataElement componentDataElement : registerDataElement.getComponentElements( ) )
+      data.addComponentData( RegisterData.createEmptyData( componentDataElement ) );
+    return data;
     }
   }

@@ -89,36 +89,4 @@ public class QuestionTest
     Assert.assertTrue( obj.getDescription( ).equals( empty ) );
     Assert.assertFalse( obj.getDescription( ).equals( "test" ) );
     }
-
-  @Test
-  public void questionGetNullUpperQuestion( )
-    {
-    Assert.assertNull( new Question( "id" ).getUpperQuestion( ) );
-    }
-
-  @Test
-  public void questionSetUpperQuestion( )
-    {
-    Question master = new Question( "master" );
-    Question slave1 = new Question( "slave1" );
-    Question slave2 = new Question( "slave2" );
-    Question slave3 = new Question( "slave3" );
-
-    Assert.assertTrue( master.getSubQuestions( ).isEmpty( ) );
-    slave1.setUpperQuestion( master );
-    slave2.setUpperQuestion( master );
-    slave3.setUpperQuestion( master );
-    Assert.assertTrue( master.getSubQuestions( ).contains( slave1 ) );
-    Assert.assertTrue( master.getSubQuestions( ).contains( slave2 ) );
-    Assert.assertTrue( master.getSubQuestions( ).contains( slave3 ) );
-
-    Question master2 = new Question( "master2" );
-    slave1.setUpperQuestion( master2 );
-    Assert.assertFalse( master.getSubQuestions( ).contains( slave1 ) );
-    Assert.assertTrue( master2.getSubQuestions( ).contains( slave1 ) );
-    Assert.assertFalse( master2.getSubQuestions( ).contains( slave2 ) );
-    Assert.assertFalse( master2.getSubQuestions( ).contains( slave3 ) );
-    Assert.assertEquals( slave1.getUpperQuestion( ), master2 );
-    }
-
   }

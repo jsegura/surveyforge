@@ -22,11 +22,9 @@
 package org.surveyforge.core.metadata;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.Collections;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -38,10 +36,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import org.hibernate.annotations.CollectionOfElements;
+
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.IndexColumn;
-import org.hibernate.annotations.MapKey;
 import org.surveyforge.core.data.RegisterData;
 import org.surveyforge.core.survey.Questionnaire;
 
@@ -50,9 +47,9 @@ import org.surveyforge.core.survey.Questionnaire;
  * @author jsegura
  */
 @Entity
-public class Register implements Serializable
+public class Register extends DataElement implements Serializable
   {
-  private static final long         serialVersionUID     = 0L;
+  private static final long         serialVersionUID = 0L;
 
   @SuppressWarnings("unused")
   @Id
@@ -77,7 +74,7 @@ public class Register implements Serializable
    */
   @ManyToOne
   @JoinColumn(name = "masterRegister_id", insertable = false, updatable = false)
-  private Register                  masterRegister       = null;
+  private Register                  masterRegister   = null;
 
   /**
    * When defining hierarchical registers the hierarchy is expressed as master/detail relationship. The detail registers defines the
@@ -86,32 +83,14 @@ public class Register implements Serializable
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "detailRegistersIndex")
   @JoinColumn(name = "masterRegister_id")
-  private List<Register>            detailRegisters      = new ArrayList<Register>( );
+  private List<Register>            detailRegisters  = new ArrayList<Register>( );
   /** */
-
-  @CollectionOfElements
-  @MapKey(columns = {@Column(name = "elementMapKey", length = 50)})
-  @Column(name = "index", length = 10)
-  private Map<String, Integer>      indexes              = new HashMap<String, Integer>( );
-
-  /** */
-  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
-  @IndexColumn(name = "registerDataElementsIndex")
-  // @JoinColumn(name = "register_id", nullable = false)
-  @JoinColumn(name = "register_id")
-  private List<RegisterDataElement> registerDataElements = new ArrayList<RegisterDataElement>( );
 
   /** */
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "keyIndex")
   @JoinColumn(name = "registerKey_id")
-  private List<RegisterDataElement> key                  = new ArrayList<RegisterDataElement>( );
-
-  /** */
-  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
-  @IndexColumn(name = "validationRulesIndex")
-  @JoinColumn(name = "register_id")
-  private List<ValidationRule>      validationRules      = new ArrayList<ValidationRule>( );
+  private List<RegisterDataElement> key              = new ArrayList<RegisterDataElement>( );
 
   /** */
   @OneToOne(optional = false, cascade = {CascadeType.ALL})
@@ -170,7 +149,7 @@ public class Register implements Serializable
    */
   public void setMasterRegister( Register masterRegister )
     {
-    if( this.masterRegister != null ) this.masterRegister.delDetailRegister( this );
+    if( this.masterRegister != null ) this.masterRegister.removeDetailRegister( this );
     this.masterRegister = masterRegister;
     if( this.masterRegister != null ) this.masterRegister.addDetailRegister( this );
 
@@ -195,62 +174,51 @@ public class Register implements Serializable
   /**
    * @param detailRegister The detailRegister to set.
    */
-  protected void delDetailRegister( Register detailRegister )
+  protected void removeDetailRegister( Register detailRegister )
     {
     if( detailRegister != null ) this.detailRegisters.remove( detailRegister );
     }
 
-  /**
-   * @return Returns the registerDataElements.
-   */
-  public List<RegisterDataElement> getRegisterDataElements( )
+  @Override
+  public List<? extends RegisterDataElement> getComponentElements( )
     {
-    return Collections.unmodifiableList( this.registerDataElements );
+    List<RegisterDataElement> componentElements = new ArrayList<RegisterDataElement>( );
+    for( DataElement dataElement : super.getComponentElements( ) )
+      componentElements.add( (RegisterDataElement) dataElement );
+    return componentElements;
     }
 
-
-  protected void addRegisterDataElement( RegisterDataElement registerDataElement )
+  @Override
+  public void addComponentElement( DataElement componentElement )
     {
-    if( registerDataElement == null )
-      throw new NullPointerException( );
-    else if( this.registerData.getRows( ).size( ) > 0 )
+    if( !(componentElement instanceof RegisterDataElement) )
+      throw new IllegalArgumentException( );
+    else if( this.registerData.getObjectData( ).size( ) > 0 )
       throw new IllegalStateException( );
     else
-      {
-      this.registerDataElements.add( registerDataElement );
-      // this.updateElements( );
-      }
+      super.addComponentElement( componentElement );
     }
 
-  protected void removeRegisterDataElement( RegisterDataElement registerDataElement )
+  @Override
+  public void removeComponentElement( DataElement componentElement )
     {
-    if( registerDataElement == null )
-      throw new NullPointerException( );
-    else if( this.registerData.getRows( ).size( ) > 0 )
+    if( this.registerData.getObjectData( ).size( ) > 0 )
       throw new IllegalStateException( );
     else
-      {
-      this.registerDataElements.remove( registerDataElement );
-      this.updateElements( );
-      }
+      super.removeComponentElement( componentElement );
     }
 
-  /**
-   * @param registerDataElements
-   */
-  public void setRegisterDataElements( List<RegisterDataElement> registerDataElements )
+  @Override
+  public void setComponentElements( List<? extends DataElement> componentElements )
     {
-    if( registerDataElements == null )
+    if( componentElements == null )
       throw new NullPointerException( );
-    else if( this.registerData.getRows( ).size( ) > 0 )
+    else if( this.registerData.getObjectData( ).size( ) > 0 )
       throw new IllegalStateException( );
-    else if( this.key != null && !registerDataElements.containsAll( this.key ) )
+    else if( this.key != null && !componentElements.containsAll( this.key ) )
       throw new IllegalArgumentException( );
     else
-      {
-      this.registerDataElements = registerDataElements;
-      this.updateElements( );
-      }
+      super.setComponentElements( componentElements );
     }
 
   /**
@@ -268,51 +236,10 @@ public class Register implements Serializable
     {
     if( key == null )
       throw new NullPointerException( );
-    else if( this.registerDataElements.containsAll( key ) )
+    else if( this.getComponentElements( ).containsAll( key ) )
       this.key = key;
     else
       throw new IllegalArgumentException( );
-    }
-
-  /**
-   * @return Returns the validationRules.
-   */
-  public List<ValidationRule> getValidationRules( )
-    {
-    return Collections.unmodifiableList( this.validationRules );
-    }
-
-  /**
-   * @param validationRules The validationRules to set.
-   */
-  public void setValidationRules( List<ValidationRule> validationRules )
-    {
-    if( validationRules != null )
-      this.validationRules = validationRules;
-    else
-      throw new NullPointerException( );
-    }
-
-  /**
-   * @param validationRule
-   */
-  public void addValidationRule( ValidationRule validationRule )
-    {
-    if( validationRule != null )
-      this.validationRules.add( validationRule );
-    else
-      throw new NullPointerException( );
-    }
-
-  /**
-   * @param validationRule
-   */
-  public void delValidationRule( ValidationRule validationRule )
-    {
-    if( validationRule != null )
-      this.validationRules.remove( validationRule );
-    else
-      throw new NullPointerException( );
     }
 
   /**
@@ -323,45 +250,10 @@ public class Register implements Serializable
     return this.registerData;
     }
 
-
-  private void updateElements( )
-    {
-    HashMap<String, Integer> fieldIndexes = new HashMap<String, Integer>( );
-    int index = 0;
-    for( RegisterDataElement currentRegisterDataElement : this.registerDataElements )
-      {
-      fieldIndexes.put( currentRegisterDataElement.getIdentifier( ), index );
-      index++;
-      }
-
-    if( this.registerDataElements.size( ) == fieldIndexes.size( ) )
-      {
-      this.indexes = fieldIndexes;
-      }
-    else
-      {
-      throw new IllegalArgumentException( );
-      }
-    }
-
-  // TODO Hardwritted -1
-  public int getElementIndex( String elementIdentifier )
-    {
-    Integer index = this.indexes.get( elementIdentifier );
-    return (index != null) ? index : -1;
-    }
-
-  public List<String> getElementIdentifiers( )
-    {
-    return new ArrayList<String>( this.indexes.keySet( ) );
-    }
-
-
   public Questionnaire getQuestionnaire( )
     {
     return this.questionnaire;
     }
-
 
   public void setQuestionnaire( Questionnaire questionnaire )
     {
@@ -380,5 +272,4 @@ public class Register implements Serializable
     {
     return this.getIdentifier( ).hashCode( );
     }
-
   }

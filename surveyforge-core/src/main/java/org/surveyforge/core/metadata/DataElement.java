@@ -24,7 +24,10 @@ package org.surveyforge.core.metadata;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -36,6 +39,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -50,29 +54,29 @@ import org.surveyforge.core.metadata.domain.AbstractValueDomain;
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"identifier", "register_id"})})
 public abstract class DataElement implements Serializable
   {
-  private static final long serialVersionUID  = 0L;
+  private static final long        serialVersionUID  = 0L;
 
   @SuppressWarnings("unused")
   @Id
   @Column(length = 50)
   @GeneratedValue(generator = "system-uuid")
   @GenericGenerator(name = "system-uuid", strategy = "uuid")
-  private String            id;
+  private String                   id;
   /** Version for optimistic locking. */
   @SuppressWarnings("unused")
   @javax.persistence.Version
-  private int               lockingVersion;
+  private int                      lockingVersion;
 
   /**
    * This is a unique and language independent identifier for the data element. The identifier is unique among all other data elements
    * for an object variable (standard data element) or within the scope of a statistical activity.
    */
   @Column(length = 50)
-  private String            identifier;
+  private String                   identifier;
   /**  */
-  private boolean           multiple          = false;
+  private boolean                  multiple          = false;
   /**  */
-  private int               maxResponses      = 1;
+  private int                      maxResponses      = 1;
   /**  */
   @ManyToOne(cascade = {CascadeType.ALL})
   @JoinColumn(name = "valueDomain_id")
@@ -80,12 +84,14 @@ public abstract class DataElement implements Serializable
   /**  */
   @ManyToOne(cascade = {CascadeType.ALL})
   @JoinColumn(name = "variableStructure_id", insertable = false, updatable = false)
-  private DataElement       variableStructure;
+  private DataElement              variableStructure;
   /**  */
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "componentElementsIndex")
   @JoinColumn(name = "variableStructure_id")
-  private List<DataElement> componentElements = new ArrayList<DataElement>( );
+  private List<DataElement>        componentElements = new ArrayList<DataElement>( );
+  @Transient
+  private Map<String, DataElement> nameToElementMap  = new HashMap<String, DataElement>( );
 
 
   protected DataElement( )
@@ -100,10 +106,10 @@ public abstract class DataElement implements Serializable
    * @param valueDomain
    * @param identifier
    */
-  public DataElement( AbstractValueDomain valueDomain, String identifier )
+  public DataElement( String identifier, AbstractValueDomain valueDomain )
     {
-    this.setValueDomain( valueDomain );
     this.setIdentifier( identifier );
+    this.setValueDomain( valueDomain );
     }
 
   /**
@@ -119,7 +125,7 @@ public abstract class DataElement implements Serializable
    */
   public void setIdentifier( String identifier )
     {
-    if( identifier != null && !identifier.equals( "" ) )
+    if( identifier != null && !identifier.trim( ).equals( "" ) )
       this.identifier = identifier;
     else
       throw new NullPointerException( );
@@ -179,7 +185,6 @@ public abstract class DataElement implements Serializable
       throw new NullPointerException( );
     }
 
-
   /**
    * @return Returns the variableStructure.
    */
@@ -193,52 +198,168 @@ public abstract class DataElement implements Serializable
    */
   public void setVariableStructure( DataElement variableStructure )
     {
-    if( this.variableStructure != null ) this.variableStructure.removeComponentElement( this );
-    this.variableStructure = variableStructure;
-    if( this.variableStructure != null ) this.variableStructure.addComponentElement( this );
+    if( (variableStructure == null && this.getVariableStructure( ) != null)
+        || !variableStructure.equals( this.getVariableStructure( ) ) )
+      {
+      if( this.getVariableStructure( ) != null ) this.getVariableStructure( ).removeElement( this );
+      this.variableStructure = variableStructure;
+      if( this.getVariableStructure( ) != null ) this.getVariableStructure( ).addElement( this );
+      }
     }
 
   /**
    * @return Returns the componentElements.
    */
-  public List<DataElement> getComponentElements( )
+  public List<? extends DataElement> getComponentElements( )
     {
     return Collections.unmodifiableList( this.componentElements );
     }
 
   /**
-   * @param componentElements The componentElements to set.
+   * @param componentElements
    */
-  private void addComponentElement( DataElement componentElement )
+  public void setComponentElements( List<? extends DataElement> componentElements )
     {
-    if( componentElement != null )
-      this.componentElements.add( componentElement );
-    else
-      throw new NullPointerException( );
+    this.clearComponentElements( );
+    for( DataElement dataElement : componentElements )
+      this.addComponentElement( dataElement );
+    }
+
+  /**
+   * 
+   */
+  protected void clearComponentElements( )
+    {
+    Iterator<? extends DataElement> componentElementIterator = this.getComponentElements( ).iterator( );
+
+    while( componentElementIterator.hasNext( ) )
+      {
+      DataElement dataElement = (DataElement) componentElementIterator.next( );
+      dataElement.variableStructure = null;
+      componentElementIterator.remove( );
+      }
     }
 
   /**
    * @param componentElements The componentElements to set.
    */
-  private void removeComponentElement( DataElement componentElement )
+  public void addComponentElement( DataElement componentElement )
     {
     if( componentElement != null )
-      this.componentElements.remove( componentElement );
+      {
+      if( !this.getComponentElements( ).contains( componentElement ) )
+        {
+        if( componentElement.getVariableStructure( ) != null && !componentElement.getVariableStructure( ).equals( this ) )
+          {
+          componentElement.getVariableStructure( ).removeElement( componentElement );
+          componentElement.variableStructure = this;
+          }
+        this.componentElements.add( componentElement );
+        }
+      else
+        throw new IllegalArgumentException( );
+      }
     else
       throw new NullPointerException( );
+    }
+
+  /**
+   * @param componentElement
+   */
+  protected void addElement( DataElement componentElement )
+    {
+    if( !this.getNameToElementMap( ).containsKey( componentElement.getIdentifier( ) ) )
+      {
+      this.componentElements.add( componentElement );
+      this.getNameToElementMap( ).put( componentElement.getIdentifier( ), componentElement );
+      }
+    else
+      throw new IllegalArgumentException( );
+    }
+
+  /**
+   * @param componentElements The componentElements to set.
+   */
+  public void removeComponentElement( DataElement componentElement )
+    {
+    if( componentElement != null )
+      {
+      this.removeElement( componentElement );
+      componentElement.variableStructure = null;
+      }
+    else
+      throw new NullPointerException( );
+    }
+
+  /**
+   * @param componentElement
+   */
+  protected void removeElement( DataElement componentElement )
+    {
+    if( this.getNameToElementMap( ).containsKey( componentElement.getIdentifier( ) ) )
+      {
+      this.componentElements.remove( componentElement );
+      this.getNameToElementMap( ).remove( componentElement.getIdentifier( ) );
+      }
+    else
+      throw new IllegalArgumentException( );
+    }
+
+  /**
+   * @return
+   */
+  protected Map<String, DataElement> getNameToElementMap( )
+    {
+    if( this.nameToElementMap == null )
+      {
+      Map<String, DataElement> nameToElementMap = new HashMap<String, DataElement>( );
+
+      for( DataElement dataElement : this.getComponentElements( ) )
+        {
+        nameToElementMap.put( dataElement.getIdentifier( ), dataElement );
+        }
+
+      this.nameToElementMap = nameToElementMap;
+      }
+
+    return this.nameToElementMap;
+    }
+
+  /**
+   * @param identifier
+   * @return
+   */
+  public DataElement getDataElement( String identifier )
+    {
+    return this.getNameToElementMap( ).get( identifier );
+    }
+
+  public DataElement getRootDataElement( )
+    {
+    if( this.getVariableStructure( ) == null )
+      return this;
+    else
+      return this.getVariableStructure( ).getRootDataElement( );
     }
 
   @Override
   public boolean equals( Object object )
     {
-    DataElement other = (DataElement) object;
-    return this.getIdentifier( ).equals( other.getIdentifier( ) );
+    if( object instanceof DataElement )
+      {
+      DataElement otherDataElement = (DataElement) object;
+
+      return this.getIdentifier( ).equals( otherDataElement.getIdentifier( ) )
+          && (this.getVariableStructure( ) == null ? otherDataElement.getVariableStructure( ) == null : this.getVariableStructure( )
+              .equals( otherDataElement.getVariableStructure( ) ));
+      }
+    else
+      return false;
     }
 
   @Override
   public int hashCode( )
     {
-    return this.getIdentifier( ).hashCode( );
+    return this.getIdentifier( ).hashCode( ) ^ (this.getVariableStructure( ) == null ? 0 : this.getVariableStructure( ).hashCode( ));
     }
-
   }

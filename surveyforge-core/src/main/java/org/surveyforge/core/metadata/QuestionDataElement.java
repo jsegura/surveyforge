@@ -48,9 +48,9 @@ public class QuestionDataElement extends DataElement
   protected QuestionDataElement( )
     {}
 
-  public QuestionDataElement( AbstractValueDomain valueDomain, String identifier )
+  public QuestionDataElement( String identifier, AbstractValueDomain valueDomain )
     {
-    super( valueDomain, identifier );
+    super( identifier, valueDomain );
     }
 
   /**

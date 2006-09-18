@@ -362,7 +362,7 @@ public class Level implements Serializable
    * @param searchSublevels whether to search in levels under this level.
    * @return <code>true</code> if the provided code is included in this level or levels under this level.
    */
-  public boolean isIncludedInLevel( String code, boolean searchSublevels )
+  public boolean includes( String code, boolean searchSublevels )
     {
     if( this.getCodeToItemMapping( ).containsKey( code ) )
       return true;
@@ -370,9 +370,31 @@ public class Level implements Serializable
       {
       List<Level> levelsInVersion = this.getVersion( ).getLevels( );
       if( searchSublevels && this.getNumber( ) < levelsInVersion.size( ) )
-        return levelsInVersion.get( this.getNumber( ) ).isIncludedInLevel( code, searchSublevels );
+        return levelsInVersion.get( this.getNumber( ) ).includes( code, searchSublevels );
       else
         return false;
+      }
+    }
+
+  /**
+   * Returns the item with the specified code if the provided code is included in this level or levels under this level. Levels under
+   * this level will only be searched if <code>searchSublevels</code> is true.
+   * 
+   * @param code the code to search.
+   * @param searchSublevels whether to search in levels under this level.
+   * @return the item with the specified code, <code>null</code> if no item with that code is found.
+   */
+  public Item getItem( String code, boolean searchSublevels )
+    {
+    if( this.getCodeToItemMapping( ).containsKey( code ) )
+      return this.getCodeToItemMapping( ).get( code );
+    else
+      {
+      List<Level> levelsInVersion = this.getVersion( ).getLevels( );
+      if( searchSublevels && this.getNumber( ) < levelsInVersion.size( ) )
+        return levelsInVersion.get( this.getNumber( ) ).getItem( code, searchSublevels );
+      else
+        return null;
       }
     }
 

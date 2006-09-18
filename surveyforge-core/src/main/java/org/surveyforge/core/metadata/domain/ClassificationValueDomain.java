@@ -83,7 +83,7 @@ public class ClassificationValueDomain extends AbstractValueDomain
     if( object instanceof String )
       {
       String code = (String) object;
-      return this.getLevel( ).isIncludedInLevel( code, this.isSublevelsAllowed( ) );
+      return this.getLevel( ).includes( code, this.isSublevelsAllowed( ) );
       }
     else
       return false;

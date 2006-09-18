@@ -53,9 +53,9 @@ public class ConceptualDataElement extends QuestionDataElement
    * @param valueDomain
    * @param identifier
    */
-  public ConceptualDataElement( AbstractValueDomain valueDomain, ObjectVariable objectVariable, String identifier )
+  public ConceptualDataElement( String identifier, AbstractValueDomain valueDomain, ObjectVariable objectVariable )
     {
-    super( valueDomain, identifier );
+    super( identifier, valueDomain );
     this.setObjectVariable( objectVariable );
     }
 

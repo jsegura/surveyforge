@@ -24,12 +24,12 @@ package org.surveyforge.core.survey;
 import java.lang.reflect.Method;
 
 import org.surveyforge.core.metadata.ConceptualDataElement;
+import org.surveyforge.core.metadata.GlobalVariable;
+import org.surveyforge.core.metadata.ObjectVariable;
 import org.surveyforge.core.metadata.RegisterDataElement;
+import org.surveyforge.core.metadata.StatisticalObjectType;
 import org.surveyforge.core.metadata.domain.LogicalValueDomain;
-import org.testng.Assert;
 import org.testng.annotations.DataProvider;
-import org.testng.annotations.ExpectedExceptions;
-import org.testng.annotations.Test;
 
 /**
  * @author jsegura
@@ -39,51 +39,12 @@ public class QuestionnaireElementTest
   @DataProvider(name = "dp")
   public Object[][] createData( Method m )
     {
-    ConceptualDataElement conceptualDataElement = new ConceptualDataElement( new LogicalValueDomain( ), "conceptualDataElement" );
-    RegisterDataElement registerDataElement = new RegisterDataElement( conceptualDataElement, "registerDataElement" );
+    StatisticalObjectType objectType = new StatisticalObjectType( "objectType" );
+    GlobalVariable globalVariable = new GlobalVariable( "globalVariable" );
+    ObjectVariable objectVariable = new ObjectVariable( objectType, globalVariable, "objectVariable" );
+    ConceptualDataElement conceptualDataElement = new ConceptualDataElement( "conceptualDataElement", new LogicalValueDomain( ),
+        objectVariable );
+    RegisterDataElement registerDataElement = new RegisterDataElement( "registerDataElement", conceptualDataElement );
     return new Object[][] {new Object[] {registerDataElement}};
     }
-
-
-  @Test(dataProvider = "dp")
-  @ExpectedExceptions( {NullPointerException.class})
-  public void questionnaireElementCreationWithNullIdentifier( RegisterDataElement registerDataElement )
-    {
-    new QuestionnaireElement( registerDataElement, null );
-    }
-
-  @Test(dataProvider = "dp")
-  @ExpectedExceptions( {NullPointerException.class})
-  public void questionnaireElementCreationWithEmptyIdentifier( RegisterDataElement registerDataElement )
-    {
-    new QuestionnaireElement( registerDataElement, "" );
-    }
-
-
-  @Test(dataProvider = "dp")
-  public void questionnaireElementCreation( RegisterDataElement registerDataElement )
-    {
-    new QuestionnaireElement( registerDataElement, "id" );
-    }
-
-  @Test(dataProvider = "dp")
-  public void questionnaireElementIdentifier( RegisterDataElement registerDataElement )
-    {
-    String id = "id";
-    QuestionnaireElement object = new QuestionnaireElement( registerDataElement, id );
-    Assert.assertEquals( id, object.getIdentifier( ) );
-    }
-
-
-  @Test(dataProvider = "dp")
-  public void questionnaireElementQuestion( RegisterDataElement registerDataElement )
-    {
-    String id = "id";
-    QuestionnaireElement object = new QuestionnaireElement( registerDataElement, id );
-    Question question = new Question( "question" );
-    object.setQuestion( question );
-    Assert.assertEquals( question, object.getQuestion( ) );
-    }
-
-
   }

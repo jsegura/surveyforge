@@ -4,6 +4,7 @@
   <test name="util">
     <packages>
       <package name="org.surveyforge.util" />
+      <package name="org.surveyforge.util.beans" />
     </packages>
   </test>
 </suite>
