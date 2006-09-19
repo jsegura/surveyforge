@@ -111,7 +111,7 @@ public class QuestionnaireElement implements Serializable
     this.setIdentifier( registerDataElement.getIdentifier( ) );
     }
 
-  public QuestionnaireElement( QuestionnaireElement upperElement, RegisterDataElement registerDataElement )
+  public QuestionnaireElement( RegisterDataElement registerDataElement, QuestionnaireElement upperElement )
     {
     this( registerDataElement );
     this.setUpperQuestionnaireElement( upperElement );

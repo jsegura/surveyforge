@@ -84,7 +84,7 @@ public class GlobalVariable implements Serializable
    * @param variableFamily The Variable Family where the GlobalVariable will be placed.
    * @throws NullPointerException If the identifier is <code>null</code> or is empty.
    */
-  public GlobalVariable( VariableFamily variableFamily, String identifier )
+  public GlobalVariable( String identifier, VariableFamily variableFamily )
     {
     this.setIdentifier( identifier );
     this.setVariableFamily( variableFamily );

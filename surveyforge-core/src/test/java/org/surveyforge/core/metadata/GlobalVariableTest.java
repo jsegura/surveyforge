@@ -35,7 +35,7 @@ public class GlobalVariableTest
   @ExpectedExceptions( {NullPointerException.class})
   public void globalVariableCreationWithNullIdentifier( )
     {
-    new GlobalVariable( new VariableFamily( "family" ), null );
+    new GlobalVariable( null, new VariableFamily( "family" ) );
     }
 
 
@@ -43,20 +43,20 @@ public class GlobalVariableTest
   @ExpectedExceptions( {NullPointerException.class})
   public void globalVariableCreationWithEmptyIdentifier( )
     {
-    new GlobalVariable( new VariableFamily( "family" ), "" );
+    new GlobalVariable( "", new VariableFamily( "family" ) );
     }
 
   @Test
   public void globalVariableCreation( )
     {
-    new GlobalVariable( new VariableFamily( "family" ), "GlobalVariable" );
+    new GlobalVariable( "GlobalVariable", new VariableFamily( "family" ) );
     }
 
   @Test
   public void globalVariableGetIdentifier( )
     {
     String id = "id";
-    GlobalVariable globalVariable = new GlobalVariable( new VariableFamily( "family" ), id );
+    GlobalVariable globalVariable = new GlobalVariable( id, new VariableFamily( "family" ) );
     Assert.assertTrue( globalVariable.getIdentifier( ).equals( id ) );
     Assert.assertFalse( globalVariable.getIdentifier( ).equals( "test" ) );
     }
@@ -65,14 +65,14 @@ public class GlobalVariableTest
   @ExpectedExceptions( {NullPointerException.class})
   public void globalVariableSetNullName( )
     {
-    new GlobalVariable( new VariableFamily( "family" ), "id" ).setName( null );
+    new GlobalVariable( "id", new VariableFamily( "family" ) ).setName( null );
     }
 
   @Test
   public void globalVariableSetName( )
     {
     String name = "name";
-    GlobalVariable gb = new GlobalVariable( new VariableFamily( "family" ), "id" );
+    GlobalVariable gb = new GlobalVariable( "id", new VariableFamily( "family" ) );
     gb.setName( name );
     Assert.assertTrue( gb.getName( ).equals( name ) );
     }
@@ -81,7 +81,7 @@ public class GlobalVariableTest
   @ExpectedExceptions( {NullPointerException.class})
   public void globalVariableSetNullDescription( )
     {
-    new GlobalVariable( new VariableFamily( "family" ), "id" ).setDescription( null );
+    new GlobalVariable( "id", new VariableFamily( "family" ) ).setDescription( null );
     }
 
   @Test
@@ -89,7 +89,7 @@ public class GlobalVariableTest
     {
     String empty = "";
     String desc = "desc";
-    GlobalVariable obj = new GlobalVariable( new VariableFamily( "family" ), "id" );
+    GlobalVariable obj = new GlobalVariable( "id", new VariableFamily( "family" ) );
     obj.setDescription( desc );
     Assert.assertTrue( obj.getDescription( ).equals( desc ) );
     Assert.assertFalse( obj.getDescription( ).equals( "test" ) );
@@ -102,7 +102,7 @@ public class GlobalVariableTest
   public void globalVariableGetFamily( )
     {
     VariableFamily family = new VariableFamily( "family" );
-    GlobalVariable gb = new GlobalVariable( family, "id" );
+    GlobalVariable gb = new GlobalVariable( "id", family );
     gb.setVariableFamily( family );
     Assert.assertEquals( gb.getVariableFamily( ), family );
     }

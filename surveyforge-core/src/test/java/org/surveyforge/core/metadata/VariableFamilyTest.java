@@ -88,8 +88,8 @@ public class VariableFamilyTest
     {
     Assert.assertEquals( new ArrayList<GlobalVariable>( ), new VariableFamily( "id" ).getGlobalVariables( ) );
     VariableFamily family = new VariableFamily( "family" );
-    GlobalVariable gb1 = new GlobalVariable( family, "gb1" );
-    GlobalVariable gb2 = new GlobalVariable( family, "gb2" );
+    GlobalVariable gb1 = new GlobalVariable( "gb1", family );
+    GlobalVariable gb2 = new GlobalVariable( "gb2", family );
     // VariableFamily family2 = new VariableFamily( "vf" );
     gb1.setVariableFamily( family );
     Assert.assertTrue( family.getGlobalVariables( ).contains( gb1 ) );
