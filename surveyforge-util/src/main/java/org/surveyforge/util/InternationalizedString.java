@@ -30,6 +30,7 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
@@ -57,7 +58,7 @@ public class InternationalizedString implements Serializable
   @SuppressWarnings("unused")
   @javax.persistence.Version
   private int                 lockingVersion;
-  @CollectionOfElements
+  @CollectionOfElements(fetch = FetchType.EAGER)
   @MapKey(columns = {@Column(name = "locale", length = 25)})
   @Column(name = "string", length = 2500)
   private Map<Locale, String> strings          = new HashMap<Locale, String>( );
