@@ -226,8 +226,13 @@ public class Register extends DataElement implements Serializable
   @Override
   public boolean equals( Object object )
     {
-    Register otherRegister = (Register) object;
-    return this.getIdentifier( ).equals( otherRegister.getIdentifier( ) );
+    if( object instanceof Register )
+      {
+      Register otherRegister = (Register) object;
+      return this.getIdentifier( ).equals( otherRegister.getIdentifier( ) );
+      }
+    else
+      return false;
     }
 
   @Override

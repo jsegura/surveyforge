@@ -129,7 +129,8 @@ public class RegisterDataElement extends DataElement
   @Override
   public void removeComponentElement( DataElement componentElement )
     {
-    if( ((Register) this.getRootDataElement( )).getRegisterData( ).getObjectData( ).size( ) > 0 )
+    if( !(this.getRootDataElement( ) instanceof Register)
+        || ((Register) this.getRootDataElement( )).getRegisterData( ).getObjectData( ).size( ) > 0 )
       throw new IllegalStateException( );
     else
       super.removeComponentElement( componentElement );

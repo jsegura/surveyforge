@@ -196,15 +196,15 @@ public abstract class DataElement implements Serializable
   /**
    * @param variableStructure The variableStructure to set.
    */
-  public void setVariableStructure( DataElement variableStructure )
+  protected void setVariableStructure( DataElement variableStructure )
     {
-    if( (variableStructure == null && this.getVariableStructure( ) != null)
-        || !variableStructure.equals( this.getVariableStructure( ) ) )
-      {
-      if( this.getVariableStructure( ) != null ) this.getVariableStructure( ).removeElement( this );
-      this.variableStructure = variableStructure;
-      if( this.getVariableStructure( ) != null ) this.getVariableStructure( ).addElement( this );
-      }
+    // if( (variableStructure == null && this.getVariableStructure( ) != null)
+    // || !variableStructure.equals( this.getVariableStructure( ) ) )
+    // {
+    if( this.getVariableStructure( ) != null ) this.getVariableStructure( ).removeElement( this );
+    this.variableStructure = variableStructure;
+    if( this.getVariableStructure( ) != null ) this.getVariableStructure( ).addElement( this );
+    // }
     }
 
   /**
@@ -247,12 +247,10 @@ public abstract class DataElement implements Serializable
     {
     if( componentElement != null )
       {
-      if( !this.getComponentElements( ).contains( componentElement ) )
+      if( !this.getComponentElements( ).contains( componentElement ) && this.getValueDomain( ) instanceof StructuredValueDomain )
         {
-        if( componentElement.getVariableStructure( ) != null && !componentElement.getVariableStructure( ).equals( this ) )
-          componentElement.getVariableStructure( ).removeElement( componentElement );
-        componentElement.variableStructure = this;
-        this.componentElements.add( componentElement );
+        componentElement.setVariableStructure( this );
+        // ((StructuredValueDomain) this.getValueDomain( )).addSubDomain( componentElement.getValueDomain( ) );
         }
       else
         throw new IllegalArgumentException( );
@@ -266,10 +264,14 @@ public abstract class DataElement implements Serializable
    */
   protected void addElement( DataElement componentElement )
     {
-    if( !this.getNameToElementMap( ).containsKey( componentElement.getIdentifier( ) ) )
+    if( !this.getNameToElementMap( ).containsKey( componentElement.getIdentifier( ) )
+        && this.getValueDomain( ) instanceof StructuredValueDomain )
       {
       this.componentElements.add( componentElement );
+      componentElement.variableStructure = this;
       this.getNameToElementMap( ).put( componentElement.getIdentifier( ), componentElement );
+      ((StructuredValueDomain) this.getValueDomain( )).addSubDomain( componentElement.getValueDomain( ) );
+
       }
     else
       throw new IllegalArgumentException( );
@@ -283,7 +285,7 @@ public abstract class DataElement implements Serializable
     if( componentElement != null )
       {
       this.removeElement( componentElement );
-      componentElement.variableStructure = null;
+      componentElement.setVariableStructure( null );
       }
     else
       throw new NullPointerException( );
@@ -294,10 +296,13 @@ public abstract class DataElement implements Serializable
    */
   protected void removeElement( DataElement componentElement )
     {
-    if( this.getNameToElementMap( ).containsKey( componentElement.getIdentifier( ) ) )
+    if( this.getNameToElementMap( ).containsKey( componentElement.getIdentifier( ) )
+        && this.getValueDomain( ) instanceof StructuredValueDomain )
       {
       this.componentElements.remove( componentElement );
       this.getNameToElementMap( ).remove( componentElement.getIdentifier( ) );
+      componentElement.variableStructure = null;
+      ((StructuredValueDomain) this.getValueDomain( )).removeSubDomain( componentElement.getValueDomain( ) );
       }
     else
       throw new IllegalArgumentException( );

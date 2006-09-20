@@ -4,6 +4,7 @@
   <test name="All">
     <packages>
       <package name="org.surveyforge.core.metadata" />
+      <package name="org.surveyforge.core.metadata.domain" />
       <package name="org.surveyforge.core.data" />
       <package name="org.surveyforge.core.survey" />
     </packages>

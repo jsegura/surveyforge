@@ -13,7 +13,6 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.IndexColumn;
 import org.surveyforge.core.data.ObjectData;
-import org.surveyforge.core.metadata.ValueDomain;
 
 @Entity
 public class StructuredValueDomain extends AbstractValueDomain
