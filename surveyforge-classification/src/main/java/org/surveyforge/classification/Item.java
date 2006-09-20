@@ -473,8 +473,13 @@ public class Item implements Serializable
   @Override
   public boolean equals( Object object )
     {
-    Item otherItem = (Item) object;
-    return this.getVersion( ).equals( otherItem.getVersion( ) ) && this.getCode( ).equals( otherItem.getCode( ) );
+    if( object instanceof Item )
+      {
+      Item otherItem = (Item) object;
+      return this.getVersion( ).equals( otherItem.getVersion( ) ) && this.getCode( ).equals( otherItem.getCode( ) );
+      }
+    else
+      return false;
     }
 
   @Override
