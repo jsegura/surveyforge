@@ -80,7 +80,7 @@ public abstract class DataElement implements Serializable
   /**  */
   @ManyToOne(cascade = {CascadeType.ALL})
   @JoinColumn(name = "valueDomain_id")
-  private AbstractValueDomain       valueDomain;
+  private AbstractValueDomain      valueDomain;
   /**  */
   @ManyToOne(cascade = {CascadeType.ALL})
   @JoinColumn(name = "variableStructure_id", insertable = false, updatable = false)
@@ -250,10 +250,8 @@ public abstract class DataElement implements Serializable
       if( !this.getComponentElements( ).contains( componentElement ) )
         {
         if( componentElement.getVariableStructure( ) != null && !componentElement.getVariableStructure( ).equals( this ) )
-          {
           componentElement.getVariableStructure( ).removeElement( componentElement );
-          componentElement.variableStructure = this;
-          }
+        componentElement.variableStructure = this;
         this.componentElements.add( componentElement );
         }
       else
@@ -361,5 +359,22 @@ public abstract class DataElement implements Serializable
   public int hashCode( )
     {
     return this.getIdentifier( ).hashCode( ) ^ (this.getVariableStructure( ) == null ? 0 : this.getVariableStructure( ).hashCode( ));
+    }
+
+  @Override
+  public String toString( )
+    {
+    StringBuffer dataElementString = new StringBuffer( );
+    dataElementString.append( '|' ).append( this.getIdentifier( ) );
+    if( !this.getComponentElements( ).isEmpty( ) )
+      {
+      dataElementString.append( ':' );
+      for( DataElement componentElement : this.getComponentElements( ) )
+        dataElementString.append( componentElement.toString( ) );
+      }
+
+    dataElementString.append( "|" );
+
+    return dataElementString.toString( );
     }
   }
