@@ -45,13 +45,13 @@ import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.IndexColumn;
 import org.surveyforge.core.metadata.domain.AbstractValueDomain;
+import org.surveyforge.core.metadata.domain.StructuredValueDomain;
 
 // TODO Elaborate on comments
 /**
  * @author jsegura
  */
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"identifier", "register_id"})})
 public abstract class DataElement implements Serializable
   {
   private static final long        serialVersionUID  = 0L;

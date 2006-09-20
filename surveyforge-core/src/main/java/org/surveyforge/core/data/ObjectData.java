@@ -21,14 +21,9 @@
  */
 package org.surveyforge.core.data;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-
-import org.hibernate.annotations.GenericGenerator;
 
 /**
  * @author jsegura
@@ -37,17 +32,6 @@ import org.hibernate.annotations.GenericGenerator;
 public class ObjectData extends Data
   {
   private static final long serialVersionUID = 6601926722422919229L;
-
-  @SuppressWarnings("unused")
-  @Id
-  @Column(length = 50)
-  @GeneratedValue(generator = "system-uuid")
-  @GenericGenerator(name = "system-uuid", strategy = "uuid")
-  private String            id;
-  /** Version for optimistic locking. */
-  @SuppressWarnings("unused")
-  @javax.persistence.Version
-  private int               lockingVersion;
 
   @ManyToOne(optional = true)
   @JoinColumn(name = "registerData_id", insertable = false, updatable = false)

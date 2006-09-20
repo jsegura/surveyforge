@@ -30,16 +30,14 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.IndexColumn;
 import org.surveyforge.core.data.RegisterData;
+import org.surveyforge.core.metadata.domain.StructuredValueDomain;
 import org.surveyforge.core.survey.Questionnaire;
 
 // TODO Elaborate on comments
@@ -51,23 +49,7 @@ public class Register extends DataElement implements Serializable
   {
   private static final long         serialVersionUID = 0L;
 
-  @SuppressWarnings("unused")
-  @Id
-  @Column(length = 50)
-  @GeneratedValue(generator = "system-uuid")
-  @GenericGenerator(name = "system-uuid", strategy = "uuid")
-  private String                    id;
-  /** Version for optimistic locking. */
-  @SuppressWarnings("unused")
-  @javax.persistence.Version
-  private int                       lockingVersion;
 
-  /**
-   * The name of the register is either a systematic name according to the naming conventions in the organisation or a human language
-   * name that reflects the idea or concept of the cube or register.
-   */
-  @Column(unique = true, length = 50)
-  private String                    identifier;
   /**
    * When defining hierarchical registers the hierarchy is expressed as master/detail relationship. The master register defines the
    * objects that consist of the details.
@@ -93,7 +75,7 @@ public class Register extends DataElement implements Serializable
   private List<RegisterDataElement> key              = new ArrayList<RegisterDataElement>( );
 
   /** */
-  @OneToOne(optional = false, cascade = {CascadeType.ALL})
+  @OneToOne(cascade = {CascadeType.ALL})
   private RegisterData              registerData;
 
   /** */
@@ -114,27 +96,8 @@ public class Register extends DataElement implements Serializable
     {
     this.setIdentifier( identifier );
     this.registerData = new RegisterData( this );
+    this.setValueDomain( new StructuredValueDomain( ) );
     }
-
-  /**
-   * @return Returns the identifier.
-   */
-  public String getIdentifier( )
-    {
-    return this.identifier;
-    }
-
-  /**
-   * @param identifier The identifier to set.
-   */
-  public void setIdentifier( String identifier )
-    {
-    if( identifier != null && !identifier.equals( "" ) )
-      this.identifier = identifier;
-    else
-      throw new NullPointerException( );
-    }
-
 
   /**
    * @return Returns the masterRegister.

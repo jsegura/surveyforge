@@ -60,7 +60,7 @@ public class RegisterData implements Serializable
   @javax.persistence.Version
   private int               lockingVersion;
 
-  @OneToOne(optional = true)
+  @OneToOne
   private Register          register;
 
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
