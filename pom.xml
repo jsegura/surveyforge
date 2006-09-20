@@ -306,6 +306,12 @@
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>8.1-407.jdbc3</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
         <groupId>com.jgoodies</groupId>
         <artifactId>looks</artifactId>
         <version>2.0.4</version>
