@@ -72,8 +72,7 @@ public class QuestionnaireElement implements Serializable
   @Column(unique = true, length = 50)
   private String                     identifier;
   /** Each questionnaire element has a {@link Question} that has the text and the structure of the question. */
-  @ManyToOne(optional = true, cascade = {CascadeType.ALL})
-  @JoinColumn(name = "question_id", insertable = false, updatable = false)
+  @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   private Question                   question                  = null;
   /** A questionnaire element have a {@link RegisterDataElement} to have the info of the data. */
   @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
