@@ -159,7 +159,7 @@
     <module>surveyforge-classification</module>
     <module>surveyforge-core</module>
     <module>surveyforge-db</module>
-    <!-- <module>surveyforge-runner</module> -->
+    <module>surveyforge-runner</module>
   </modules>
   <repositories>
     <repository>
