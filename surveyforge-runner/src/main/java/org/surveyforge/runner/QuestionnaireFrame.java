@@ -151,7 +151,10 @@ public class QuestionnaireFrame extends JFrame
         }
 
       pageSectionPanelBuilder.nextColumn( ); // Needed to place cursor in correct column
-      pageSectionPanelBuilder.addLabel( element.getQuestion( ).getText( ) );
+      if( element.getQuestion( ) != null )
+        pageSectionPanelBuilder.addLabel( element.getQuestion( ).getText( ) );
+      else
+        pageSectionPanelBuilder.nextColumn( 1 );
       pageSectionPanelBuilder.nextColumn( 2 );
       pageSectionPanelBuilder.add( this.createDataEntryComponent( element ) );
       }
@@ -196,9 +199,9 @@ public class QuestionnaireFrame extends JFrame
         final ClassificationValueDomain classificationValueDomain = (ClassificationValueDomain) valueDomain;
         JPanel classificationPanel = new JPanel( new FlowLayout( FlowLayout.LEFT ) );
         // JComboBox classificationCombo = new JComboBox( classificationValueDomain.getLevel( ).getItems( ).toArray( ) );
-        JComboBox classificationCombo = new JComboBox(
-            new ComboBoxAdapter( classificationValueDomain.getLevel( ).getItems( ), new QuestionnaireFrame.ClassificationConverter(
-                classificationValueDomain.getLevel( ), this.dataModel.getModel( propertyName ) ) ) );
+        JComboBox classificationCombo = new JComboBox( new ComboBoxAdapter( classificationValueDomain.getLevel( ).getItems( ),
+            new QuestionnaireFrame.ClassificationConverter( classificationValueDomain.getLevel( ), this.dataModel
+                .getModel( propertyName ) ) ) );
 
         // JTextField classificationCode = new JTextField( 5 );
         final JTextField classificationCode = BasicComponentFactory.createTextField( this.dataModel.getModel( propertyName ) );
@@ -232,10 +235,6 @@ public class QuestionnaireFrame extends JFrame
               return verify( input );
               }
           } );
-        // JFormattedTextField classificationCode = new JFormattedTextField( new QuestionnaireFrame.ClassificationFormatter(
-        // classificationValueDomain.getLevel( ) ) );
-        // PropertyConnector propertyConnector = new PropertyConnector( this.dataModel.getModel( "sexo" ), "value", classificationCode,
-        // "value" );
 
         classificationPanel.add( classificationCombo );
         classificationPanel.add( classificationCode );
