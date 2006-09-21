@@ -35,35 +35,35 @@ public class QuestionnaireTest
   @ExpectedExceptions( {NullPointerException.class})
   public void questionnaireCreationWithNullIdentifier( )
     {
-    new Questionnaire( new Study( "id" ), new Register( "id" ), null );
+    new Questionnaire( null, new Study( "id" ), new Register( "id" ) );
     }
 
   @Test
   @ExpectedExceptions( {NullPointerException.class})
   public void questionnaireCreationWithEmptyIdentifier( )
     {
-    new Questionnaire( new Study( "id" ), new Register( "id" ), "" );
+    new Questionnaire( "", new Study( "id" ), new Register( "id" ) );
     }
 
   @Test
   @ExpectedExceptions( {NullPointerException.class})
   public void questionnaireCreationWithNullStudy( )
     {
-    new Questionnaire( null, new Register( "id" ), "id" );
+    new Questionnaire( "id", null, new Register( "id" ) );
     }
 
   @Test
   @ExpectedExceptions( {NullPointerException.class})
   public void questionnaireCreationWithNullRegister( )
     {
-    new Questionnaire( new Study( "id" ), null, "id" );
+    new Questionnaire( "id", new Study( "id" ), null );
     }
 
   @Test
   public void questionnaireGetIdentifier( )
     {
     String id = "id";
-    Questionnaire questionnaire = new Questionnaire( new Study( "id" ), new Register( "id" ), id );
+    Questionnaire questionnaire = new Questionnaire( id, new Study( "id" ), new Register( "id" ) );
     Assert.assertEquals( questionnaire.getIdentifier( ), id );
     }
 
@@ -72,14 +72,14 @@ public class QuestionnaireTest
   public void questionnaireSetNullTitle( )
     {
 
-    new Questionnaire( new Study( "id" ), new Register( "id" ), "id" ).setTitle( null );
+    new Questionnaire( "id", new Study( "id" ), new Register( "id" ) ).setTitle( null );
     }
 
 
   @Test
   public void questionnaireGetTitle( )
     {
-    Questionnaire questionnaire = new Questionnaire( new Study( "id" ), new Register( "id" ), "id" );
+    Questionnaire questionnaire = new Questionnaire( "id", new Study( "id" ), new Register( "id" ) );
     questionnaire.setTitle( "title" );
     Assert.assertEquals( questionnaire.getTitle( ), "title" );
     }
@@ -88,7 +88,7 @@ public class QuestionnaireTest
   @ExpectedExceptions( {NullPointerException.class})
   public void questionnaireSetNullDescription( )
     {
-    new Questionnaire( new Study( "id" ), new Register( "id" ), "id" ).setDescription( null );
+    new Questionnaire( "id", new Study( "id" ), new Register( "id" ) ).setDescription( null );
     }
 
   @Test
@@ -96,7 +96,7 @@ public class QuestionnaireTest
     {
     String empty = "";
     String desc = "desc";
-    Questionnaire obj = new Questionnaire( new Study( "id" ), new Register( "id" ), "id" );
+    Questionnaire obj = new Questionnaire( "id", new Study( "id" ), new Register( "id" ) );
     obj.setDescription( desc );
     Assert.assertTrue( obj.getDescription( ).equals( desc ) );
     Assert.assertFalse( obj.getDescription( ).equals( "test" ) );
