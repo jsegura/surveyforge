@@ -123,11 +123,11 @@ public class Questionnaire implements Serializable
    * @throws NullPointerException If the study is <code>null</code> or if the register is <code>null</code> or if the identifier is
    *           <code>null</code> or is empty.
    */
-  public Questionnaire( Study study, Register register, String identifier )
+  public Questionnaire( String identifier, Study study, Register register )
     {
+    this.setIdentifier( identifier );
     this.setStudy( study );
     this.setRegister( register );
-    this.setIdentifier( identifier );
     }
 
   /**
