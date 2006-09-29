@@ -27,14 +27,14 @@ public class RegisterTest
   @ExpectedExceptions( {NullPointerException.class})
   public void RegisterCreationWithNullIdentifier( )
     {
-    Register register = new Register( null );
+    new Register( null );
     }
 
   @Test
   @ExpectedExceptions( {NullPointerException.class})
   public void RegisterCreationWithEmptyIdentifier( )
     {
-    Register register = new Register( "" );
+    new Register( "" );
     }
 
 

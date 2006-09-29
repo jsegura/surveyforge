@@ -31,7 +31,6 @@ import javax.persistence.OneToOne;
 
 import org.surveyforge.core.metadata.domain.AbstractValueDomain;
 import org.surveyforge.core.survey.Question;
-import org.surveyforge.core.survey.QuestionnaireElement;
 
 /**
  * Register data elements define data elements for a register. In contrast to an abstract data element a register data element is
@@ -54,8 +53,8 @@ public class RegisterDataElement extends DataElement
   @ManyToOne(optional = true)
   private Question              question;
 
-  @OneToOne
-  private QuestionnaireElement  questionnaireElement;
+//  @OneToOne
+//  private QuestionnaireElement  questionnaireElement;
 
   protected RegisterDataElement( )
     {};
@@ -182,18 +181,18 @@ public class RegisterDataElement extends DataElement
   /**
    * @return the questionnaireElement
    */
-  public QuestionnaireElement getQuestionnaireElement( )
-    {
-    return questionnaireElement;
-    }
+//  public QuestionnaireElement getQuestionnaireElement( )
+//    {
+//    return questionnaireElement;
+//    }
 
   /**
    * @param questionnaireElement the questionnaireElement to set
    */
-  public void setQuestionnaireElement( QuestionnaireElement questionnaireElement )
-    {
-    this.questionnaireElement = questionnaireElement;
-    }
+//  public void setQuestionnaireElement( QuestionnaireElement questionnaireElement )
+//    {
+//    this.questionnaireElement = questionnaireElement;
+//    }
 
   public AbstractValueDomain getValueDomain( )
     {

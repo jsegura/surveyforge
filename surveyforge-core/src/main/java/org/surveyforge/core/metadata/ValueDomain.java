@@ -22,6 +22,9 @@
 package org.surveyforge.core.metadata;
 
 import java.io.Serializable;
+import java.util.List;
+
+import org.surveyforge.core.metadata.domain.AbstractValueDomain;
 
 
 /**
@@ -30,4 +33,6 @@ import java.io.Serializable;
 public interface ValueDomain
   {
   public boolean isValid( Serializable object );
+
+  public List<AbstractValueDomain> getSubDomains( );
   }

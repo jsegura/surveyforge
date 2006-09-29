@@ -32,6 +32,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -42,7 +44,8 @@ import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.IndexColumn;
 import org.surveyforge.core.metadata.RegisterDataElement;
-
+import org.surveyforge.core.metadata.domain.AbstractValueDomain;
+import org.surveyforge.core.metadata.domain.StructuredValueDomain;
 
 /**
  * A questionnaire element is the link between the {@link Question} of the {@link Questionnaire} and the metadata layer represented by
@@ -51,10 +54,11 @@ import org.surveyforge.core.metadata.RegisterDataElement;
  * @author jsegura
  */
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"identifier", "questionnaire_id"})})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"identifier", "upperElement_id"})})
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class QuestionnaireElement implements Serializable
   {
-  private static final long          serialVersionUID          = -5920656314181190011L;
+  private static final long          serialVersionUID     = -5920656314181190011L;
 
 
   @SuppressWarnings("unused")
@@ -68,59 +72,44 @@ public class QuestionnaireElement implements Serializable
   @javax.persistence.Version
   private int                        lockingVersion;
 
-  /** A questionnaire element is identified by a unique identifier. */
+  /** A SurveyElement is identified by a unique identifier. */
   @Column(unique = true, length = 50)
   private String                     identifier;
+
   /** Each questionnaire element has a {@link Question} that has the text and the structure of the question. */
   @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
-  private Question                   question                  = null;
+  private Question                   question             = null;
   /** A questionnaire element have a {@link RegisterDataElement} to have the info of the data. */
-  @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
-  private RegisterDataElement        registerDataElement;
+  @OneToOne(cascade = {CascadeType.ALL})
+  protected RegisterDataElement      registerDataElement;
   /** Default answer if the question is not applicable. */
   @Column(length = 50)
-  private String                     defaultNotApplicable      = "";
+  private String                     defaultNotApplicable = "";
   /** Default answer if the question is not answered. */
   @Column(length = 50)
-  private String                     defaultNotAnswered        = "";
-  /** This is the question that acts as a frame for a number of sub questions. */
+  private String                     defaultNotAnswered   = "";
+
   @ManyToOne
-  @JoinColumn(name = "upperQuestionnaireElement_id", insertable = false, updatable = false)
-  private QuestionnaireElement       upperQuestionnaireElement = null;
-  /** A question referring to a complex fact can be divided in a number of sub questions. */
+  @JoinColumn(name = "upperElement_id", insertable = false, updatable = false)
+  private QuestionnaireElement       upperElement         = null;
+
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
-  @IndexColumn(name = "subQuestionnaireElementsIndex")
-  @JoinColumn(name = "upperQuestionnaireElement_id")
-  private List<QuestionnaireElement> subQuestionnaireElements  = new ArrayList<QuestionnaireElement>( );
+  @IndexColumn(name = "componentElementsIndex")
+  @JoinColumn(name = "upperElement_id")
+  private List<QuestionnaireElement> componentElements    = new ArrayList<QuestionnaireElement>( );
 
 
   protected QuestionnaireElement( )
     {}
 
-  /**
-   * Creates a new instance of a QuestionnaireElement linked to the registerDataElement and identified by identifier.
-   * 
-   * @param registerDataElement The {@link RegisterDataElement} the questionnaire element is linked to.
-   * @param identifier The identifier of the questionnaire element.
-   * @throws NullPointerException If the registerDataElement or the identifier are <code>null</code> and if the identifier is empty.
-   */
-  public QuestionnaireElement( RegisterDataElement registerDataElement )
+  public QuestionnaireElement( String identifier, AbstractValueDomain valueDomain )
     {
-    this.setRegisterDataElement( registerDataElement );
-    this.setIdentifier( registerDataElement.getIdentifier( ) );
+    this.setIdentifier( identifier );
+    this.registerDataElement = new RegisterDataElement( identifier, valueDomain );
     }
 
-  public QuestionnaireElement( RegisterDataElement registerDataElement, QuestionnaireElement upperElement )
-    {
-    this( registerDataElement );
-    this.setUpperQuestionnaireElement( upperElement );
-    }
-
-
-  /**
-   * Returns the identifier of the questionnaire element.
-   * 
-   * @return Returns the identifier.
+  /*
+   * Returns the identifier of the SurveyElement. @return Returns the identifier.
    */
   public String getIdentifier( )
     {
@@ -128,12 +117,12 @@ public class QuestionnaireElement implements Serializable
     }
 
   /**
-   * Sets a new identifier for the questionnaire element.
+   * Sets the identifier of the SurveyElement.
    * 
    * @param identifier The identifier to set.
-   * @throws NullPointerException If the identifier is <code>null</code> and if the identifier is empty.
+   * @throws NullPointerException If the register is <code>null</code> or if the identifier is <code>null</code> or is empty.
    */
-  protected void setIdentifier( String identifier )
+  public void setIdentifier( String identifier )
     {
     if( identifier != null && !identifier.equals( "" ) )
       this.identifier = identifier;
@@ -162,36 +151,13 @@ public class QuestionnaireElement implements Serializable
     }
 
   /**
-   * Return the {@link RegisterDataElement} this questionnaire element is linked to.
+   * / * Return the {@link RegisterDataElement} this questionnaire element is linked to.
    * 
    * @return Returns the registerDataElement.
    */
   public RegisterDataElement getRegisterDataElement( )
     {
     return this.registerDataElement;
-    }
-
-  /**
-   * Sets a the new {@link RegisterDataElement} this questionnaire element is linked to.
-   * 
-   * @param registerDataElement The registerDataElement to set.
-   * @throws If the registerDataElement is <code>null</code>;
-   */
-  protected void setRegisterDataElement( RegisterDataElement registerDataElement )
-    {
-    if( registerDataElement != null )
-      {
-      // TODO remove old elements
-      this.registerDataElement = registerDataElement;
-      registerDataElement.setQuestionnaireElement( this );
-      for( int i = 0; i < registerDataElement.getComponentElements( ).size( ); i++ )
-        {
-        this.addSubQuestionnaireElement( new QuestionnaireElement( (RegisterDataElement) (registerDataElement.getComponentElements( )
-            .get( i )) ) );
-        }
-      }
-    else
-      throw new NullPointerException( );
     }
 
   /**
@@ -242,42 +208,90 @@ public class QuestionnaireElement implements Serializable
       throw new NullPointerException( );
     }
 
-
-  public QuestionnaireElement getUpperQuestionnaireElement( )
+  protected void setUpperElement( QuestionnaireElement upperElement )
     {
-    return this.upperQuestionnaireElement;
+    if( this.getUpperElement( ) != null ) this.getUpperElement( ).removeElement( this );
+    this.upperElement = upperElement;
+    if( this.getUpperElement( ) != null ) this.getUpperElement( ).addElement( this );
     }
 
-  public void setUpperQuestionnaireElement( QuestionnaireElement upperQuestionnaireElement )
+  public QuestionnaireElement getUpperElement( )
     {
-    if( this.upperQuestionnaireElement != null ) this.upperQuestionnaireElement.removeSubQuestionnaireElement( this );
-    this.upperQuestionnaireElement = upperQuestionnaireElement;
-    if( this.upperQuestionnaireElement != null ) this.upperQuestionnaireElement.addSubQuestionnaireElement( this );
+    return this.upperElement;
     }
 
 
-  private void removeSubQuestionnaireElement( QuestionnaireElement subQuestionnaireElement )
+  public List<QuestionnaireElement> getComponentElements( )
     {
-    if( subQuestionnaireElement != null )
-      this.subQuestionnaireElements.remove( subQuestionnaireElement );
+    return Collections.unmodifiableList( this.componentElements );
+    }
+
+  /**
+   * @param componentElements The componentElements to set.
+   */
+  public void addComponentElement( QuestionnaireElement componentElement )
+    {
+    if( componentElement != null )
+      {
+      if( !this.getComponentElements( ).contains( componentElement )
+          && this.getRegisterDataElement( ).getValueDomain( ) instanceof StructuredValueDomain )
+        {
+        componentElement.setUpperElement( this );
+        // ((StructuredValueDomain) this.getValueDomain( )).addSubDomain( componentElement.getValueDomain( ) );
+        }
+      else
+        throw new IllegalArgumentException( );
+      }
     else
       throw new NullPointerException( );
     }
 
-  public List<QuestionnaireElement> getSubQuestionnaireElementss( )
+
+  /**
+   * @param componentElement
+   */
+  protected void addElement( QuestionnaireElement componentElement )
     {
-    return Collections.unmodifiableList( this.subQuestionnaireElements );
+    if( componentElement == null ) throw new NullPointerException( );
+    if( this.getRegisterDataElement( ).getValueDomain( ) instanceof StructuredValueDomain )
+      {
+      this.componentElements.add( componentElement );
+      componentElement.upperElement = this;
+      this.getRegisterDataElement( ).addComponentElement( componentElement.getRegisterDataElement( ) );
+      }
+    else
+      throw new IllegalArgumentException( );
     }
 
-
-  private void addSubQuestionnaireElement( QuestionnaireElement subQuestionnaireElement )
+  /**
+   * @param componentElements The componentElements to set.
+   */
+  public void removeComponentElement( QuestionnaireElement componentElement )
     {
-    if( subQuestionnaireElement != null )
-      this.subQuestionnaireElements.add( subQuestionnaireElement );
+    if( componentElement != null )
+      {
+      componentElement.setUpperElement( null );
+      }
     else
       throw new NullPointerException( );
     }
 
+  /**
+   * @param componentElement
+   */
+  protected void removeElement( QuestionnaireElement componentElement )
+    {
+    if( componentElement == null ) throw new NullPointerException( );
+    if( this.getRegisterDataElement( ).getValueDomain( ) instanceof StructuredValueDomain )
+      {
+      this.componentElements.remove( componentElement );
+      componentElement.upperElement = null;
+      this.getRegisterDataElement( ).removeComponentElement( componentElement.getRegisterDataElement( ) );
+
+      }
+    else
+      throw new IllegalArgumentException( );
+    }
 
   // TODO : Equals+hashcode
   // @Override
@@ -293,5 +307,4 @@ public class QuestionnaireElement implements Serializable
   // {
   // return this.getStudy( ).hashCode( ) ^ this.getIdentifier( ).hashCode( );
   // }
-
   }

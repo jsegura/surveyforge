@@ -66,8 +66,7 @@ public class DataElementTest
   public void RegisterDataElementCreationWithNullIdentifier( )
     {
     LogicalValueDomain lvd = new LogicalValueDomain( );
-    RegisterDataElement rde = new RegisterDataElement( null, lvd );
-
+    new RegisterDataElement( null, lvd );
     }
 
   @Test
@@ -75,9 +74,6 @@ public class DataElementTest
   public void RegisterCreationWithNullDomain( )
     {
     LogicalValueDomain lvd = null;
-    RegisterDataElement rde = new RegisterDataElement( "id", lvd );
-
+    new RegisterDataElement( "id", lvd );
     }
-
-
   }

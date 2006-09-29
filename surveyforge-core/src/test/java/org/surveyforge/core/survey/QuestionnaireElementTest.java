@@ -29,7 +29,10 @@ import org.surveyforge.core.metadata.ObjectVariable;
 import org.surveyforge.core.metadata.RegisterDataElement;
 import org.surveyforge.core.metadata.StatisticalObjectType;
 import org.surveyforge.core.metadata.domain.LogicalValueDomain;
+import org.surveyforge.core.metadata.domain.StructuredValueDomain;
+import org.testng.Assert;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 /**
  * @author jsegura
@@ -46,5 +49,28 @@ public class QuestionnaireElementTest
         objectVariable );
     RegisterDataElement registerDataElement = new RegisterDataElement( "registerDataElement", conceptualDataElement );
     return new Object[][] {new Object[] {registerDataElement}};
+    }
+
+  @Test
+  public void Test( )
+    {
+
+
+    QuestionnaireElement upperQE = new QuestionnaireElement( "upperQE", new StructuredValueDomain( ) );
+    QuestionnaireElement q1 = new QuestionnaireElement( "qe1", new LogicalValueDomain( ) );
+    QuestionnaireElement q2 = new QuestionnaireElement( "qe2", new LogicalValueDomain( ) );
+    QuestionnaireElement q3 = new QuestionnaireElement( "qe3", new LogicalValueDomain( ) );
+    QuestionnaireElement q4 = new QuestionnaireElement( "qe4", new LogicalValueDomain( ) );
+    QuestionnaireElement q5 = new QuestionnaireElement( "qe5", new LogicalValueDomain( ) );
+    upperQE.addComponentElement( q1 );
+    upperQE.addComponentElement( q2 );
+    upperQE.addComponentElement( q3 );
+    upperQE.addComponentElement( q4 );
+    upperQE.addComponentElement( q5 );
+    Assert.assertEquals( 5, upperQE.getComponentElements( ).size( ) );
+    Assert.assertEquals( 5, upperQE.getRegisterDataElement( ).getComponentElements( ).size( ) );
+    Assert.assertEquals( 5, upperQE.getRegisterDataElement( ).getValueDomain( ).getSubDomains( ).size( ) );
+
+
     }
   }

@@ -21,13 +21,11 @@
  */
 package org.surveyforge.core.metadata;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -38,17 +36,20 @@ import javax.persistence.OneToOne;
 import org.hibernate.annotations.IndexColumn;
 import org.surveyforge.core.data.RegisterData;
 import org.surveyforge.core.metadata.domain.StructuredValueDomain;
-import org.surveyforge.core.survey.Questionnaire;
 
 // TODO Elaborate on comments
 /**
  * @author jsegura
  */
 @Entity
-public class Register extends DataElement implements Serializable
+public class Register extends RegisterDataElement
   {
-  private static final long         serialVersionUID = 0L;
 
+
+  /**
+   * 
+   */
+  private static final long         serialVersionUID = -7481816596643587493L;
 
   /**
    * When defining hierarchical registers the hierarchy is expressed as master/detail relationship. The master register defines the
@@ -78,10 +79,10 @@ public class Register extends DataElement implements Serializable
   @OneToOne(cascade = {CascadeType.ALL})
   private RegisterData              registerData;
 
-  /** */
-  @OneToOne(mappedBy = "register", fetch = FetchType.LAZY, optional = true)
-  // @OneToOne(fetch = FetchType.LAZY)
-  private Questionnaire             questionnaire;
+//  /** */
+//  @OneToOne(mappedBy = "register", fetch = FetchType.LAZY, optional = true)
+//  // @OneToOne(fetch = FetchType.LAZY)
+//  private Questionnaire             questionnaire;
 
 
   protected Register( )
@@ -94,9 +95,8 @@ public class Register extends DataElement implements Serializable
    */
   public Register( String identifier )
     {
-    this.setIdentifier( identifier );
+    super( identifier, new StructuredValueDomain( ) );
     this.registerData = new RegisterData( this );
-    this.setValueDomain( new StructuredValueDomain( ) );
     }
 
   /**
@@ -142,47 +142,47 @@ public class Register extends DataElement implements Serializable
     if( detailRegister != null ) this.detailRegisters.remove( detailRegister );
     }
 
-  @Override
-  public List<? extends RegisterDataElement> getComponentElements( )
-    {
-    List<RegisterDataElement> componentElements = new ArrayList<RegisterDataElement>( );
-    for( DataElement dataElement : super.getComponentElements( ) )
-      componentElements.add( (RegisterDataElement) dataElement );
-    return componentElements;
-    }
+  // @Override
+  // public List<? extends RegisterDataElement> getComponentElements( )
+  // {
+  // List<RegisterDataElement> componentElements = new ArrayList<RegisterDataElement>( );
+  // for( DataElement dataElement : super.getComponentElements( ) )
+  // componentElements.add( (RegisterDataElement) dataElement );
+  // return componentElements;
+  // }
 
-  @Override
-  public void addComponentElement( DataElement componentElement )
-    {
-    if( !(componentElement instanceof RegisterDataElement) )
-      throw new IllegalArgumentException( );
-    else if( this.registerData.getObjectData( ).size( ) > 0 )
-      throw new IllegalStateException( );
-    else
-      super.addComponentElement( componentElement );
-    }
-
-  @Override
-  public void removeComponentElement( DataElement componentElement )
-    {
-    if( this.registerData.getObjectData( ).size( ) > 0 )
-      throw new IllegalStateException( );
-    else
-      super.removeComponentElement( componentElement );
-    }
-
-  @Override
-  public void setComponentElements( List<? extends DataElement> componentElements )
-    {
-    if( componentElements == null )
-      throw new NullPointerException( );
-    else if( this.registerData.getObjectData( ).size( ) > 0 )
-      throw new IllegalStateException( );
-    else if( this.key != null && !componentElements.containsAll( this.key ) )
-      throw new IllegalArgumentException( );
-    else
-      super.setComponentElements( componentElements );
-    }
+  // @Override
+  // public void addComponentElement( DataElement componentElement )
+  // {
+  // if( !(componentElement instanceof RegisterDataElement) )
+  // throw new IllegalArgumentException( );
+  // else if( this.registerData.getObjectData( ).size( ) > 0 )
+  // throw new IllegalStateException( );
+  // else
+  // super.addComponentElement( componentElement );
+  // }
+  //
+  // @Override
+  // public void removeComponentElement( DataElement componentElement )
+  // {
+  // if( this.registerData.getObjectData( ).size( ) > 0 )
+  // throw new IllegalStateException( );
+  // else
+  // super.removeComponentElement( componentElement );
+  // }
+  //
+  // @Override
+  // public void setComponentElements( List<? extends DataElement> componentElements )
+  // {
+  // if( componentElements == null )
+  // throw new NullPointerException( );
+  // else if( this.registerData.getObjectData( ).size( ) > 0 )
+  // throw new IllegalStateException( );
+  // else if( this.key != null && !componentElements.containsAll( this.key ) )
+  // throw new IllegalArgumentException( );
+  // else
+  // super.setComponentElements( componentElements );
+  // }
 
   /**
    * @return Returns the key.
@@ -213,15 +213,15 @@ public class Register extends DataElement implements Serializable
     return this.registerData;
     }
 
-  public Questionnaire getQuestionnaire( )
-    {
-    return this.questionnaire;
-    }
+//  public Questionnaire getQuestionnaire( )
+//    {
+//    return (Questionnaire) super.getQuestionnaireElement( );
+//    }
 
-  public void setQuestionnaire( Questionnaire questionnaire )
-    {
-    this.questionnaire = questionnaire;
-    }
+//  public void setQuestionnaire( Questionnaire questionnaire )
+//    {
+//    this.questionnaire = questionnaire;
+//    }
 
   @Override
   public boolean equals( Object object )

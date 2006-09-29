@@ -32,19 +32,16 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.IndexColumn;
 import org.surveyforge.core.metadata.Register;
 import org.surveyforge.util.InternationalizedString;
+
 
 /**
  * A questionnaire is a list of {@link Question}s used to recollect the data into a register. The questionnaire is included in almost
@@ -54,61 +51,38 @@ import org.surveyforge.util.InternationalizedString;
  */
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"identifier", "study_id"})})
-public class Questionnaire implements Serializable
+public class Questionnaire extends QuestionnaireElement
   {
-  private static final long          serialVersionUID = 6844066269698434310L;
-
-  @SuppressWarnings("unused")
-  @Id
-  @Column(length = 50)
-  @GeneratedValue(generator = "system-uuid")
-  @GenericGenerator(name = "system-uuid", strategy = "uuid")
-  private String                     id;
-  /** Version for optimistic locking. */
-  @SuppressWarnings("unused")
-  @javax.persistence.Version
-  private int                        lockingVersion;
-
   /**
-   * A questionnaire is identified by an identifier, which is unique in the context of a statistical activity. It may typically be an
-   * abbreviation of its title or a systematic number.
+   * 
    */
-  @Column(nullable = false, length = 50)
-  private String                     identifier;
+  private static final long serialVersionUID = -357629851050021121L;
   /** A questionnaire has a title as provided by the owner or maintenance unit. */
   @Column(length = 250)
-  private String                     title            = "";
+  private String            title            = "";
   /**
    * Detailed description of the questionnaire. The questionnaire description typically describes the underlying concept of the
    * questionnaire and basic principles.
    */
   @Column(length = 500)
-  private String                     description      = "";
-  /** A questionnaire consists of a number of questionnaire elements. Each element refers to a question. */
-  @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
-  @IndexColumn(name = "questionnairesIndex")
-  @JoinColumn(name = "questionnaire_id")
-  private List<QuestionnaireElement> elements         = new ArrayList<QuestionnaireElement>( );
+  private String            description      = "";
+
   /** A questionnaire may have its content organized in pages. */
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "pageIndex")
   // @JoinColumn(name = "questionnaire_page_id")
   @JoinColumn(name = "questionnaire_page_id")
-  private List<Feed>                 pageFeeds        = new ArrayList<Feed>( );
+  private List<Feed>        pageFeeds        = new ArrayList<Feed>( );
   /** A questionnaire may have its content organized in sections. */
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "sectionIndex")
   @JoinColumn(name = "questionnaire_section_id")
-  private List<SectionFeed>          sectionFeeds     = new ArrayList<SectionFeed>( );
-
-  /** A questionnaire corresponds logically to a register, which describes the content of the data collection. */
-  @OneToOne(fetch = FetchType.LAZY)
-  private Register                   register;
+  private List<SectionFeed> sectionFeeds     = new ArrayList<SectionFeed>( );
 
   /** A questionnaire is included in a Study. */
   @ManyToOne
   @JoinColumn(name = "study_id", insertable = false, updatable = false)
-  private Study                      study;
+  private Study             study;
 
 
   protected Questionnaire( )
@@ -123,37 +97,16 @@ public class Questionnaire implements Serializable
    * @throws NullPointerException If the study is <code>null</code> or if the register is <code>null</code> or if the identifier is
    *           <code>null</code> or is empty.
    */
-  public Questionnaire( String identifier, Study study, Register register )
+  public Questionnaire( String identifier, Study study )
     {
+    // super( );
     this.setIdentifier( identifier );
+    this.registerDataElement = new Register( identifier );
     this.setStudy( study );
-    this.setRegister( register );
     }
 
-  /**
-   * Returns the identifier of the Questionnaire.
-   * 
-   * @return Returns the identifier.
-   */
-  public String getIdentifier( )
-    {
-    return this.identifier;
-    }
 
-  /**
-   * Sets the identifier of the Questionnaire.
-   * 
-   * @param identifier The identifier to set.
-   * @throws NullPointerException If the register is <code>null</code> or if the identifier is <code>null</code> or is empty.
-   */
-  public void setIdentifier( String identifier )
-    {
-    if( identifier != null && !identifier.equals( "" ) )
-      this.identifier = identifier;
-    else
-      throw new NullPointerException( );
-    }
-
+  // }
   /**
    * Returns the title of the questionnaire.
    * 
@@ -203,17 +156,6 @@ public class Questionnaire implements Serializable
     }
 
   /**
-   * Return the list of {@link QuestionnaireElement}s included in this questionnaire.
-   * 
-   * @return Returns the elements.
-   */
-  public List<QuestionnaireElement> getElements( )
-    {
-    return Collections.unmodifiableList( this.elements );
-    }
-
-
-  /**
    * Adds a new {@link Element} to he Questionnaire.
    * 
    * @param element The element to add.
@@ -223,7 +165,7 @@ public class Questionnaire implements Serializable
     {
     if( element != null )
       {
-      this.elements.add( element );
+      super.addElement( element );
       if( this.pageFeeds.isEmpty( ) ) this.createPageFeed( element );
       if( this.sectionFeeds.isEmpty( ) ) this.createSectionFeed( element );
       }
@@ -241,7 +183,7 @@ public class Questionnaire implements Serializable
     {
     if( element != null )
       {
-      int indexToRemove = this.elements.indexOf( element );
+      int indexToRemove = this.getComponentElements( ).indexOf( element );
       if( indexToRemove != -1 )
         {
         Comparator<Feed> feedComparator = new Questionnaire.FeedComparator( );
@@ -252,7 +194,8 @@ public class Questionnaire implements Serializable
         if( pageFeedPosition >= 0 )
           {
           this.pageFeeds.remove( pageFeedPosition );
-          if( indexToRemove < this.elements.size( ) - 1 ) this.createPageFeed( this.elements.get( indexToRemove + 1 ) );
+          if( indexToRemove < this.getComponentElements( ).size( ) - 1 )
+            this.createPageFeed( this.getComponentElements( ).get( indexToRemove + 1 ) );
           }
 
         SectionFeed sectionFeedToRemove = new SectionFeed( element );
@@ -261,11 +204,12 @@ public class Questionnaire implements Serializable
         if( sectionFeedPosition >= 0 )
           {
           SectionFeed oldSectionFeed = this.sectionFeeds.remove( sectionFeedPosition );
-          if( indexToRemove < this.elements.size( ) - 1 )
-            this.createSectionFeed( this.elements.get( indexToRemove + 1 ), oldSectionFeed.getInternationalizedTitle( ) );
+          if( indexToRemove < this.getComponentElements( ).size( ) - 1 )
+            this
+                .createSectionFeed( this.getComponentElements( ).get( indexToRemove + 1 ), oldSectionFeed.getInternationalizedTitle( ) );
           }
 
-        this.elements.remove( element );
+        this.delElement( element );
         }
       }
     else
@@ -375,20 +319,22 @@ public class Questionnaire implements Serializable
       int pageNumber = this.pageFeeds.indexOf( pageFeed );
       int sectionNumber = this.sectionFeeds.indexOf( sectionFeed );
 
-      int firstElementIndex = Math.max( this.elements.indexOf( pageFeed.getFirstElement( ) ), this.elements.indexOf( sectionFeed
-          .getFirstElement( ) ) );
+      int firstElementIndex = Math.max( this.getComponentElements( ).indexOf( pageFeed.getFirstElement( ) ), this
+          .getComponentElements( ).indexOf( sectionFeed.getFirstElement( ) ) );
 
-      int lastElementInPageIndex = (pageNumber != this.pageFeeds.size( ) - 1) ? this.elements.indexOf( this.pageFeeds.get(
-          pageNumber + 1 ).getFirstElement( ) ) : Integer.MAX_VALUE;
-      int lastElementInSectionIndex = (sectionNumber != this.sectionFeeds.size( ) - 1) ? this.elements.indexOf( this.sectionFeeds.get(
-          sectionNumber + 1 ).getFirstElement( ) ) : Integer.MAX_VALUE;
-      int lastElementIndex = Math.min( Math.min( lastElementInPageIndex, lastElementInSectionIndex ), this.elements.size( ) );
+      int lastElementInPageIndex = (pageNumber != this.pageFeeds.size( ) - 1) ? this.getComponentElements( ).indexOf(
+          this.pageFeeds.get( pageNumber + 1 ).getFirstElement( ) ) : Integer.MAX_VALUE;
+      int lastElementInSectionIndex = (sectionNumber != this.sectionFeeds.size( ) - 1) ? this.getComponentElements( ).indexOf(
+          this.sectionFeeds.get( sectionNumber + 1 ).getFirstElement( ) ) : Integer.MAX_VALUE;
+      int lastElementIndex = Math.min( Math.min( lastElementInPageIndex, lastElementInSectionIndex ), this.getComponentElements( )
+          .size( ) );
 
-      return Collections.unmodifiableList( this.elements.subList( firstElementIndex, lastElementIndex ) );
+      return Collections.unmodifiableList( this.getComponentElements( ).subList( firstElementIndex, lastElementIndex ) );
       }
     else
       throw new IllegalArgumentException( );
     }
+
 
   /**
    * Returns the {@link Register} of the questionnaire.
@@ -397,22 +343,9 @@ public class Questionnaire implements Serializable
    */
   public Register getRegister( )
     {
-    return this.register;
+    return (Register) this.getRegisterDataElement( );
     }
 
-  /**
-   * Sets the register of the Questionnaire.
-   * 
-   * @param register The register to set.
-   * @throws NullPointerException If the register is <code>null</code>
-   */
-  public void setRegister( Register register )
-    {
-    if( register != null )
-      this.register = register;
-    else
-      throw new NullPointerException( );
-    }
 
   /**
    * Return the study his questionnaire belongs to.
@@ -461,8 +394,8 @@ public class Questionnaire implements Serializable
 
     public int compare( Feed feed1, Feed feed2 )
       {
-      Integer firstPosition = Questionnaire.this.getElements( ).indexOf( feed1.getFirstElement( ) );
-      Integer secondPosition = Questionnaire.this.getElements( ).indexOf( feed2.getFirstElement( ) );
+      Integer firstPosition = Questionnaire.this.getComponentElements( ).indexOf( feed1.getFirstElement( ) );
+      Integer secondPosition = Questionnaire.this.getComponentElements( ).indexOf( feed2.getFirstElement( ) );
       return firstPosition.compareTo( secondPosition );
       }
     }

@@ -22,6 +22,8 @@
 package org.surveyforge.core.metadata.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -58,6 +60,11 @@ public abstract class AbstractValueDomain implements Serializable, Cloneable, Va
   protected AbstractValueDomain( )
     {}
 
+
+  public List<AbstractValueDomain> getSubDomains( )
+    {
+    return new ArrayList<AbstractValueDomain>( );
+    }
 
 
   @Override
