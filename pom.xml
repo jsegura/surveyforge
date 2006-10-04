@@ -312,6 +312,11 @@
         <scope>runtime</scope>
       </dependency>
       <dependency>
+        <groupId>com.openinput.tools</groupId>
+        <artifactId>openinput-tools-swing</artifactId>
+        <version>0.1-SNAPSHOT</version>
+      </dependency>
+      <dependency>
         <groupId>com.jgoodies</groupId>
         <artifactId>looks</artifactId>
         <version>2.0.4</version>
