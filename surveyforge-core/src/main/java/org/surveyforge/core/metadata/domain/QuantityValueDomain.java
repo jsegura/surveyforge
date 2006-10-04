@@ -132,7 +132,14 @@ public class QuantityValueDomain extends AbstractValueDomain
 
   public boolean isValid( Serializable object )
     {
-    if( object instanceof BigDecimal )
+    if( object instanceof Integer )
+      {
+      BigDecimal quantity = new BigDecimal( (Integer) object );
+      return quantity.scale( ) <= this.getScale( )
+          && (quantity.precision( ) - quantity.scale( )) <= (this.getPrecision( ) - this.getScale( ))
+          && this.getMinimum( ).compareTo( quantity ) <= 0 && quantity.compareTo( this.getMaximum( ) ) <= 0;
+      }
+    else if( object instanceof BigDecimal )
       {
       BigDecimal quantity = (BigDecimal) object;
       return quantity.scale( ) <= this.getScale( )
