@@ -76,6 +76,10 @@
       <artifactId>postgresql</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.openinput.tools</groupId>
+      <artifactId>openinput-tools-swing</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.jgoodies</groupId>
       <artifactId>looks</artifactId>
     </dependency>

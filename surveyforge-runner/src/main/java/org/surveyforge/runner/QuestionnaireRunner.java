@@ -21,13 +21,18 @@
  */
 package org.surveyforge.runner;
 
+import java.awt.Color;
+import java.io.IOException;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.swing.JFrame;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
+import javax.swing.plaf.ColorUIResource;
 
 import org.surveyforge.core.survey.Questionnaire;
 
@@ -36,7 +41,7 @@ import org.surveyforge.core.survey.Questionnaire;
  */
 public class QuestionnaireRunner
   {
-  public static void main( String[] args )
+  public static void main( String[] args ) throws IOException
     {
     try
       {
@@ -47,6 +52,11 @@ public class QuestionnaireRunner
       {
       // Likely PlasticXP is not in the class path; ignore.
       }
+    
+    // Default selection color
+    UIDefaults defaults = UIManager.getDefaults( );
+    defaults.put( "TextField.selectionBackground", new ColorUIResource( Color.ORANGE ) );
+    defaults.put( "FormattedTextField.selectionBackground", new ColorUIResource( Color.ORANGE ) );
 
     EntityManager entityManager = null;
     EntityTransaction transaction = null;
@@ -62,7 +72,7 @@ public class QuestionnaireRunner
       questionnaireQuery.setParameter( "questionnaireIdentifier", args[0] );
       if( !questionnaireQuery.getResultList( ).isEmpty( ) )
         {
-        questionnaireFrame = new QuestionnaireFrame( (Questionnaire) questionnaireQuery.getResultList( ).get( 0 ) );
+        questionnaireFrame = new QuestionnaireFrame( entityManagerFactory, (Questionnaire) questionnaireQuery.getResultList( ).get( 0 ) );
         questionnaireFrame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
         questionnaireFrame.pack( );
         }

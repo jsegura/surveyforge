@@ -21,27 +21,38 @@
  */
 package org.surveyforge.runner;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.FlowLayout;
-import java.awt.Toolkit;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
+import javax.persistence.EntityManagerFactory;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.InputVerifier;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JToolBar;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
+import javax.swing.plaf.ColorUIResource;
 
 import org.surveyforge.classification.Item;
 import org.surveyforge.classification.Level;
@@ -70,43 +81,141 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class QuestionnaireFrame extends JFrame
   {
-  private static final long                    serialVersionUID        = -2135625525102812393L;
+  private static final long                     serialVersionUID      = -2135625525102812393L;
 
-  private Questionnaire                        questionnaire;
-  private Map<QuestionnaireElement, Component> questionnaireComponents = new HashMap<QuestionnaireElement, Component>( );
-  private ObjectData                           objectData;
-  private PresentationModel                    dataModel;
+  private static final ResourceBundle           RESOURCE_BUNDLE       = ResourceBundle
+                                                                          .getBundle( "org.surveyforge.runner.QuestionnaireRunnerResourceBundle" );
 
-  public QuestionnaireFrame( Questionnaire questionnaire )
+  private QuestionnaireRunnerController         controller;
+
+  private Map<QuestionnaireElement, JComponent> elementToComponentMap = new HashMap<QuestionnaireElement, JComponent>( );
+  private Map<JComponent, QuestionnaireElement> componentToElementMap = new HashMap<JComponent, QuestionnaireElement>( );
+
+  private EntityManagerFactory                  entityManagerFactory;
+  private Questionnaire                         questionnaire;
+  private ObjectData                            objectData;
+  private PresentationModel                     dataModel;
+
+  /**
+   * @param entityManagerFactory
+   * @param questionnaire
+   * @throws IOException
+   */
+  public QuestionnaireFrame( EntityManagerFactory entityManagerFactory, Questionnaire questionnaire ) throws IOException
     {
-    super( "QuestionnaireRunner" );
+    super( "QuestionnaireRunner - " + questionnaire.getTitle( ) );
 
+    this.entityManagerFactory = entityManagerFactory;
     this.questionnaire = questionnaire;
+
     this.setObjectData( questionnaire.getRegister( ).getRegisterData( ).createEmptyObjectData( ) );
 
-    JTabbedPane pagesPane = new JTabbedPane( );
-    this.getContentPane( ).add( pagesPane );
+    this.controller = new QuestionnaireRunnerController( this.entityManagerFactory, this );
 
-    for( Feed pageFeed : questionnaire.getPageFeeds( ) )
-      {
-      pagesPane.addTab( "Page", this.createPagePanel( questionnaire, pageFeed ) );
-      }
+    this.createUI( );
     }
 
+  /**
+   * @return
+   */
+  protected Questionnaire getQuestionnaire( )
+    {
+    return this.questionnaire;
+    }
+
+  /**
+   * @return
+   */
   protected ObjectData getObjectData( )
     {
     return this.objectData;
     }
 
+  /**
+   * @param objectData
+   */
   protected void setObjectData( ObjectData objectData )
     {
     this.objectData = objectData;
-    this.dataModel = new JXPathPresentationModel( this.objectData );
+    if( this.dataModel == null )
+      this.dataModel = new JXPathPresentationModel( this.objectData );
+    else
+      this.dataModel.setBean( this.objectData );
     }
 
+  /**
+   * @return
+   */
   protected PresentationModel getDataModel( )
     {
     return this.dataModel;
+    }
+
+  /**
+   * @return
+   */
+  protected Map<QuestionnaireElement, JComponent> getElementToComponentMap( )
+    {
+    return this.elementToComponentMap;
+    }
+
+  /**
+   * @return
+   */
+  protected Map<JComponent, QuestionnaireElement> getComponentToElementMap( )
+    {
+    return this.componentToElementMap;
+    }
+
+  /**
+   * 
+   */
+  private void createUI( )
+    {
+    this.createMenuBar( );
+    this.createToolBar( );
+    this.createQuestionnairePanel( );
+    }
+
+  private void createMenuBar( )
+    {
+    JMenuBar menuBar = new JMenuBar( );
+
+    // Sample menu
+    JMenu sampleMenu = new JMenu( QuestionnaireFrame.RESOURCE_BUNDLE.getString( "sampleMenu.title" ) );
+    sampleMenu.setMnemonic( (Integer) QuestionnaireFrame.RESOURCE_BUNDLE.getObject( "sampleMenu.mnemonic" ) );
+    sampleMenu.add( new JMenuItem( this.controller.getActions( ).get( QuestionnaireRunnerController.NEW_SAMPLE_ACTION_NAME ) ) );
+    sampleMenu.add( new JMenuItem( this.controller.getActions( ).get( QuestionnaireRunnerController.SAVE_SAMPLE_ACTION_NAME ) ) );
+    menuBar.add( sampleMenu );
+
+    this.setJMenuBar( menuBar );
+    }
+
+  private void createToolBar( )
+    {
+    JToolBar toolbar = new JToolBar( );
+
+    JButton newButton = new JButton( this.controller.getActions( ).get( QuestionnaireRunnerController.NEW_SAMPLE_ACTION_NAME ) );
+    newButton.setText( "" );
+    toolbar.add( newButton );
+    JButton saveButton = new JButton( this.controller.getActions( ).get( QuestionnaireRunnerController.SAVE_SAMPLE_ACTION_NAME ) );
+    saveButton.setText( "" );
+    toolbar.add( saveButton );
+
+    this.getContentPane( ).add( toolbar, BorderLayout.NORTH );
+    }
+
+  private void createQuestionnairePanel( )
+    {
+    JTabbedPane pagesPane = new JTabbedPane( );
+    this.getContentPane( ).add( pagesPane, BorderLayout.CENTER );
+
+    int pageNumber = 1;
+    for( Feed pageFeed : questionnaire.getPageFeeds( ) )
+      {
+      pagesPane.addTab( "Page " + pageNumber, this.createPagePanel( questionnaire, pageFeed ) );
+      pageNumber++;
+      }
     }
 
   private JScrollPane createPagePanel( Questionnaire questionnaire, Feed pageFeed )
@@ -120,6 +229,7 @@ public class QuestionnaireFrame extends JFrame
       {
       pagePanel.add( this.createSectionPanel( questionnaire, pageFeed, sectionFeed ) );
       }
+    pagePanel.add( Box.createVerticalGlue( ) );
 
     return pageScrollPane;
     }
@@ -127,10 +237,9 @@ public class QuestionnaireFrame extends JFrame
   private JPanel createSectionPanel( Questionnaire questionnaire, Feed pageFeed, SectionFeed sectionFeed )
     {
     StringBuffer rowSpecification = new StringBuffer( );
-    for( int elementIndex = 0; elementIndex <= questionnaire.getElements( ).size( ); elementIndex++ )
+    for( int elementIndex = 0; elementIndex <= questionnaire.getComponentElements( ).size( ); elementIndex++ )
       rowSpecification.append( "3dlu, top:pref, 3dlu, pref, " );
-    FormLayout sectionLayout = new FormLayout( "3dlu, pref, 5dlu, left:pref, 3dlu:grow", rowSpecification.toString( ) );
-
+    FormLayout sectionLayout = new FormLayout( "3dlu, max(150dlu;pref):grow, 5dlu, left:pref, 3dlu:grow", rowSpecification.toString( ) );
     PanelBuilder pageSectionPanelBuilder = new PanelBuilder( sectionLayout );
     pageSectionPanelBuilder.setBorder( BorderFactory.createTitledBorder( BorderFactory.createLineBorder( Color.DARK_GRAY, 1 ),
         sectionFeed.getTitle( ), TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, Color.DARK_GRAY ) );
@@ -152,7 +261,15 @@ public class QuestionnaireFrame extends JFrame
 
       pageSectionPanelBuilder.nextColumn( ); // Needed to place cursor in correct column
       if( element.getQuestion( ) != null )
-        pageSectionPanelBuilder.addLabel( element.getQuestion( ).getText( ) );
+        {
+        JTextArea questionText = new JTextArea( element.getQuestion( ).getText( ) );
+        questionText.setFocusable( false );
+        questionText.setEditable( false );
+        questionText.setLineWrap( true );
+        questionText.setWrapStyleWord( true );
+
+        pageSectionPanelBuilder.add( questionText );
+        }
       else
         pageSectionPanelBuilder.nextColumn( 1 );
       pageSectionPanelBuilder.nextColumn( 2 );
@@ -189,9 +306,13 @@ public class QuestionnaireFrame extends JFrame
         {
         QuantityValueDomain quantityValueDomain = (QuantityValueDomain) valueDomain;
         // JTextField field = new JTextField( quantityValueDomain.getPrecision( ) );
-        JTextField field = BasicComponentFactory.createIntegerField( this.getDataModel( ).getModel( propertyName ) );
+        JFormattedTextField field = BasicComponentFactory.createIntegerField( this.getDataModel( ).getModel( propertyName ) );
         field.setColumns( quantityValueDomain.getPrecision( ) );
-        this.questionnaireComponents.put( element, field );
+        field.addFocusListener( this.controller.getSelectionController( ) );
+        field.setInputVerifier( this.controller.getValidationController( ) );
+
+        this.elementToComponentMap.put( element, field );
+        this.componentToElementMap.put( field, element );
         return field;
         }
       else if( valueDomain instanceof ClassificationValueDomain )
@@ -204,41 +325,16 @@ public class QuestionnaireFrame extends JFrame
                 .getModel( propertyName ) ) ) );
 
         // JTextField classificationCode = new JTextField( 5 );
-        final JTextField classificationCode = BasicComponentFactory.createTextField( this.dataModel.getModel( propertyName ) );
+        JTextField classificationCode = BasicComponentFactory.createTextField( this.dataModel.getModel( propertyName ) );
         classificationCode.setColumns( 5 );
-        classificationCode.setInputVerifier( new InputVerifier( )
-          {
-            Color defaultBackground = classificationCode.getBackground( );
 
-            @Override
-            public boolean verify( JComponent component )
-              {
-              if( classificationValueDomain.getLevel( ).includes( classificationCode.getText( ), false ) )
-                {
-                classificationCode.setBackground( defaultBackground );
-                return true;
-                }
-              else
-                {
-                classificationCode.setBackground( Color.RED );
-                Toolkit.getDefaultToolkit( ).beep( );
-                JOptionPane.showMessageDialog( classificationCode.getRootPane( ),
-                    "El c\u00f3digo introducido no se encuentra entre las opciones disponibles.", "C\u00f3digo err\u00f3neo",
-                    JOptionPane.ERROR_MESSAGE );
-                return false;
-                }
-              }
-
-            @Override
-            public boolean shouldYieldFocus( JComponent input )
-              {
-              return verify( input );
-              }
-          } );
+        classificationCode.addFocusListener( this.controller.getSelectionController( ) );
+        classificationCode.setInputVerifier( this.controller.getValidationController( ) );
 
         classificationPanel.add( classificationCombo );
         classificationPanel.add( classificationCode );
-        this.questionnaireComponents.put( element, classificationPanel );
+        this.elementToComponentMap.put( element, classificationPanel );
+        this.componentToElementMap.put( classificationCode, element );
         return classificationPanel;
         }
       else
@@ -276,32 +372,11 @@ public class QuestionnaireFrame extends JFrame
     return propertyName.toString( );
     }
 
-  // public static class ClassificationFormatter extends JFormattedTextField.AbstractFormatter
-  // {
-  // private Level level;
-  //
-  // public ClassificationFormatter( Level level )
-  // {
-  // this.level = level;
-  // }
-  //
-  // @Override
-  // public Object stringToValue( String text ) throws ParseException
-  // {
-  // // TODO Auto-generated method stub
-  // return this.level.getItem( text, false );
-  // }
-  //
-  // @Override
-  // public String valueToString( Object value ) throws ParseException
-  // {
-  // return value != null ? ((Item) value).getCode( ) : null;
-  // }
-  // }
-  //
   public static class ClassificationConverter extends AbstractConverter
     {
-    private Level level;
+    private static final long serialVersionUID = 5430851351776185423L;
+
+    private Level             level;
 
     public ClassificationConverter( Level level, ValueModel subject )
       {
