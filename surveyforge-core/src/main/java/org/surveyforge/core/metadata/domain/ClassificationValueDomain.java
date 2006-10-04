@@ -38,14 +38,14 @@ public class ClassificationValueDomain extends AbstractValueDomain
 
   @ManyToOne
   private Level             level;
-  private boolean           sublevelsAllowed = true;
+  private boolean           sublevelsAllowed;
 
   protected ClassificationValueDomain( )
     {};
 
   public ClassificationValueDomain( Level level )
     {
-    this( level, true );
+    this( level, false );
     }
 
   public ClassificationValueDomain( Level level, boolean sublevelsAllowed )
