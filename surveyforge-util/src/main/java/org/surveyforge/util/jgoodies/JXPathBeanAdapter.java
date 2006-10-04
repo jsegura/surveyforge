@@ -128,46 +128,46 @@ import com.jgoodies.binding.value.ValueModel;
  * <strong>Basic Examples:</strong>
  * 
  * <pre>
- *    // Direct access, ignores changes
- *    Address address = new Address()
- *    JXPathBeanAdapter adapter = new JXPathBeanAdapter(address);
- *    adapter.setValue(&quot;street&quot;, &quot;Broadway&quot;);
- *    System.out.println(address.getStreet());        // Prints &quot;Broadway&quot;
- *    address.setStreet(&quot;Franz-Josef-Str.&quot;);
- *    System.out.println(adapter.getValue(&quot;street&quot;)); // Prints &quot;Franz-Josef-Str.&quot;
- *    
- *    
- *    //Direct access, observes changes
- *    JXPathBeanAdapter adapter = new JXPathBeanAdapter(address, true);
- *    
- *    
- *    // Indirect access, ignores changes
- *    ValueHolder addressHolder = new ValueHolder(address1);
- *    JXPathBeanAdapter adapter = new JXPathBeanAdapter(addressHolder);
- *    adapter.setValue(&quot;street&quot;, &quot;Broadway&quot;);         // Sets the street in address1
- *    System.out.println(address1.getStreet());       // Prints &quot;Broadway&quot;
- *    adapter.setBean(address2);
- *    adapter.setValue(&quot;street&quot;, &quot;Robert-Koch-Str.&quot;); // Sets the street in address2
- *    System.out.println(address2.getStreet());       // Prints &quot;Robert-Koch-Str.&quot;
- *   
- *     
- *    // Indirect access, observes changes
- *    ValueHolder addressHolder = new ValueHolder();
- *    JXPathBeanAdapter adapter = new JXPathBeanAdapter(addressHolder, true);
- *    addressHolder.setValue(address1);
- *    address1.setStreet(&quot;Broadway&quot;);
- *    System.out.println(adapter.getValue(&quot;street&quot;)); // Prints &quot;Broadway&quot;
- *    
- *    
- *    // Access through ValueModels
- *    Address address = new Address();
- *    JXPathBeanAdapter adapter = new JXPathBeanAdapter(address);
- *    ValueModel streetModel = adapter.getValueModel(&quot;street&quot;);
- *    ValueModel cityModel   = adapter.getValueModel(&quot;city&quot;);
- *    streetModel.setValue(&quot;Broadway&quot;);
- *    System.out.println(address.getStreet());        // Prints &quot;Broadway&quot;
- *    address.setCity(&quot;Hamburg&quot;);
- *    System.out.println(cityModel.getValue());       // Prints &quot;Hamburg&quot;
+ *          // Direct access, ignores changes
+ *          Address address = new Address()
+ *          JXPathBeanAdapter adapter = new JXPathBeanAdapter(address);
+ *          adapter.setValue(&quot;street&quot;, &quot;Broadway&quot;);
+ *          System.out.println(address.getStreet());        // Prints &quot;Broadway&quot;
+ *          address.setStreet(&quot;Franz-Josef-Str.&quot;);
+ *          System.out.println(adapter.getValue(&quot;street&quot;)); // Prints &quot;Franz-Josef-Str.&quot;
+ *          
+ *          
+ *          //Direct access, observes changes
+ *          JXPathBeanAdapter adapter = new JXPathBeanAdapter(address, true);
+ *          
+ *          
+ *          // Indirect access, ignores changes
+ *          ValueHolder addressHolder = new ValueHolder(address1);
+ *          JXPathBeanAdapter adapter = new JXPathBeanAdapter(addressHolder);
+ *          adapter.setValue(&quot;street&quot;, &quot;Broadway&quot;);         // Sets the street in address1
+ *          System.out.println(address1.getStreet());       // Prints &quot;Broadway&quot;
+ *          adapter.setBean(address2);
+ *          adapter.setValue(&quot;street&quot;, &quot;Robert-Koch-Str.&quot;); // Sets the street in address2
+ *          System.out.println(address2.getStreet());       // Prints &quot;Robert-Koch-Str.&quot;
+ *         
+ *           
+ *          // Indirect access, observes changes
+ *          ValueHolder addressHolder = new ValueHolder();
+ *          JXPathBeanAdapter adapter = new JXPathBeanAdapter(addressHolder, true);
+ *          addressHolder.setValue(address1);
+ *          address1.setStreet(&quot;Broadway&quot;);
+ *          System.out.println(adapter.getValue(&quot;street&quot;)); // Prints &quot;Broadway&quot;
+ *          
+ *          
+ *          // Access through ValueModels
+ *          Address address = new Address();
+ *          JXPathBeanAdapter adapter = new JXPathBeanAdapter(address);
+ *          ValueModel streetModel = adapter.getValueModel(&quot;street&quot;);
+ *          ValueModel cityModel   = adapter.getValueModel(&quot;city&quot;);
+ *          streetModel.setValue(&quot;Broadway&quot;);
+ *          System.out.println(address.getStreet());        // Prints &quot;Broadway&quot;
+ *          address.setCity(&quot;Hamburg&quot;);
+ *          System.out.println(cityModel.getValue());       // Prints &quot;Hamburg&quot;
  * </pre>
  * 
  * <strong>Adapter Chain Example:</strong> <br>
@@ -315,7 +315,7 @@ public final class JXPathBeanAdapter extends Model
    */
   private PropertyChangeListener        propertyChangeHandler;
 
-  private final JXPathContext           beanContext;
+  private JXPathContext                 beanContext;
 
 
   // Instance creation ****************************************************
@@ -920,7 +920,10 @@ public final class JXPathBeanAdapter extends Model
    */
   private Object getValue0( Object bean, String propertyName )
     {
-    return this.beanContext.getValue( propertyName );
+    if( bean == this.getBean( ) )
+      return this.beanContext.getValue( propertyName );
+    else
+      return JXPathContext.newContext( bean ).getValue( propertyName );
     // return getValue0( bean, getPropertyDescriptor( bean, propertyName ) );
     }
 
@@ -969,7 +972,10 @@ public final class JXPathBeanAdapter extends Model
    */
   private void setValue0( Object bean, String propertyName, Object newValue ) throws PropertyVetoException
     {
-    this.beanContext.setValue( propertyName, newValue );
+    if( bean == this.getBean( ) )
+      this.beanContext.setValue( propertyName, newValue );
+    else
+      JXPathContext.newContext( bean ).setValue( propertyName, newValue );
     // setValue0( bean, getPropertyDescriptor( bean, propertyName ), newValue );
     }
 
@@ -1032,6 +1038,7 @@ public final class JXPathBeanAdapter extends Model
     public void propertyChange( PropertyChangeEvent evt )
       {
       Object newBean = evt.getNewValue( ) != null ? evt.getNewValue( ) : getBean( );
+      JXPathBeanAdapter.this.beanContext = JXPathContext.newContext( newBean );
       setBean0( storedOldBean, newBean );
       storedOldBean = newBean;
       }
@@ -1084,35 +1091,31 @@ public final class JXPathBeanAdapter extends Model
     /**
      * Holds the name of the adapted property.
      */
-    private final String       propertyName;
+    private final String      propertyName;
 
     /**
      * Holds the optional name of the property's getter. Used to create the PropertyDescriptor. Also used to reject potential misuse of
      * {@link JXPathBeanAdapter#getValueModel(String)} and {@link JXPathBeanAdapter#getValueModel(String, String, String)}. See the
      * latter methods for details.
      */
-    final String               getterName;
+    final String              getterName;
 
     /**
      * Holds the optional name of the property's setter. Used to create the PropertyDescriptor. Also used to reject potential misuse of
      * {@link JXPathBeanAdapter#getValueModel(String)} and {@link JXPathBeanAdapter#getValueModel(String, String, String)}. See the
      * latter methods for details.
      */
-    final String               setterName;
+    final String              setterName;
 
     /**
      * Describes the property accessor; basically a getter and setter.
      */
-//    private PropertyDescriptor cachedPropertyDescriptor;
-
+    // private PropertyDescriptor cachedPropertyDescriptor;
     /**
      * Holds the bean class associated with the cached property descriptor.
      */
-//    private Class              cachedBeanClass;
-
-
+    // private Class cachedBeanClass;
     // Instance Creation --------------------------------------------------
-
     SimplePropertyAdapter( String propertyName, String getterName, String setterName )
       {
       this.propertyName = propertyName;
