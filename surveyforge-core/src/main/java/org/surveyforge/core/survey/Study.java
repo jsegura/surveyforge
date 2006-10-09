@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -33,10 +34,12 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.IndexColumn;
+import org.surveyforge.util.InternationalizedString;
 
 /**
  * Studies are used to document the concepts and production rules for statistical data. A statistical activity might describe
@@ -48,40 +51,40 @@ import org.hibernate.annotations.IndexColumn;
 @Entity
 public class Study implements Serializable
   {
-  private static final long   serialVersionUID = -4089931270976596457L;
+  private static final long       serialVersionUID = -4089931270976596457L;
 
   @SuppressWarnings("unused")
   @Id
   @Column(length = 50)
   @GeneratedValue(generator = "system-uuid")
   @GenericGenerator(name = "system-uuid", strategy = "uuid")
-  private String              id;
+  private String                  id;
   /** Version for optimistic locking. */
   @SuppressWarnings("unused")
   @javax.persistence.Version
-  private int                 lockingVersion;
+  private int                     lockingVersion;
 
   /**
    * A statistical activity is identified by a unique identifier, which may typically be an abbreviation of its title or a systematic
    * number.
    */
   @Column(unique = true, nullable = false, length = 50)
-  private String              identifier;
+  private String                  identifier;
   /** A statistical activity has a title as provided by the owner or maintenance unit. */
-  @Column(length = 250)
-  private String              title            = "";
+  @ManyToOne(cascade = {CascadeType.ALL})
+  private InternationalizedString title            = new InternationalizedString( );
   /**
    * Detailed description of the statistical activity. The activity description describes the actions performed in the frame of the
    * activity.
    */
-  @Column(length = 500)
-  private String              description      = "";
+  @ManyToOne(cascade = {CascadeType.ALL})
+  private InternationalizedString description      = new InternationalizedString( );
 
   /** When the statistical activity includes a survey one or more questionnaires can be defined in the context of the activity. */
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "questionnairesIndex")
   @JoinColumn(name = "study_id", nullable = false)
-  private List<Questionnaire> questionnaires   = new ArrayList<Questionnaire>( );
+  private List<Questionnaire>     questionnaires   = new ArrayList<Questionnaire>( );
 
   protected Study( )
     {}
@@ -121,50 +124,121 @@ public class Study implements Serializable
       throw new NullPointerException( );
     }
 
-  /**
-   * Returns the title of the Study.
-   * 
-   * @return Returns the title.
-   */
-  public String getTitle( )
+
+  public InternationalizedString getInternationalizedTitle( )
     {
     return this.title;
     }
 
   /**
-   * Sets a new title to the Study.
+   * Returns the title of this Study.
    * 
-   * @param title The title to set.
-   * @throws NullPointerException If the title is <code>null</code>.
+   * @return the title of this Study for the default language.
+   * @see InternationalizedString#getString()
+   */
+  public String getTitle( )
+    {
+    return this.title.getString( );
+    }
+
+  /**
+   * Returns the title of this Study for the given language.
+   * 
+   * @param locale the language of the Study to be returned.
+   * @return the title of this Study for the given language.
+   * @see InternationalizedString#getString(Locale)
+   */
+  public String getTitle( Locale locale )
+    {
+    return this.title.getString( locale );
+    }
+
+  /**
+   * Sets the title of this Study. The title must be non <code>null</code>, otherwise a {@link NullPointerException} is thrown.
+   * 
+   * @param title the title of this Study.
+   * @throws NullPointerException if the title is <code>null</code>.
    */
   public void setTitle( String title )
     {
     if( title != null )
-      this.title = title;
+      this.title.setString( title );
     else
       throw new NullPointerException( );
     }
 
   /**
-   * Returns the description of the Study.
+   * Sets the title of this Study for the given language. The language and title must be non <code>null</code>, otherwise a
+   * {@link NullPointerException} is thrown.
    * 
-   * @return Returns the description.
+   * @param locale the language of the title to be set.
+   * @param title the title of this Study.
+   * @throws NullPointerException if the language or title are <code>null</code>.
    */
-  public String getDescription( )
+  public void setTitle( Locale locale, String title )
+    {
+    if( title != null )
+      this.title.setString( locale, title );
+    else
+      throw new NullPointerException( );
+    }
+
+
+  public InternationalizedString getInternationalizedDescription( )
     {
     return this.description;
     }
 
   /**
-   * Sets a new description to the Study.
+   * Returns the description of this Study.
    * 
-   * @param description The description to set.
-   * @throws NullPointerException If the description is <code>null</code>.
+   * @return the description of this Study for the default language.
+   * @see InternationalizedString#getString()
+   */
+  public String getDescription( )
+    {
+    return this.description.getString( );
+    }
+
+  /**
+   * Returns the description of this Study for the given language.
+   * 
+   * @param locale the language of the Study to be returned.
+   * @return the description of this Study for the given language.
+   * @see InternationalizedString#getString(Locale)
+   */
+  public String getDescription( Locale locale )
+    {
+    return this.description.getString( locale );
+    }
+
+  /**
+   * Sets the description of this Study. The description must be non <code>null</code>, otherwise a {@link NullPointerException} is
+   * thrown.
+   * 
+   * @param description the description of this Study.
+   * @throws NullPointerException if the description is <code>null</code>.
    */
   public void setDescription( String description )
     {
     if( description != null )
-      this.description = description;
+      this.description.setString( description );
+    else
+      throw new NullPointerException( );
+    }
+
+  /**
+   * Sets the description of this Study for the given language. The language and description must be non <code>null</code>,
+   * otherwise a {@link NullPointerException} is thrown.
+   * 
+   * @param locale the language of the description to be set.
+   * @param description the description of this Study.
+   * @throws NullPointerException if the language or description are <code>null</code>.
+   */
+  public void setDescription( Locale locale, String description )
+    {
+    if( description != null )
+      this.description.setString( locale, description );
     else
       throw new NullPointerException( );
     }

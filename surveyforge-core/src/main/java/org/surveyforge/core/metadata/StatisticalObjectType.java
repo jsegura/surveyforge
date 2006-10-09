@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -38,6 +39,7 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.IndexColumn;
+import org.surveyforge.util.InternationalizedString;
 
 /**
  * Statistical objects or units may be real world objects (e.g. person, enterprise) or abstract objects like events or states (e.g.
@@ -69,11 +71,11 @@ public class StatisticalObjectType implements Serializable
   @Column(unique = true, length = 50)
   private String                      identifier;
   /** Unique name statistical unit. */
-  @Column(length = 250)
-  private String                      name             = "";
+  @ManyToOne(cascade = {CascadeType.ALL})
+  private InternationalizedString     name             = new InternationalizedString( );
   /** Short general multilingual description of the statistical object/unit, including its purpose, its main subject areas etc. */
-  @Column(length = 500)
-  private String                      description      = "";
+  @ManyToOne(cascade = {CascadeType.ALL})
+  private InternationalizedString     description      = new InternationalizedString( );
   /** A super-type is a generalisation of an object type. */
   @ManyToOne
   @JoinColumn(name = "superType_id", insertable = false, updatable = false)
@@ -127,50 +129,121 @@ public class StatisticalObjectType implements Serializable
       throw new NullPointerException( );
     }
 
-  /**
-   * Returns the name of the StatisticalObjectType.
-   * 
-   * @return Returns the name.
-   */
-  public String getName( )
+  public InternationalizedString getInternationalizedName( )
     {
     return this.name;
     }
 
   /**
-   * Sets a new name to the StatisticalObjectType.
+   * Returns the name of this Statistical Object Type.
    * 
-   * @param name The name to set.
-   * @throws NullPointerException If the name is <code>null</code>.
+   * @return the name of this Statistical Object Type for the default language.
+   * @see InternationalizedString#getString()
+   */
+  public String getName( )
+    {
+    return this.name.getString( );
+    }
+
+  /**
+   * Returns the name of this Statistical Object Type for the given language.
+   * 
+   * @param locale the language of the Statistical Object Type to be returned.
+   * @return the name of this Statistical Object Type for the given language.
+   * @see InternationalizedString#getString(Locale)
+   */
+  public String getName( Locale locale )
+    {
+    return this.name.getString( locale );
+    }
+
+  /**
+   * Sets the name of this Statistical Object Type. The name must be non <code>null</code>, otherwise a {@link NullPointerException} is
+   * thrown.
+   * 
+   * @param name the name of this Statistical Object Type.
+   * @throws NullPointerException if the name is <code>null</code>.
    */
   public void setName( String name )
     {
     if( name != null )
-      this.name = name;
+      this.name.setString( name );
     else
       throw new NullPointerException( );
     }
 
   /**
-   * Returns the description of the StatisticalObjectType.
+   * Sets the name of this Statistical Object Type for the given language. The language and name must be non <code>null</code>, otherwise a
+   * {@link NullPointerException} is thrown.
    * 
-   * @return Returns the description.
+   * @param locale the language of the name to be set.
+   * @param name the name of this Statistical Object Type.
+   * @throws NullPointerException if the language or name are <code>null</code>.
    */
-  public String getDescription( )
+  public void setName( Locale locale, String name )
+    {
+    if( name != null )
+      this.name.setString( locale, name );
+    else
+      throw new NullPointerException( );
+    }
+
+
+  public InternationalizedString getInternationalizedDescription( )
     {
     return this.description;
     }
 
   /**
-   * Sets a new description for the StatisticalObjectType.
+   * Returns the description of this Statistical Object Type.
    * 
-   * @param description The description to set.
-   * @throws NullPointerException If the name is <code>null</code>.
+   * @return the description of this Statistical Object Type for the default language.
+   * @see InternationalizedString#getString()
+   */
+  public String getDescription( )
+    {
+    return this.description.getString( );
+    }
+
+  /**
+   * Returns the description of this Statistical Object Type for the given language.
+   * 
+   * @param locale the language of the Statistical Object Type to be returned.
+   * @return the description of this Statistical Object Type for the given language.
+   * @see InternationalizedString#getString(Locale)
+   */
+  public String getDescription( Locale locale )
+    {
+    return this.description.getString( locale );
+    }
+
+  /**
+   * Sets the description of this Statistical Object Type. The description must be non <code>null</code>, otherwise a
+   * {@link NullPointerException} is thrown.
+   * 
+   * @param description the description of this Statistical Object Type.
+   * @throws NullPointerException if the description is <code>null</code>.
    */
   public void setDescription( String description )
     {
     if( description != null )
-      this.description = description;
+      this.description.setString( description );
+    else
+      throw new NullPointerException( );
+    }
+
+  /**
+   * Sets the description of this Statistical Object Type for the given language. The language and description must be non <code>null</code>,
+   * otherwise a {@link NullPointerException} is thrown.
+   * 
+   * @param locale the language of the description to be set.
+   * @param description the description of this Statistical Object Type.
+   * @throws NullPointerException if the language or description are <code>null</code>.
+   */
+  public void setDescription( Locale locale, String description )
+    {
+    if( description != null )
+      this.description.setString( locale, description );
     else
       throw new NullPointerException( );
     }

@@ -22,7 +22,9 @@
 package org.surveyforge.core.metadata;
 
 import java.io.Serializable;
+import java.util.Locale;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,6 +33,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.surveyforge.util.InternationalizedString;
 
 /**
  * An object variable defines the concept of a variable in connection with a defined statistical object (e.g. the income of a person).
@@ -62,11 +65,11 @@ public class ObjectVariable implements Serializable
   @Column(unique = true, length = 50)
   private String                identifier;
   /** The name is the official, language dependent name of the global variable, provided by the owner of the variable. */
-  @Column(length = 250)
-  private String                name             = "";
+  @ManyToOne(cascade = {CascadeType.ALL})
+  private InternationalizedString                name             = new InternationalizedString();
   /** Short general multilingual description of the object variable, including its purpose, its main subject areas etc. */
-  @Column(length = 500)
-  private String                description      = "";
+  @ManyToOne(cascade = {CascadeType.ALL})
+  private InternationalizedString                description      = new InternationalizedString();
   /**
    * Each object variable belongs to a statistical object or unit. The object variable exists only in the context of the object
    * variable.
@@ -121,50 +124,121 @@ public class ObjectVariable implements Serializable
       throw new NullPointerException( );
     }
 
-  /**
-   * Returns the name of the ObjectVariable.
-   * 
-   * @return Returns the name.
-   */
-  public String getName( )
+  public InternationalizedString getInternationalizedName( )
     {
     return this.name;
     }
 
   /**
-   * Sets the name of the ObjectVariable.
+   * Returns the name of this Object Variable.
    * 
-   * @param name The name to set.
-   * @throws NullPointerException If the name is <code>null</code>.
+   * @return the name of this Object Variable for the default language.
+   * @see InternationalizedString#getString()
+   */
+  public String getName( )
+    {
+    return this.name.getString( );
+    }
+
+  /**
+   * Returns the name of this Object Variable for the given language.
+   * 
+   * @param locale the language of the Object Variable to be returned.
+   * @return the name of this Object Variable for the given language.
+   * @see InternationalizedString#getString(Locale)
+   */
+  public String getName( Locale locale )
+    {
+    return this.name.getString( locale );
+    }
+
+  /**
+   * Sets the name of this Object Variable. The name must be non <code>null</code>, otherwise a {@link NullPointerException} is
+   * thrown.
+   * 
+   * @param name the name of this Object Variable.
+   * @throws NullPointerException if the name is <code>null</code>.
    */
   public void setName( String name )
     {
     if( name != null )
-      this.name = name;
+      this.name.setString( name );
     else
       throw new NullPointerException( );
     }
 
   /**
-   * Returns the description of the ObjectVariable.
+   * Sets the name of this Object Variable for the given language. The language and name must be non <code>null</code>, otherwise a
+   * {@link NullPointerException} is thrown.
    * 
-   * @return Returns the description.
+   * @param locale the language of the name to be set.
+   * @param name the name of this Object Variable.
+   * @throws NullPointerException if the language or name are <code>null</code>.
    */
-  public String getDescription( )
+  public void setName( Locale locale, String name )
+    {
+    if( name != null )
+      this.name.setString( locale, name );
+    else
+      throw new NullPointerException( );
+    }
+
+
+  public InternationalizedString getInternationalizedDescription( )
     {
     return this.description;
     }
 
   /**
-   * Sets a new description to the ObjectVariable.
+   * Returns the description of this Object Variable.
    * 
-   * @param description The description to set.
-   * @throws NullPointerException If the description is <code>null</code>.
+   * @return the description of this Object Variable for the default language.
+   * @see InternationalizedString#getString()
+   */
+  public String getDescription( )
+    {
+    return this.description.getString( );
+    }
+
+  /**
+   * Returns the description of this Object Variable for the given language.
+   * 
+   * @param locale the language of the Object Variable to be returned.
+   * @return the description of this Object Variable for the given language.
+   * @see InternationalizedString#getString(Locale)
+   */
+  public String getDescription( Locale locale )
+    {
+    return this.description.getString( locale );
+    }
+
+  /**
+   * Sets the description of this Object Variable. The description must be non <code>null</code>, otherwise a
+   * {@link NullPointerException} is thrown.
+   * 
+   * @param description the description of this Object Variable.
+   * @throws NullPointerException if the description is <code>null</code>.
    */
   public void setDescription( String description )
     {
     if( description != null )
-      this.description = description;
+      this.description.setString( description );
+    else
+      throw new NullPointerException( );
+    }
+
+  /**
+   * Sets the description of this Object Variable for the given language. The language and description must be non <code>null</code>,
+   * otherwise a {@link NullPointerException} is thrown.
+   * 
+   * @param locale the language of the description to be set.
+   * @param description the description of this Object Variable.
+   * @throws NullPointerException if the language or description are <code>null</code>.
+   */
+  public void setDescription( Locale locale, String description )
+    {
+    if( description != null )
+      this.description.setString( locale, description );
     else
       throw new NullPointerException( );
     }

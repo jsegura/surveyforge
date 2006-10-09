@@ -22,13 +22,17 @@
 package org.surveyforge.core.survey;
 
 import java.io.Serializable;
+import java.util.Locale;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.surveyforge.util.InternationalizedString;
 
 /**
  * The question contain the text for the question, with the sub questions being used to provide further information about the question.
@@ -39,32 +43,31 @@ import org.hibernate.annotations.GenericGenerator;
 @Entity
 public class Question implements Serializable
   {
-  private static final long serialVersionUID = 0L;
+  private static final long       serialVersionUID = 0L;
 
   @SuppressWarnings("unused")
   @Id
   @Column(length = 50)
   @GeneratedValue(generator = "system-uuid")
   @GenericGenerator(name = "system-uuid", strategy = "uuid")
-  private String            id;
+  private String                  id;
   /** Version for optimistic locking. */
   @SuppressWarnings("unused")
   @javax.persistence.Version
-  private int               lockingVersion;
+  private int                     lockingVersion;
 
   /** A question has a language independent identifier that identifies the question among all other globally defined questions. */
   @Column(unique = true, length = 50)
-  private String            identifier;
+  private String                  identifier;
   /**
    * The question contains the exact text of the question that has been asked to collect the data. The question text is language
    * dependent.
    */
-  @Column(length = 250)
-  private String            text             = "";
+  @ManyToOne(cascade = {CascadeType.ALL})
+  private InternationalizedString text             = new InternationalizedString( );
   /** The description contains explanatory notes to the question and/or an extended definition of the question's meaning. */
-  @Column(length = 500)
-  private String            description      = "";
-
+  @ManyToOne(cascade = {CascadeType.ALL})
+  private InternationalizedString description      = new InternationalizedString( );
 
 
   protected Question( )
@@ -119,50 +122,120 @@ public class Question implements Serializable
       throw new NullPointerException( );
     }
 
-  /**
-   * Returns the text of the question.
-   * 
-   * @return Returns the question.
-   */
-  public String getText( )
+  public InternationalizedString getInternationalizedText( )
     {
     return this.text;
     }
 
   /**
-   * Sets the text of the Question.
+   * Returns the text of this Question.
    * 
-   * @param text The text to set.
-   * @throws NullPointerException if the text is <code>null</code> or is empty.
+   * @return the text of this Question for the default language.
+   * @see InternationalizedString#getString()
+   */
+  public String getText( )
+    {
+    return this.text.getString( );
+    }
+
+  /**
+   * Returns the text of this Question for the given language.
+   * 
+   * @param locale the language of the Question to be returned.
+   * @return the text of this Question for the given language.
+   * @see InternationalizedString#getString(Locale)
+   */
+  public String getText( Locale locale )
+    {
+    return this.text.getString( locale );
+    }
+
+  /**
+   * Sets the text of this Question. The text must be non <code>null</code>, otherwise a {@link NullPointerException} is thrown.
+   * 
+   * @param text the text of this Question.
+   * @throws NullPointerException if the text is <code>null</code>.
    */
   public void setText( String text )
     {
     if( text != null )
-      this.text = text;
+      this.text.setString( text );
     else
       throw new NullPointerException( );
     }
 
   /**
-   * Returns the description of the Question.
+   * Sets the text of this Question for the given language. The language and text must be non <code>null</code>, otherwise a
+   * {@link NullPointerException} is thrown.
    * 
-   * @return Returns the description.
+   * @param locale the language of the text to be set.
+   * @param text the text of this Question.
+   * @throws NullPointerException if the language or text are <code>null</code>.
    */
-  public String getDescription( )
+  public void setText( Locale locale, String text )
+    {
+    if( text != null )
+      this.text.setString( locale, text );
+    else
+      throw new NullPointerException( );
+    }
+
+
+  public InternationalizedString getInternationalizedDescription( )
     {
     return this.description;
     }
 
   /**
-   * Sets the description text of the Question.
+   * Returns the description of this Question.
    * 
-   * @param description The description to set.
-   * @throws NullPointerException if the description text is <code>null</code>.
+   * @return the description of this Question for the default language.
+   * @see InternationalizedString#getString()
+   */
+  public String getDescription( )
+    {
+    return this.description.getString( );
+    }
+
+  /**
+   * Returns the description of this Question for the given language.
+   * 
+   * @param locale the language of the Question to be returned.
+   * @return the description of this Question for the given language.
+   * @see InternationalizedString#getString(Locale)
+   */
+  public String getDescription( Locale locale )
+    {
+    return this.description.getString( locale );
+    }
+
+  /**
+   * Sets the description of this Question. The description must be non <code>null</code>, otherwise a {@link NullPointerException}
+   * is thrown.
+   * 
+   * @param description the description of this Question.
+   * @throws NullPointerException if the description is <code>null</code>.
    */
   public void setDescription( String description )
     {
     if( description != null )
-      this.description = description;
+      this.description.setString( description );
+    else
+      throw new NullPointerException( );
+    }
+
+  /**
+   * Sets the description of this Question for the given language. The language and description must be non <code>null</code>,
+   * otherwise a {@link NullPointerException} is thrown.
+   * 
+   * @param locale the language of the description to be set.
+   * @param description the description of this Question.
+   * @throws NullPointerException if the language or description are <code>null</code>.
+   */
+  public void setDescription( Locale locale, String description )
+    {
+    if( description != null )
+      this.description.setString( locale, description );
     else
       throw new NullPointerException( );
     }

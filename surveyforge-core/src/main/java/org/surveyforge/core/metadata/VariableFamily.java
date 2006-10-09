@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -33,10 +34,12 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.IndexColumn;
+import org.surveyforge.util.InternationalizedString;
 
 /**
  * A variable family groups a number of global variables that refer to a certain theme.
@@ -46,34 +49,34 @@ import org.hibernate.annotations.IndexColumn;
 @Entity
 public class VariableFamily implements Serializable
   {
-  private static final long    serialVersionUID = 7344092827765295413L;
+  private static final long       serialVersionUID = 7344092827765295413L;
 
   @SuppressWarnings("unused")
   @Id
   @Column(length = 50)
   @GeneratedValue(generator = "system-uuid")
   @GenericGenerator(name = "system-uuid", strategy = "uuid")
-  private String               id;
+  private String                  id;
   /** Version for optimistic locking. */
   @SuppressWarnings("unused")
   @javax.persistence.Version
-  private int                  lockingVersion;
+  private int                     lockingVersion;
 
   /** A VariableFamily is identified by a unique identifier. */
   @Column(unique = true, length = 50)
-  private String               identifier;
+  private String                  identifier;
   /**
    * Detailed description of the VariableFamily. The description describes the theme of the {@link GlobalVariable}s included in the
    * family.
    */
-  @Column(length = 500)
-  private String               description      = "";
+  @ManyToOne(cascade = {CascadeType.ALL})
+  private InternationalizedString description      = new InternationalizedString( );
   /** The family have the list of all {@link GlobalVariable}s included in the theme. */
 
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "globalVariablesIndex")
   @JoinColumn(name = "variableFamily_id", nullable = false)
-  private List<GlobalVariable> globalVariables  = new ArrayList<GlobalVariable>( );
+  private List<GlobalVariable>    globalVariables  = new ArrayList<GlobalVariable>( );
 
   protected VariableFamily( )
     {}
@@ -113,26 +116,61 @@ public class VariableFamily implements Serializable
       throw new NullPointerException( );
     }
 
-  /**
-   * Returns the description of the family.
-   * 
-   * @return Returns the description.
-   */
-  public String getDescription( )
+  public InternationalizedString getInternationalizedDescription( )
     {
     return this.description;
     }
 
   /**
-   * Sets a new description to the family.
+   * Returns the description of this Variable Family.
    * 
-   * @param description The description to set.
-   * @throws NullPointerException If the description is <code>null</code>.
+   * @return the description of this Variable Family for the default language.
+   * @see InternationalizedString#getString()
+   */
+  public String getDescription( )
+    {
+    return this.description.getString( );
+    }
+
+  /**
+   * Returns the description of this Variable Family for the given language.
+   * 
+   * @param locale the language of the Variable Family to be returned.
+   * @return the description of this Variable Family for the given language.
+   * @see InternationalizedString#getString(Locale)
+   */
+  public String getDescription( Locale locale )
+    {
+    return this.description.getString( locale );
+    }
+
+  /**
+   * Sets the description of this Variable Family. The description must be non <code>null</code>, otherwise a {@link NullPointerException} is
+   * thrown.
+   * 
+   * @param description the description of this Variable Family.
+   * @throws NullPointerException if the description is <code>null</code>.
    */
   public void setDescription( String description )
     {
     if( description != null )
-      this.description = description;
+      this.description.setString( description );
+    else
+      throw new NullPointerException( );
+    }
+
+  /**
+   * Sets the description of this Variable Family for the given language. The language and description must be non <code>null</code>,
+   * otherwise a {@link NullPointerException} is thrown.
+   * 
+   * @param locale the language of the description to be set.
+   * @param description the description of this Variable Family.
+   * @throws NullPointerException if the language or description are <code>null</code>.
+   */
+  public void setDescription( Locale locale, String description )
+    {
+    if( description != null )
+      this.description.setString( locale, description );
     else
       throw new NullPointerException( );
     }

@@ -27,9 +27,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -56,33 +56,33 @@ public class Questionnaire extends QuestionnaireElement
   /**
    * 
    */
-  private static final long serialVersionUID = -357629851050021121L;
+  private static final long       serialVersionUID = -357629851050021121L;
   /** A questionnaire has a title as provided by the owner or maintenance unit. */
-  @Column(length = 250)
-  private String            title            = "";
+  @ManyToOne(cascade = {CascadeType.ALL})
+  private InternationalizedString title            = new InternationalizedString( );
   /**
    * Detailed description of the questionnaire. The questionnaire description typically describes the underlying concept of the
    * questionnaire and basic principles.
    */
-  @Column(length = 500)
-  private String            description      = "";
+  @ManyToOne(cascade = {CascadeType.ALL})
+  private InternationalizedString description      = new InternationalizedString( );
 
   /** A questionnaire may have its content organized in pages. */
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "pageIndex")
   // @JoinColumn(name = "questionnaire_page_id")
   @JoinColumn(name = "questionnaire_page_id")
-  private List<Feed>        pageFeeds        = new ArrayList<Feed>( );
+  private List<Feed>              pageFeeds        = new ArrayList<Feed>( );
   /** A questionnaire may have its content organized in sections. */
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
   @IndexColumn(name = "sectionIndex")
   @JoinColumn(name = "questionnaire_section_id")
-  private List<SectionFeed> sectionFeeds     = new ArrayList<SectionFeed>( );
+  private List<SectionFeed>       sectionFeeds     = new ArrayList<SectionFeed>( );
 
   /** A questionnaire is included in a Study. */
   @ManyToOne
   @JoinColumn(name = "study_id", insertable = false, updatable = false)
-  private Study             study;
+  private Study                   study;
 
 
   protected Questionnaire( )
@@ -106,55 +106,123 @@ public class Questionnaire extends QuestionnaireElement
     }
 
 
-  // }
-  /**
-   * Returns the title of the questionnaire.
-   * 
-   * @return Returns the title.
-   */
-  public String getTitle( )
+  public InternationalizedString getInternationalizedTitle( )
     {
     return this.title;
     }
 
   /**
-   * Sets the title of the Questionnaire.
+   * Returns the title of this Questionnaire.
    * 
-   * @param title The title to set.
-   * @throws NullPointerException If the title is <code>null</code>.
+   * @return the title of this Questionnaire for the default language.
+   * @see InternationalizedString#getString()
+   */
+  public String getTitle( )
+    {
+    return this.title.getString( );
+    }
+
+  /**
+   * Returns the title of this Questionnaire for the given language.
+   * 
+   * @param locale the language of the Questionnaire to be returned.
+   * @return the title of this Questionnaire for the given language.
+   * @see InternationalizedString#getString(Locale)
+   */
+  public String getTitle( Locale locale )
+    {
+    return this.title.getString( locale );
+    }
+
+  /**
+   * Sets the title of this Questionnaire. The title must be non <code>null</code>, otherwise a {@link NullPointerException} is thrown.
+   * 
+   * @param title the title of this Questionnaire.
+   * @throws NullPointerException if the title is <code>null</code>.
    */
   public void setTitle( String title )
     {
     if( title != null )
-      this.title = title;
+      this.title.setString( title );
     else
       throw new NullPointerException( );
     }
 
   /**
-   * Returns the description of the questionnaire.
+   * Sets the title of this Questionnaire for the given language. The language and title must be non <code>null</code>, otherwise a
+   * {@link NullPointerException} is thrown.
    * 
-   * @return Returns the description.
+   * @param locale the language of the title to be set.
+   * @param title the title of this Questionnaire.
+   * @throws NullPointerException if the language or title are <code>null</code>.
    */
-  public String getDescription( )
+  public void setTitle( Locale locale, String title )
+    {
+    if( title != null )
+      this.title.setString( locale, title );
+    else
+      throw new NullPointerException( );
+    }
+
+
+  public InternationalizedString getInternationalizedDescription( )
     {
     return this.description;
     }
 
   /**
-   * Sets the description of the Questionnaire.
+   * Returns the description of this Questionnaire.
    * 
-   * @param description The description to set.
-   * @throws NullPointerException If the description is <code>null</code>
+   * @return the description of this Questionnaire for the default language.
+   * @see InternationalizedString#getString()
+   */
+  public String getDescription( )
+    {
+    return this.description.getString( );
+    }
+
+  /**
+   * Returns the description of this Questionnaire for the given language.
+   * 
+   * @param locale the language of the Questionnaire to be returned.
+   * @return the description of this Questionnaire for the given language.
+   * @see InternationalizedString#getString(Locale)
+   */
+  public String getDescription( Locale locale )
+    {
+    return this.description.getString( locale );
+    }
+
+  /**
+   * Sets the description of this Questionnaire. The description must be non <code>null</code>, otherwise a {@link NullPointerException} is
+   * thrown.
+   * 
+   * @param description the description of this Questionnaire.
+   * @throws NullPointerException if the description is <code>null</code>.
    */
   public void setDescription( String description )
     {
     if( description != null )
-      this.description = description;
+      this.description.setString( description );
     else
       throw new NullPointerException( );
     }
 
+  /**
+   * Sets the description of this Questionnaire for the given language. The language and description must be non <code>null</code>,
+   * otherwise a {@link NullPointerException} is thrown.
+   * 
+   * @param locale the language of the description to be set.
+   * @param description the description of this Questionnaire.
+   * @throws NullPointerException if the language or description are <code>null</code>.
+   */
+  public void setDescription( Locale locale, String description )
+    {
+    if( description != null )
+      this.description.setString( locale, description );
+    else
+      throw new NullPointerException( );
+    }
   /**
    * Adds a new {@link Element} to he Questionnaire.
    * 
