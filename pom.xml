@@ -322,9 +322,9 @@
         <version>0.1-SNAPSHOT</version>
       </dependency>
       <dependency>
-        <groupId>com.sun</groupId>
-        <artifactId>jlfgr</artifactId>
-        <version>1.0</version>
+        <groupId>org.tango-project</groupId>
+        <artifactId>tango-icon-theme</artifactId>
+        <version>0.7.1</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
