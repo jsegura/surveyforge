@@ -60,7 +60,7 @@ public class RegisterData implements Serializable
   @javax.persistence.Version
   private int               lockingVersion;
 
-  @OneToOne
+  @OneToOne(fetch = FetchType.LAZY)
   private Register          register;
 
   @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
@@ -100,34 +100,37 @@ public class RegisterData implements Serializable
   /**
    * @param objectData The objectData to .
    */
-  protected void addObjectData( ObjectData objectData )
+  public void addObjectData( ObjectData objectData )
     {
-    if( objectData != null )
-      {
-      if( this.register.getKey( ).size( ) == 0 ) throw new IllegalArgumentException( );
-      ArrayList<Integer> illegalList = new ArrayList<Integer>( );
-      // TODO: Check validation rules and throw Exceptions if needed
+    if( objectData.getRegisterData( ) != null ) objectData.getRegisterData( ).removeObjectData( objectData );
+    // TODO: Add data validation
+    this.objectData.add( objectData );
+    }
 
-      if( this.register.getComponentElements( ).size( ) != objectData.getComponentData( ).size( ) )
-        throw new IllegalArgumentException( );
-      int index = 0;
-      for( Data data : objectData.getComponentData( ) )
-        {
-        if( !this.register.getComponentElements( ).get( index ).getValueDomain( ).isValid( data.getData( ) ) )
-          illegalList.add( index ); // TODO: Elaborate on this Exception
-        index++;
-        }
-      if( illegalList.size( ) == 0 ) this.objectData.add( objectData );
-      }
+  /**
+   * @param objectData
+   */
+  public void checkObjectData( ObjectData objectData )
+    {
+    // TODO: Check validation rules and throw Exceptions if needed
 
-    else
-      throw new NullPointerException( );
+    // TODO: Later activate this, deactivated to test load/save
+    // if( this.register.getKey( ).size( ) == 0 ) throw new IllegalArgumentException( );
+    // if( this.register.getComponentElements( ).size( ) != objectData.getComponentData( ).size( ) )
+    // throw new IllegalArgumentException( );
+    // int index = 0;
+    // for( Data data : objectData.getComponentData( ) )
+    // {
+    // if( !this.register.getComponentElements( ).get( index ).getValueDomain( ).isValid( data.getData( ) ) )
+    // illegalList.add( index ); // TODO: Elaborate on this Exception
+    // index++;
+    // }
     }
 
   /**
    * @param objectData The objectData to .
    */
-  protected void removeObjectData( ObjectData objectData )
+  public void removeObjectData( ObjectData objectData )
     {
     if( objectData != null )
       this.objectData.remove( objectData );

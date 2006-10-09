@@ -50,8 +50,8 @@ import org.hibernate.annotations.IndexColumn;
 @Entity
 public class Data implements Serializable
   {
-  private static final long serialVersionUID = 0L;
-
+  private static final long serialVersionUID = -2555299258079055098L;
+  
   @SuppressWarnings("unused")
   @Id
   @Column(length = 50)
@@ -75,7 +75,7 @@ public class Data implements Serializable
   private boolean           answered;
   private boolean           applicable;
 
-  @ManyToOne(cascade = {CascadeType.ALL})
+  @ManyToOne
   @JoinColumn(name = "enclosingData_id", insertable = false, updatable = false)
   private Data              enclosingData;
 

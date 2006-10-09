@@ -56,7 +56,7 @@ public class ObjectData extends Data
   /**
    * @param registerData The registerData to set.
    */
-  public void setRegisterData( RegisterData registerData )
+  protected void setRegisterData( RegisterData registerData )
     {
     if( registerData != null )
       {
