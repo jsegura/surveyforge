@@ -31,7 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityManager;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -49,10 +50,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
-import javax.swing.plaf.ColorUIResource;
 
 import org.surveyforge.classification.Item;
 import org.surveyforge.classification.Level;
@@ -79,19 +77,18 @@ import com.jgoodies.forms.layout.FormLayout;
 /**
  * @author jgonzalez
  */
-public class QuestionnaireFrame extends JFrame
+public class Frame extends JFrame
   {
   private static final long                     serialVersionUID      = -2135625525102812393L;
 
   private static final ResourceBundle           RESOURCE_BUNDLE       = ResourceBundle
-                                                                          .getBundle( "org.surveyforge.runner.QuestionnaireRunnerResourceBundle" );
+                                                                          .getBundle( "org.surveyforge.runner.RunnerResourceBundle" );
 
-  private QuestionnaireRunnerController         controller;
+  private Controller                            controller;
 
   private Map<QuestionnaireElement, JComponent> elementToComponentMap = new HashMap<QuestionnaireElement, JComponent>( );
   private Map<JComponent, QuestionnaireElement> componentToElementMap = new HashMap<JComponent, QuestionnaireElement>( );
 
-  private EntityManagerFactory                  entityManagerFactory;
   private Questionnaire                         questionnaire;
   private ObjectData                            objectData;
   private PresentationModel                     dataModel;
@@ -101,16 +98,18 @@ public class QuestionnaireFrame extends JFrame
    * @param questionnaire
    * @throws IOException
    */
-  public QuestionnaireFrame( EntityManagerFactory entityManagerFactory, Questionnaire questionnaire ) throws IOException
+  public Frame( EntityManager entityManager, Questionnaire questionnaire ) throws IOException
     {
     super( "QuestionnaireRunner - " + questionnaire.getTitle( ) );
 
-    this.entityManagerFactory = entityManagerFactory;
     this.questionnaire = questionnaire;
 
-    this.setObjectData( questionnaire.getRegister( ).getRegisterData( ).createEmptyObjectData( ) );
+    this.setObjectData( null ); // Create a presentation model for correct action instantiation
 
-    this.controller = new QuestionnaireRunnerController( this.entityManagerFactory, this );
+    this.controller = new Controller( entityManager, this );
+    ActionMap actions = this.controller.getActions( );
+    Controller.NewSampleAction newSampleAction = (Controller.NewSampleAction) actions.get( Controller.NEW_SAMPLE_ACTION_NAME );
+    newSampleAction.newSample( );
 
     this.createUI( );
     }
@@ -182,11 +181,17 @@ public class QuestionnaireFrame extends JFrame
     JMenuBar menuBar = new JMenuBar( );
 
     // Sample menu
-    JMenu sampleMenu = new JMenu( QuestionnaireFrame.RESOURCE_BUNDLE.getString( "sampleMenu.title" ) );
-    sampleMenu.setMnemonic( (Integer) QuestionnaireFrame.RESOURCE_BUNDLE.getObject( "sampleMenu.mnemonic" ) );
-    sampleMenu.add( new JMenuItem( this.controller.getActions( ).get( QuestionnaireRunnerController.NEW_SAMPLE_ACTION_NAME ) ) );
-    sampleMenu.add( new JMenuItem( this.controller.getActions( ).get( QuestionnaireRunnerController.SAVE_SAMPLE_ACTION_NAME ) ) );
+    JMenu sampleMenu = new JMenu( Frame.RESOURCE_BUNDLE.getString( "sampleMenu.title" ) );
+    sampleMenu.setMnemonic( (Integer) Frame.RESOURCE_BUNDLE.getObject( "sampleMenu.mnemonic" ) );
+    sampleMenu.add( new JMenuItem( this.controller.getActions( ).get( Controller.NEW_SAMPLE_ACTION_NAME ) ) );
+    sampleMenu.add( new JMenuItem( this.controller.getActions( ).get( Controller.SAVE_SAMPLE_ACTION_NAME ) ) );
     menuBar.add( sampleMenu );
+    sampleMenu.addSeparator( );
+    sampleMenu.add( new JMenuItem( this.controller.getActions( ).get( Controller.FIRST_SAMPLE_ACTION_NAME ) ) );
+    sampleMenu.add( new JMenuItem( this.controller.getActions( ).get( Controller.PREVIOUS_SAMPLE_ACTION_NAME ) ) );
+    sampleMenu.add( new JMenuItem( this.controller.getActions( ).get( Controller.NEXT_SAMPLE_ACTION_NAME ) ) );
+    sampleMenu.add( new JMenuItem( this.controller.getActions( ).get( Controller.LAST_SAMPLE_ACTION_NAME ) ) );
+
 
     this.setJMenuBar( menuBar );
     }
@@ -195,12 +200,27 @@ public class QuestionnaireFrame extends JFrame
     {
     JToolBar toolbar = new JToolBar( );
 
-    JButton newButton = new JButton( this.controller.getActions( ).get( QuestionnaireRunnerController.NEW_SAMPLE_ACTION_NAME ) );
+    JButton newButton = new JButton( this.controller.getActions( ).get( Controller.NEW_SAMPLE_ACTION_NAME ) );
     newButton.setText( "" );
     toolbar.add( newButton );
-    JButton saveButton = new JButton( this.controller.getActions( ).get( QuestionnaireRunnerController.SAVE_SAMPLE_ACTION_NAME ) );
+    JButton saveButton = new JButton( this.controller.getActions( ).get( Controller.SAVE_SAMPLE_ACTION_NAME ) );
     saveButton.setText( "" );
     toolbar.add( saveButton );
+
+    toolbar.addSeparator( );
+
+    JButton firstButton = new JButton( this.controller.getActions( ).get( Controller.FIRST_SAMPLE_ACTION_NAME ) );
+    firstButton.setText( "" );
+    toolbar.add( firstButton );
+    JButton previousButton = new JButton( this.controller.getActions( ).get( Controller.PREVIOUS_SAMPLE_ACTION_NAME ) );
+    previousButton.setText( "" );
+    toolbar.add( previousButton );
+    JButton nextButton = new JButton( this.controller.getActions( ).get( Controller.NEXT_SAMPLE_ACTION_NAME ) );
+    nextButton.setText( "" );
+    toolbar.add( nextButton );
+    JButton lastButton = new JButton( this.controller.getActions( ).get( Controller.LAST_SAMPLE_ACTION_NAME ) );
+    lastButton.setText( "" );
+    toolbar.add( lastButton );
 
     this.getContentPane( ).add( toolbar, BorderLayout.NORTH );
     }
@@ -284,7 +304,7 @@ public class QuestionnaireFrame extends JFrame
     // QuestionnaireRunner.TempQuestionnaire newData = new QuestionnaireRunner.TempQuestionnaire( );
     // newData.setAnyoNacimiento( 1950 );
     // newData.setMesNacimiento( 8 );
-    // QuestionnaireFrame.this.dataModel.setBean( newData );
+    // Frame.this.dataModel.setBean( newData );
     // }
     // } );
     // pageSectionPanelBuilder.nextLine( );
@@ -300,7 +320,7 @@ public class QuestionnaireFrame extends JFrame
     if( element.getRegisterDataElement( ).getComponentElements( ).isEmpty( ) )
       {
       // Simple question
-      String propertyName = QuestionnaireFrame.computePropertyName( element.getRegisterDataElement( ) );
+      String propertyName = Frame.computePropertyName( element.getRegisterDataElement( ) );
       ValueDomain valueDomain = element.getRegisterDataElement( ).getValueDomain( );
       if( valueDomain instanceof QuantityValueDomain )
         {
@@ -321,8 +341,7 @@ public class QuestionnaireFrame extends JFrame
         JPanel classificationPanel = new JPanel( new FlowLayout( FlowLayout.LEFT ) );
         // JComboBox classificationCombo = new JComboBox( classificationValueDomain.getLevel( ).getItems( ).toArray( ) );
         JComboBox classificationCombo = new JComboBox( new ComboBoxAdapter( classificationValueDomain.getLevel( ).getItems( ),
-            new QuestionnaireFrame.ClassificationConverter( classificationValueDomain.getLevel( ), this.dataModel
-                .getModel( propertyName ) ) ) );
+            new Frame.ClassificationConverter( classificationValueDomain.getLevel( ), this.dataModel.getModel( propertyName ) ) ) );
 
         // JTextField classificationCode = new JTextField( 5 );
         JTextField classificationCode = BasicComponentFactory.createTextField( this.dataModel.getModel( propertyName ) );

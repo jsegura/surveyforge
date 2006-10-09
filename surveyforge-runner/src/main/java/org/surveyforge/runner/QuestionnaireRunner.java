@@ -27,6 +27,7 @@ import java.io.IOException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.FlushModeType;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.swing.JFrame;
@@ -52,7 +53,7 @@ public class QuestionnaireRunner
       {
       // Likely PlasticXP is not in the class path; ignore.
       }
-    
+
     // Default selection color
     UIDefaults defaults = UIManager.getDefaults( );
     defaults.put( "TextField.selectionBackground", new ColorUIResource( Color.ORANGE ) );
@@ -60,11 +61,12 @@ public class QuestionnaireRunner
 
     EntityManager entityManager = null;
     EntityTransaction transaction = null;
-    QuestionnaireFrame questionnaireFrame = null;
+    Frame frame = null;
     try
       {
       EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory( "hivudvp" );
       entityManager = entityManagerFactory.createEntityManager( );
+      entityManager.setFlushMode( FlushModeType.COMMIT );
       transaction = entityManager.getTransaction( );
       transaction.begin( );
 
@@ -72,17 +74,16 @@ public class QuestionnaireRunner
       questionnaireQuery.setParameter( "questionnaireIdentifier", args[0] );
       if( !questionnaireQuery.getResultList( ).isEmpty( ) )
         {
-        questionnaireFrame = new QuestionnaireFrame( entityManagerFactory, (Questionnaire) questionnaireQuery.getResultList( ).get( 0 ) );
-        questionnaireFrame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-        questionnaireFrame.pack( );
+        frame = new Frame( entityManager, (Questionnaire) questionnaireQuery.getResultList( ).get( 0 ) );
+        frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
+        frame.pack( );
         }
       }
     finally
       {
-      if( transaction != null ) transaction.commit( );
-      if( entityManager != null ) entityManager.close( );
+      if( transaction != null && transaction.isActive( ) ) transaction.commit( );
       }
 
-    if( questionnaireFrame != null ) questionnaireFrame.setVisible( true );
+    if( frame != null ) frame.setVisible( true );
     }
   }
