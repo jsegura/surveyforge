@@ -82,7 +82,7 @@ public aspect JavaBeanAspect
     }
 
   pointcut javaBeanCreation( JavaBean bean ) : target( bean ) && execution( (@Observable *).new(..) );
-  after( JavaBean bean ) returning() : javaBeanCreation( bean )
+  before( JavaBean bean ) : javaBeanCreation( bean )
     {
     bean.pcs = new PropertyChangeSupport( bean );
     bean.vcs = new VetoableChangeSupport( bean );
