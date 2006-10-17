@@ -51,6 +51,7 @@
     <mapping class="org.surveyforge.core.metadata.domain.StringValueDomain" />
     <mapping class="org.surveyforge.core.metadata.domain.AbstractValueDomain" />
     <mapping class="org.surveyforge.core.metadata.domain.StructuredValueDomain" />
+    <mapping class="org.surveyforge.core.metadata.domain.DateValueDomain" />
 
     <!-- package org.surveyforge.core.data -->
     <mapping class="org.surveyforge.core.data.RegisterData" />
