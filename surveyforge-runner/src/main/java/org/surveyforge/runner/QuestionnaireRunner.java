@@ -64,7 +64,7 @@ public class QuestionnaireRunner
     Frame frame = null;
     try
       {
-      EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory( "hivudvp" );
+      EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory( "surveyforge" );
       entityManager = entityManagerFactory.createEntityManager( );
       entityManager.setFlushMode( FlushModeType.COMMIT );
       transaction = entityManager.getTransaction( );
