@@ -103,7 +103,7 @@
       <classifier>jdk15</classifier>
     </dependency>
     <dependency>
-      <groupId>hibernate</groupId>
+      <groupId>org.hibernate</groupId>
       <artifactId>hibernate-entitymanager</artifactId>
     </dependency>
   </dependencies>

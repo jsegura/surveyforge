@@ -90,7 +90,7 @@
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh-external</artifactId>
-        <version>1.0-alpha-6</version>
+        <version>1.0-beta-1</version>
       </extension>
     </extensions>
     <pluginManagement>
@@ -111,7 +111,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>aspectj-maven-plugin</artifactId>
-          <!--<version>1.0-beta-1</version>-->
+          <version>1.0-beta-2</version>
           <configuration>
             <source>1.5</source>
             <target>1.5</target>
@@ -174,6 +174,18 @@
       <url>http://labs.openinput.com/maven/</url>
     </repository>
   </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>Maven Snapshots</id>
+      <url>http://snapshots.maven.codehaus.org/maven2/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </pluginRepository>
+  </pluginRepositories>
   <reporting>
     <plugins>
       <plugin>
@@ -290,25 +302,13 @@
       <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-annotations</artifactId>
-        <version>3.2.0.cr1</version>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.persistence</groupId>
-            <artifactId>ejb</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>3.2.0.ga</version>
       </dependency>
       <dependency>
-        <groupId>hibernate</groupId>
+        <groupId>org.hibernate</groupId>
         <artifactId>hibernate-entitymanager</artifactId>
-        <version>3.1beta1</version>
+        <version>3.2.0.ga</version>
         <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.persistence</groupId>
-            <artifactId>ejb</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>postgresql</groupId>

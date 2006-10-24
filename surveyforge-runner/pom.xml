@@ -65,12 +65,10 @@
       <groupId>javax.persistence</groupId>
       <artifactId>persistence-api</artifactId>
     </dependency>
-    <!-- 
     <dependency>
-      <groupId>hibernate</groupId>
+      <groupId>org.hibernate</groupId>
       <artifactId>hibernate-entitymanager</artifactId>
     </dependency>
-    -->
     <dependency>
       <groupId>postgresql</groupId>
       <artifactId>postgresql</artifactId>
