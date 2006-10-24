@@ -36,6 +36,7 @@
     <class>org.surveyforge.core.metadata.domain.StringValueDomain</class>
     <class>org.surveyforge.core.metadata.domain.StructuredValueDomain</class>
     <class>org.surveyforge.core.metadata.domain.AbstractValueDomain</class>
+    <class>org.surveyforge.core.metadata.domain.DateValueDomain</class>
                                         
     <class>org.surveyforge.core.data.RegisterData</class>
     <class>org.surveyforge.core.data.ObjectData</class>
