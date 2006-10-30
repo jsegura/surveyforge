@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+  version="1.0">
+  <persistence-unit name="surveyforge">
+    <class>org.surveyforge.util.InternationalizedString</class>
+
+    <class>org.surveyforge.classification.Family</class>
+    <class>org.surveyforge.classification.Classification</class>
+    <class>org.surveyforge.classification.Version</class>
+    <class>org.surveyforge.classification.Level</class>
+    <class>org.surveyforge.classification.Item</class>
+
+    <class>org.surveyforge.core.survey.Study</class>
+    <class>org.surveyforge.core.survey.Questionnaire</class>
+    <class>org.surveyforge.core.survey.QuestionnaireElement</class>
+    <class>org.surveyforge.core.survey.Question</class>
+    <class>org.surveyforge.core.survey.Feed</class>
+    <class>org.surveyforge.core.survey.SectionFeed</class>
+
+    <class>org.surveyforge.core.metadata.ValidationRule</class>
+    <class>org.surveyforge.core.metadata.Register</class>
+    <class>org.surveyforge.core.metadata.RegisterDataElement</class>
+    <class>org.surveyforge.core.metadata.ConceptualDataElement</class>
+    <class>org.surveyforge.core.metadata.DataElement</class>
+    <class>org.surveyforge.core.metadata.QuestionDataElement</class>
+    <class>org.surveyforge.core.metadata.ValueDomain</class>
+    <class>org.surveyforge.core.metadata.ObjectVariable</class>
+    <class>org.surveyforge.core.metadata.GlobalVariable</class>
+    <class>org.surveyforge.core.metadata.VariableFamily</class>
+    <class>org.surveyforge.core.metadata.StatisticalObjectType</class>
+    
+    <class>org.surveyforge.core.metadata.domain.ClassificationValueDomain</class> 
+    <class>org.surveyforge.core.metadata.domain.LogicalValueDomain</class>
+    <class>org.surveyforge.core.metadata.domain.QuantityValueDomain</class>
+    <class>org.surveyforge.core.metadata.domain.StringValueDomain</class>
+    <class>org.surveyforge.core.metadata.domain.StructuredValueDomain</class>
+    <class>org.surveyforge.core.metadata.domain.AbstractValueDomain</class>
+    <class>org.surveyforge.core.metadata.domain.DateValueDomain</class>
+                                        
+    <class>org.surveyforge.core.data.RegisterData</class>
+    <class>org.surveyforge.core.data.ObjectData</class>
+    <class>org.surveyforge.core.data.Data</class>
+
+    <properties>
+      <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
+      <property name="hibernate.connection.driver_class" value="org.postgresql.Driver" />
+      <property name="hibernate.connection.url" value="jdbc:postgresql://localhost/surveyforge" />
+      <property name="hibernate.connection.username" value="postgres" />
+      <property name="hibernate.connection.password" value="postgres" />
+    </properties>
+  </persistence-unit>
+</persistence>
